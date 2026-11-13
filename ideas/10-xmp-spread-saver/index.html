@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="../../assets/js/gate.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XMP Spread Saver · XMTrading</title>
+<link rel="stylesheet" href="../../assets/css/xm.css">
+<style>
+/* =====================================================================
+   IDEA 10 · XMP Spread Saver (Client Loyalty)
+   PWA order ticket with an "XMP spread relief" card, then position and history.
+   Layout and values follow the Figma frame on slide 13 of the 2027 deck.
+   ===================================================================== */
+body { background: #f5f5f5; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 96px; }
+
+/* ---------- head ---------- */
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 22px 0 14px; }
+.head h1 { font-size: clamp(26px, 3vw, 36px); line-height: 1.1; letter-spacing: -.025em; margin-top: 4px; }
+.head p { color: var(--ink-2); max-width: 640px; font-size: 14.5px; margin-top: 6px; }
+.head .pill-tabs { box-shadow: var(--sh-s); }
+.head .pill-tabs button { padding: 10px 20px; transition: background .15s, color .15s; }
+.ctl { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.who { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--mut); }
+.who .pill-tabs button { padding: 7px 14px; font-size: 13px; }
+.cap { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 11px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+.cap .n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.cap b { color: var(--ink); }
+
+/* ---------- PWA frame ---------- */
+.app { display: grid; grid-template-columns: 64px 290px minmax(0, 1fr) 344px; grid-template-rows: 60px 1fr; height: 760px; background: #fff; border: 1px solid var(--line-2); border-radius: 20px; overflow: hidden; box-shadow: var(--sh-l); }
+.ap-top { grid-column: 1 / -1; display: flex; align-items: center; gap: 18px; padding: 0 20px; border-bottom: 1px solid var(--line); }
+.ap-top .xm-logo svg { height: 22px; }
+.ap-top .sp { flex: 1; }
+.ap-top .acc { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.ap-top .acc i { width: 7px; height: 7px; border-radius: 50%; background: #1d2024; }
+.ap-top .acc b { font-weight: 600; }
+.tier { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; background: #fdf0c0; color: #8a6a00; }
+.tier.gold { background: #fff3d6; color: #a76500; }
+.ap-top .ico { width: 18px; height: 18px; color: var(--mut); }
+.pwa-rail { border-right: 1px solid var(--line); justify-content: flex-start; gap: 10px; padding-top: 18px; }
+.pwa-rail a { cursor: default; }
+
+/* watchlist */
+.wl { border-right: 1px solid var(--line); overflow: auto; min-height: 0; }
+.wl h4 { font-size: 14px; font-weight: 500; color: var(--mut); padding: 16px 18px 8px; }
+.wr { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; border: 0; background: transparent; padding: 12px 18px; cursor: pointer; border-bottom: 1px solid var(--line); }
+.wr:hover { background: var(--bg); } .wr.on { background: var(--g-l); }
+.wr .lg { width: 34px; height: 34px; border-radius: 50%; color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
+.wr .tx { flex: 1; min-width: 0; } .wr .tx b { display: block; font-size: 14px; } .wr .tx small { display: block; font-size: 11.5px; color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wr .pr { text-align: right; font-size: 13.5px; font-weight: 600; } .wr .pr small { display: block; font-size: 12px; font-weight: 500; }
+
+/* chart */
+.ch { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-right: 1px solid var(--line); }
+.ch-h { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
+.ch-h .lg { width: 38px; height: 38px; border-radius: 50%; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+.ch-h b { font-size: 16px; } .ch-h small { display: block; font-size: 12px; } .ch-h .tf { margin-left: auto; font-size: 12.5px; color: var(--mut); }
+.ch-b { flex: 1; min-height: 0; position: relative; }
+.ch-b svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ch-tb { display: flex; gap: 16px; padding: 8px 18px; font-size: 12.5px; color: var(--ink-2); border-bottom: 1px solid var(--line); }
+.ch-tb span { font-weight: 500; } .ch-tb span.dim { color: var(--mut); }
+
+/* ticket */
+.tk { padding: 14px 16px 16px; overflow: auto; min-height: 0; display: flex; flex-direction: column; gap: 9px; background: #fff; }
+.tk > * { flex: none; }
+.oc { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 500; }
+.sw { position: relative; width: 44px; height: 26px; border-radius: 999px; background: #d6d9de; border: 0; padding: 0; transition: background .2s; flex: none; cursor: pointer; }
+.sw::after { content: ''; position: absolute; left: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform .2s; }
+.sw.on { background: var(--up); } .sw.on::after { transform: translateX(18px); } .sw[disabled] { opacity: .5; cursor: default; }
+.qt { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: var(--soft); border-radius: 12px; padding: 5px; }
+.qt button { border: 0; border-radius: 9px; padding: 8px 12px; text-align: left; background: transparent; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--mut); cursor: pointer; transition: background .15s, color .15s; }
+.qt button b { display: block; font-size: 17px; letter-spacing: 0; color: var(--ink); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.qt button.on { background: #fff; box-shadow: var(--sh-s); }
+.qt button.buy.on { background: var(--up); color: #e8fff4; } .qt button.buy.on b { color: #fff; }
+.qt button.sell.on { background: var(--dn); color: #ffe9ea; } .qt button.sell.on b { color: #fff; }
+.qs { display: grid; grid-template-columns: 1fr 1fr; background: var(--soft); border-radius: 10px; padding: 3px; font-size: 12.5px; font-weight: 600; text-align: center; }
+.qs span { padding: 6px; border-radius: 8px; color: var(--mut); } .qs span.on { background: #fff; color: var(--ink); box-shadow: var(--sh-s); }
+.amt { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); padding: 6px; }
+.amt > div { flex: 1; padding: 2px 8px; } .amt small { display: block; font-size: 11px; color: var(--mut); } .amt b { font-size: 19px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.amt button, .stp button { width: 36px; height: 36px; border-radius: 10px; border: 0; background: #fff; box-shadow: var(--sh-s); font-size: 18px; line-height: 1; cursor: pointer; flex: none; }
+.amt button:hover, .stp button:hover:not(:disabled) { background: var(--soft); } .stp button:disabled { opacity: .35; cursor: default; }
+.mrg { font-size: 12px; color: var(--ink-2); } .mrg i { display: block; height: 4px; border-radius: 4px; background: var(--soft); margin-top: 5px; } .mrg i span { display: block; height: 100%; width: 6%; background: var(--up); border-radius: 4px; }
+.mrg .r { display: flex; justify-content: space-between; }
+
+/* XMP spread relief card */
+.xc { border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; background: #fff; transition: border-color .2s, box-shadow .2s; }
+.xc.on { border-color: rgba(0, 132, 84, .45); box-shadow: 0 0 0 4px rgba(0, 132, 84, .08); }
+.xh { display: flex; align-items: center; gap: 10px; }
+.xh .xl { width: 30px; height: 30px; border-radius: 50%; background: #fcd34d; color: #1d2024; display: grid; place-items: center; font-weight: 800; font-size: 13px; flex: none; }
+.xh .tt { flex: 1; min-width: 0; } .xh .tt b { display: block; font-size: 14px; line-height: 1.2; } .xh .tt .tier { margin-top: 3px; }
+.xb { margin-top: 10px; }
+.xb .bal { font-size: 12.5px; color: var(--ink-2); margin-bottom: 8px; } .xb .bal b { color: var(--ink); }
+.xb .use { font-size: 12.5px; font-weight: 600; margin-bottom: 6px; }
+.stp { display: flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 12px; padding: 5px; } .stp b { flex: 1; text-align: center; font-weight: 500; font-size: 15px; font-variant-numeric: tabular-nums; }
+.rt { font-size: 11.5px; color: var(--mut); margin: 6px 2px 8px; }
+.cal { margin: 0; padding-top: 8px; border-top: 1px solid var(--line); display: grid; gap: 5px; font-size: 12px; color: var(--ink-2); }
+.cal div { display: flex; justify-content: space-between; } .cal dt, .cal dd { margin: 0; } .cal dd { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+.cal .cr dd { color: var(--g); } .cal .net { border-top: 1px solid var(--line); padding-top: 6px; margin-top: 2px; font-size: 13px; font-weight: 700; color: var(--ink); } .cal .net dd { color: var(--g); font-size: 14px; }
+.qn { font-size: 11px; color: var(--mut); line-height: 1.4; margin-top: 8px; }
+.lock { display: flex; gap: 10px; align-items: flex-start; margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--bg); font-size: 12.5px; color: var(--ink-2); line-height: 1.45; } .lock svg { width: 18px; height: 18px; flex: none; color: var(--mut); margin-top: 1px; }
+.lock a { color: var(--g); font-weight: 600; }
+.tpsl { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 12px; background: var(--bg); font-size: 13px; font-weight: 500; }
+.place { height: 50px; border-radius: 12px; border: 1.5px solid #0f8a57; background: var(--up); color: #fff; font-size: 15.5px; font-weight: 600; cursor: pointer; transition: transform .12s, box-shadow .15s; font-variant-numeric: tabular-nums; }
+.place:hover { box-shadow: 0 8px 22px rgba(18, 165, 106, .4); } .place:active { transform: scale(.99); } .place.sell { background: var(--dn); border-color: #b9242c; }
+.fn { font-size: 10.5px; color: var(--mut); line-height: 1.4; margin: 0; }
+
+/* position */
+.ps h3 { font-size: 15px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pl { font-size: 34px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin: 10px 0 2px; } .pl.up { color: var(--up); } .pl.dn { color: var(--dn); }
+.kvs { display: grid; gap: 0; border-top: 1px solid var(--line); margin-top: 10px; } .kvs div { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-2); } .kvs b { color: var(--ink); font-variant-numeric: tabular-nums; text-align: right; }
+.resv { margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: var(--g-l); font-size: 12.5px; line-height: 1.5; color: #0b5b3b; } .resv b { color: #064c31; }
+.btn-close { height: 46px; border-radius: 12px; border: 1.5px solid var(--ink); background: #fff; font-weight: 600; font-size: 14.5px; cursor: pointer; } .btn-close:hover { background: var(--ink); color: #fff; }
+.empty { text-align: center; color: var(--mut); font-size: 13.5px; padding: 26px 10px; }
+
+/* history */
+.hist { padding: 18px 20px; overflow: auto; flex: 1; min-height: 0; }
+.hist h3 { font-size: 18px; letter-spacing: -.01em; } .hist .sub { font-size: 13px; color: var(--mut); margin: 2px 0 14px; }
+.ht { width: 100%; border-collapse: collapse; font-size: 13px; } .ht th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--mut); font-weight: 600; padding: 8px 8px; border-bottom: 1px solid var(--line); }
+.ht td { padding: 12px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; font-variant-numeric: tabular-nums; }
+.ht .r { text-align: right; } .ht th.r { text-align: right; }
+.ht tr.new td { background: #f0fbf6; } .ht .xc2 { color: var(--g); font-weight: 600; } .ht .nn { color: var(--mut); }
+.ht .ib { display: flex; align-items: center; gap: 8px; font-weight: 600; } .ht .ib i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 9px; font-style: normal; font-weight: 700; }
+.ht small { color: var(--mut); display: block; font-size: 11px; }
+.sum { display: grid; gap: 10px; }
+.sc2 { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; } .sc2 small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mut); } .sc2 b { display: block; font-size: 22px; letter-spacing: -.01em; margin-top: 2px; font-variant-numeric: tabular-nums; } .sc2 p { font-size: 12px; color: var(--mut); margin-top: 4px; line-height: 1.45; }
+.sc2.g { background: var(--g-l); border-color: transparent; } .sc2.g b { color: var(--g); }
+
+@media (max-width: 1100px) { .app { grid-template-columns: 64px 240px minmax(0, 1fr) 330px; } }
+@media (max-width: 980px) {
+  .wrap { padding: 0 14px 90px; }
+  .app { display: flex; flex-direction: column; height: auto; }
+  .pwa-rail, .wl { display: none; }
+  .ch { height: 330px; border-right: 0; flex: none; }
+  .ch.ish { height: auto; }
+  .tk { flex: none; overflow: visible; }
+  .ap-top { height: 56px; flex: none; }
+  .head .pill-tabs { width: 100%; overflow-x: auto; } .head .pill-tabs button { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+  .ht .hide-m { display: none; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <span class="eyebrow">Idea 10 &middot; Client Loyalty</span>
+      <h1>Spend XMPs on the spread.</h1>
+      <p>Eligible Platinum traders see an estimated XMP offset right on the order ticket, choose an amount and confirm. History shows the market result and the XMP credit as separate lines.</p>
+    </div>
+    <div class="ctl">
+      <div class="who">Viewing as
+        <div class="pill-tabs" role="tablist" aria-label="Client tier"><button class="on" role="tab" data-tier="platinum">Platinum</button><button role="tab" data-tier="gold">Gold</button></div>
+      </div>
+      <div class="pill-tabs" role="tablist" aria-label="Steps">
+        <button class="on" role="tab" data-scene="a">1 &middot; Use XMPs</button>
+        <button role="tab" data-scene="b">2 &middot; Trade &amp; close</button>
+        <button role="tab" data-scene="c">3 &middot; Review history</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cap" id="cap"></div>
+
+  <div class="app" id="app">
+    <div class="ap-top">
+      <a class="xm-logo" id="logo" href="#" aria-label="XMTrading"></a>
+      <span class="sp"></span>
+      <span class="acc"><i></i><b id="acc">Real $50,028.01</b></span>
+      <span class="tier" id="tierPill">PLATINUM</span>
+      <span class="sp"></span>
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15L6 17zM10 21h4"/></svg>
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>
+    </div>
+    <nav class="pwa-rail" id="rail" aria-hidden="true"></nav>
+    <aside class="wl" id="wl"></aside>
+    <section class="ch" id="ch"></section>
+    <aside class="tk" id="tk"></aside>
+  </div>
+</main>
+
+<script src="../../assets/js/common.js"></script>
+<script>
+(function () {
+  var $ = XM.$, $$ = XM.$$, esc = XM.esc;
+  var XMP_PER_USD = 15, STEP = 15;
+
+  /* Illustrative quotes; the GOLD levels come from the Figma frame. Not live data. */
+  var INS = [
+    { s: 'GOLD',     n: 'Gold',                  lg: 'Au',  cc: '#d4a017', bid: 4120.53, spr: 0.55,    d: 2, ct: 100,    lev: 1000, amp: .006, tick: .12,  chg: -0.13, seed: 7 },
+    { s: 'SILVER',   n: 'Silver',                lg: 'Ag',  cc: '#8d96a1', bid: 55.045,  spr: 0.03,    d: 3, ct: 5000,   lev: 500,  amp: .012, tick: .006, chg: -1.2,  seed: 11 },
+    { s: 'EURUSD',   n: 'Euro vs US Dollar',     lg: '\u20ac', cc: '#2f62f0', bid: 1.11948, spr: 0.00006, d: 5, ct: 100000, lev: 1000, amp: .0016, tick: .00003, chg: -0.33, seed: 3 },
+    { s: 'GBPUSD',   n: 'Pound vs US Dollar',    lg: '\u00a3', cc: '#1d2024', bid: 1.3371,  spr: 0.00008, d: 5, ct: 100000, lev: 1000, amp: .002, tick: .00004, chg: -0.16, seed: 5 },
+    { s: 'BTCUSD',   n: 'Bitcoin vs US Dollar',  lg: '\u20bf', cc: '#f7931a', bid: 81682.75, spr: 18,     d: 2, ct: 1,      lev: 100,  amp: .02,  tick: 24,   chg: -3.53, seed: 9 },
+    { s: 'OILCash',  n: 'WTI Crude Oil Cash',    lg: 'Oil', cc: '#33383f', bid: 100.6,   spr: 0.04,    d: 2, ct: 1000,   lev: 200,  amp: .01,  tick: .03,  chg: 1.27,  seed: 13 },
+    { s: 'US100Cash', n: 'US 100 Index Cash',    lg: '100', cc: '#0b7285', bid: 29331.83, spr: 1.2,    d: 2, ct: 1,      lev: 200,  amp: .009, tick: 2.5,  chg: -1.69, seed: 17 }
+  ];
+  function rng(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  INS.forEach(function (i) {
+    var r = rng(i.seed), n = 64, cs = [], prev = null;
+    for (var k = 0; k < n; k++) {
+      var t = k / (n - 1), sh = t < .55 ? (.6 - t / .55 * 1.6) : (-1 + (t - .55) / .45);
+      var c = k === n - 1 ? i.bid : i.bid * (1 + i.amp * sh + (r() - .5) * i.amp * .3);
+      var o = prev == null ? c * (1 + i.amp * .02) : prev;
+      var hi = Math.max(o, c) + r() * i.amp * i.bid * .1, lo = Math.min(o, c) - r() * i.amp * i.bid * .1;
+      cs.push({ o: o, h: hi, l: lo, c: c }); prev = c;
+    }
+    i.cs = cs;
+  });
+  function ins(s) { return INS.filter(function (i) { return i.s === s; })[0]; }
+
+  var S = {
+    scene: 'a', tier: 'platinum', sym: 'GOLD', side: 'buy', lots: 0.10, on: true, xmp: 15, bal: 24750, cash: 50028.01, pos: null,
+    hist: [
+      { t: 'Today 09:42', s: 'GOLD', side: 'Buy', lots: 0.10, pl: 12.40, xmp: 15 },
+      { t: 'Yesterday 21:15', s: 'EURUSD', side: 'Sell', lots: 1.00, pl: -8.20, xmp: 45 },
+      { t: 'Yesterday 14:03', s: 'BTCUSD', side: 'Buy', lots: 0.05, pl: 31.10, xmp: 0 },
+      { t: 'Mon 11:27', s: 'GOLD', side: 'Sell', lots: 0.20, pl: -4.75, xmp: 30 }
+    ]
+  };
+  var CAPS = {
+    a: ['1', '<b>Use XMPs.</b> Eligible Platinum clients see the estimated offset before they confirm the order. Quote stays unchanged.'],
+    b: ['2', '<b>Trade &amp; close.</b> Open and close as usual. XMPs are reserved at order placement and offset the spread cost after a successful close.'],
+    c: ['3', '<b>Review history.</b> Trading P/L and the XMP credit are separate, so the market result stays clear. Demo ratio: 15 XMP = $1.']
+  };
+
+  function cur() { return ins(S.sym); }
+  function ask() { var i = cur(); return i.bid + i.spr; }
+  function cost() { var i = cur(); return i.spr * i.ct * S.lots; }
+  function reserved() { return S.pos ? S.pos.xmp : 0; }
+  function avail() { return S.bal - reserved(); }
+  function maxXmp() { return Math.max(0, Math.min(Math.floor(cost() + 1e-9) * XMP_PER_USD, Math.floor(avail() / STEP) * STEP)); }
+  function fit() { var m = maxXmp(); S.xmp = m < STEP ? 0 : Math.min(Math.max(STEP, S.xmp), m); }
+  function credit() { return S.on && S.tier === 'platinum' ? S.xmp / XMP_PER_USD : 0; }
+  function money(v, sign) { var a = Math.abs(v), s = a.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); return (v < 0 ? '-' : sign ? '+' : '') + '$' + s; }
+  function px(i, v) { return Number(v).toLocaleString('en-US', { minimumFractionDigits: i.d, maximumFractionDigits: i.d }); }
+  function chip(i, sz) { return '<span class="lg" style="background:' + i.cc + (sz ? ';width:' + sz + 'px;height:' + sz + 'px' : '') + '">' + esc(i.lg) + '</span>'; }
+
+  /* ---------- watchlist ---------- */
+  function renderList() {
+    $('#wl').innerHTML = '<h4>Top Losers</h4>' + INS.map(function (i) {
+      return '<button class="wr' + (i.s === S.sym ? ' on' : '') + '" data-sym="' + i.s + '">' + chip(i) + '<span class="tx"><b>' + esc(i.s) + '</b><small>' + esc(i.n) + '</small></span><span class="pr"><span data-wp="' + i.s + '">' + px(i, i.bid) + '</span><small class="' + (i.chg < 0 ? 'dn' : 'up') + '">' + (i.chg > 0 ? '+' : '') + i.chg.toFixed(2) + '%</small></span></button>';
+    }).join('');
+  }
+
+  /* ---------- chart ---------- */
+  function chartSVG() {
+    var box = $('#chb'); if (!box) return;
+    var i = cur(), W = box.clientWidth || 520, H = box.clientHeight || 420, pl = 8, pr = 64, pt = 14, pb = 26, cs = i.cs, n = cs.length;
+    var hi = -1e18, lo = 1e18; cs.forEach(function (c) { hi = Math.max(hi, c.h); lo = Math.min(lo, c.l); });
+    var pad = (hi - lo) * .06; hi += pad; lo -= pad;
+    var y = function (v) { return pt + (hi - v) / (hi - lo) * (H - pt - pb); }, step = (W - pl - pr) / n, x = function (k) { return pl + (k + .5) * step; };
+    var g = '', k;
+    for (k = 0; k < 7; k++) { var v = hi - (hi - lo) * k / 6, yy = y(v); g += '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + yy + '" y2="' + yy + '" stroke="#eef0f2"/><text x="' + (W - pr + 8) + '" y="' + (yy + 4) + '" font-size="10.5" fill="#8b929b">' + px({ d: Math.max(0, i.d - (i.bid > 1000 ? 1 : 0)) }, v) + '</text>'; }
+    ['12:30', '12:45', '13:00', '13:15', '13:30', '13:45'].forEach(function (t, j) { g += '<text x="' + (pl + (j + .5) * (W - pl - pr) / 6) + '" y="' + (H - 8) + '" font-size="10.5" fill="#8b929b" text-anchor="middle">' + t + '</text>'; });
+    cs.forEach(function (c, j) { var up = c.c >= c.o, col = up ? '#2fbf85' : '#ee4b55', bw = Math.max(2, step * .62), yt = y(Math.max(c.o, c.c)), yb = y(Math.min(c.o, c.c)); g += '<line x1="' + x(j) + '" x2="' + x(j) + '" y1="' + y(c.h) + '" y2="' + y(c.l) + '" stroke="' + col + '" stroke-width="1.4"/><rect x="' + (x(j) - bw / 2) + '" y="' + yt + '" width="' + bw + '" height="' + Math.max(1.5, yb - yt) + '" rx="1" fill="' + col + '"/>'; });
+    var ly = y(i.bid); g += '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + ly + '" y2="' + ly + '" stroke="#7a7f88" stroke-dasharray="3 3"/><rect x="' + (W - pr + 2) + '" y="' + (ly - 10) + '" width="' + (pr - 4) + '" height="20" rx="3" fill="#1d2024"/><text x="' + (W - pr / 2) + '" y="' + (ly + 4) + '" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="600">' + px(i, i.bid) + '</text>';
+    if (S.scene === 'b' && S.pos && S.pos.s === i.s) { var ey = y(S.pos.entry); if (ey > pt && ey < H - pb) g += '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + ey + '" y2="' + ey + '" stroke="#2f62f0" stroke-dasharray="5 4" stroke-width="1.4"/><rect x="' + (pl + 6) + '" y="' + (ey - 10) + '" width="132" height="20" rx="4" fill="#2f62f0"/><text x="' + (pl + 72) + '" y="' + (ey + 4) + '" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="600">' + S.pos.side.toUpperCase() + ' ' + S.pos.lots.toFixed(2) + ' @ ' + px(i, S.pos.entry) + '</text>'; }
+    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(i.s) + ' candlestick chart">' + g + '</svg>';
+  }
+
+  /* ---------- centre column ---------- */
+  function renderCentre() {
+    var i = cur(), ch = $('#ch');
+    if (S.scene === 'c') { ch.className = 'ch ish'; ch.innerHTML = histHTML(); return; }
+    ch.className = 'ch';
+    ch.innerHTML = '<div class="ch-h">' + chip(i) + '<div><b>' + esc(i.s) + '</b><small class="' + (i.chg < 0 ? 'dn' : 'up') + '">' + (i.chg > 0 ? '+' : '') + i.chg.toFixed(2) + '%</small></div><span class="tf">1 Hour</span></div>' +
+      '<div class="ch-tb"><span>1m</span><span class="dim">Candles</span><span>Indicators</span><span class="dim">Save</span></div><div class="ch-b" id="chb"></div>';
+    chartSVG();
+  }
+  function histHTML() {
+    var tp = 0, tc = 0;
+    S.hist.forEach(function (h) { tp += h.pl; tc += h.xmp / XMP_PER_USD; });
+    return '<div class="hist"><h3>Trade history</h3><p class="sub">Trading P/L is the market result. The XMP credit is shown on its own line and posts to the withdrawable balance.</p>' +
+      '<table class="ht"><thead><tr><th>Closed</th><th>Instrument</th><th class="hide-m">Side</th><th class="r">Trading P/L</th><th class="r">XMP credit</th><th class="r">Total</th></tr></thead><tbody>' +
+      S.hist.map(function (h, k) {
+        var i = ins(h.s), cr = h.xmp / XMP_PER_USD;
+        return '<tr' + (h.fresh ? ' class="new"' : '') + '><td>' + esc(h.t) + '</td><td><div class="ib"><i style="background:' + i.cc + '">' + esc(i.lg.slice(0, 3)) + '</i><span>' + esc(h.s) + '<small>' + h.lots.toFixed(2) + ' lot</small></span></div></td><td class="hide-m">' + h.side + '</td>' +
+          '<td class="r ' + (h.pl < 0 ? 'dn' : 'up') + '">' + money(h.pl, 1) + '</td><td class="r ' + (cr ? 'xc2' : 'nn') + '">' + (cr ? '+' + money(cr).replace('$', '$') + '<small>' + h.xmp + ' XMP</small>' : '&ndash;') + '</td><td class="r"><b>' + money(h.pl + cr, 1) + '</b></td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+
+  /* ---------- right column ---------- */
+  function cardHTML() {
+    var plat = S.tier === 'platinum', m = maxXmp(), i = cur();
+    var head = '<div class="xh"><span class="xl">X</span><div class="tt"><b>XMP spread relief</b><span class="tier ' + (plat ? '' : 'gold') + '">' + (plat ? 'PLATINUM' : 'PLATINUM ONLY') + '</span></div><button class="sw' + (plat && S.on ? ' on' : '') + '" id="xon" role="switch" aria-checked="' + (plat && S.on) + '" aria-label="Use XMPs toward the spread"' + (plat ? '' : ' disabled') + '></button></div>';
+    if (!plat) return '<div class="xc">' + head + '<div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>You are a <b>Gold</b> client. XMP spread relief is available to Platinum clients. <a href="#">See tier benefits</a></span></div></div>';
+    if (!S.on) return '<div class="xc">' + head + '<p class="qn" style="margin-top:8px">Switch on to offset part of the spread with XMPs. You will see the estimate before you confirm.</p></div>';
+    var body;
+    if (m < STEP) {
+      body = '<div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><span>The spread on this order is <b>' + money(cost()) + '</b>, under the $1.00 minimum offset (15 XMP). Increase the size or pick another instrument.</span></div>';
+    } else {
+      var cr = credit(), c = cost();
+      body = '<div class="bal">Balance <b>' + avail().toLocaleString('en-US') + ' XMP</b></div><div class="use">Use XMPs toward this spread</div>' +
+        '<div class="stp"><button data-x="-" aria-label="Use fewer XMPs"' + (S.xmp <= STEP ? ' disabled' : '') + '>&minus;</button><b id="xv">' + S.xmp + ' XMP</b><button data-x="+" aria-label="Use more XMPs"' + (S.xmp >= m ? ' disabled' : '') + '>+</button></div>' +
+        '<div class="rt">15 XMP = $1.00 withdrawable value</div>' +
+        '<dl class="cal"><div><dt>Estimated spread cost</dt><dd>' + money(c) + '</dd></div><div class="cr"><dt>XMP spread credit</dt><dd>-' + money(cr) + '</dd></div><div class="net"><dt>Net spread cost</dt><dd>' + money(c - cr) + '</dd></div></dl>' +
+        '<p class="qn">Quote stays unchanged. Credit posts to withdrawable balance when closed.</p>';
+    }
+    return '<div class="xc on">' + head + '<div class="xb">' + body + '</div></div>';
+  }
+  function ticketHTML() {
+    var i = cur(), buy = S.side === 'buy', margin = ask() * i.ct * S.lots / i.lev;
+    return '<div class="oc"><span>One Click Order</span><button class="sw" disabled aria-label="One click order (not in this prototype)"></button></div>' +
+      '<div class="qt"><button class="sell' + (buy ? '' : ' on') + '" data-side="sell">SELL<b id="pS">' + px(i, i.bid) + '</b></button><button class="buy' + (buy ? ' on' : '') + '" data-side="buy">BUY<b id="pB">' + px(i, ask()) + '</b></button></div>' +
+      '<div class="qs"><span>Quantity</span><span class="on">Lots</span></div>' +
+      '<div class="amt"><button data-lot="-" aria-label="Fewer lots">&minus;</button><div><small>Amount</small><b>' + S.lots.toFixed(2) + ' Lot(s)</b></div><button data-lot="+" aria-label="More lots">+</button></div>' +
+      '<div class="mrg"><div class="r"><span>Required Margin <b>' + money(margin) + '</b></span><span>0.01%</span></div><i><span></span></i></div>' +
+      '<div id="xcard">' + cardHTML() + '</div>' +
+      '<div class="tpsl"><span>TP / SL</span><button class="sw" disabled aria-label="TP / SL (not in this prototype)"></button></div>' +
+      '<button class="place' + (buy ? '' : ' sell') + '" id="place">Place Order at <span id="pPl">' + px(i, buy ? ask() : i.bid) + '</span></button>' +
+      '<p class="fn">XMPs are reserved at order placement and deducted after a successful close.</p><p class="fn">Illustrative estimate &middot; contract rules apply</p>';
+  }
+  function plOf(p) { var i = ins(p.s); return p.side === 'buy' ? (i.bid - p.entry) * i.ct * p.lots : (p.entry - (i.bid + i.spr)) * i.ct * p.lots; }
+  function posHTML() {
+    var p = S.pos;
+    if (!p) return '<div class="empty">No open position.<br>Place an order in step 1.</div>';
+    var i = ins(p.s), pl = plOf(p), cr = p.xmp / XMP_PER_USD;
+    return '<div class="ps"><h3>Open position <span class="tag">' + p.side.toUpperCase() + ' ' + esc(p.s) + '</span></h3>' +
+      '<div class="pl ' + (pl < 0 ? 'dn' : 'up') + '" id="plv">' + money(pl, 1) + '</div><small class="mut">Trading P/L, before any XMP credit</small>' +
+      '<div class="kvs"><div>Size<b>' + p.lots.toFixed(2) + ' lot</b></div><div>Entry<b>' + px(i, p.entry) + '</b></div><div>Mark<b id="mk">' + px(i, p.side === 'buy' ? i.bid : i.bid + i.spr) + '</b></div><div>Spread cost paid<b>' + money(p.cost) + '</b></div></div>' +
+      (p.xmp ? '<div class="resv"><b>' + p.xmp + ' XMP reserved</b><br>Closing posts a <b>' + money(cr) + '</b> credit to your withdrawable balance. Spread after credit: <b>' + money(p.cost - cr) + '</b>.</div>' : '<div class="resv" style="background:var(--soft);color:var(--ink-2)">No XMPs used on this order.</div>') +
+      '<div style="margin-top:14px;display:grid"><button class="btn-close" id="close">Close position</button></div></div>';
+  }
+  function sumHTML() {
+    var cr = 0, n = 0; S.hist.forEach(function (h) { cr += h.xmp / XMP_PER_USD; if (h.xmp) n++; });
+    return '<div class="sum"><div class="sc2 g"><small>XMP credit received</small><b>' + money(cr) + '</b><p>Across ' + n + ' trades. Posted to the withdrawable balance.</p></div>' +
+      '<div class="sc2"><small>XMP balance</small><b>' + S.bal.toLocaleString('en-US') + ' XMP</b><p>Worth ' + money(S.bal / XMP_PER_USD) + ' at the demo ratio.</p></div>' +
+      '<div class="sc2"><small>Account balance</small><b>' + money(S.cash) + '</b><p>Trading P/L and XMP credit both land here, but stay separate in history.</p></div></div>';
+  }
+  function renderRight() {
+    var tk = $('#tk');
+    tk.innerHTML = S.scene === 'a' ? ticketHTML() : S.scene === 'b' ? posHTML() : sumHTML();
+  }
+
+  function head() {
+    $('#acc').textContent = 'Real ' + money(S.cash);
+    var tp = $('#tierPill'); tp.textContent = S.tier.toUpperCase(); tp.className = 'tier' + (S.tier === 'gold' ? ' gold' : '');
+    var c = CAPS[S.scene]; $('#cap').innerHTML = '<span class="n">' + c[0] + '</span><span>' + c[1] + '</span>';
+    $$('[data-scene]').forEach(function (b) { var on = b.getAttribute('data-scene') === S.scene; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+    $$('[data-tier]').forEach(function (b) { var on = b.getAttribute('data-tier') === S.tier; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+  }
+  function render() { fit(); head(); renderList(); renderCentre(); renderRight(); }
+  function scene(s) {
+    if (s === 'b' && !S.pos) openPos(true);
+    S.scene = s; render();
+  }
+
+  /* ---------- actions ---------- */
+  function openPos(silent) {
+    var i = cur(), buy = S.side === 'buy';
+    fit();
+    S.pos = { s: i.s, side: S.side, lots: S.lots, entry: buy ? ask() : i.bid, cost: cost(), xmp: credit() ? S.xmp : 0 };
+    if (!silent) XM.toast('Order placed' + (S.pos.xmp ? ' &middot; ' + S.pos.xmp + ' XMP reserved' : ''));
+  }
+  function closePos() {
+    var p = S.pos; if (!p) return;
+    var pl = plOf(p), cr = p.xmp / XMP_PER_USD;
+    S.cash += pl + cr; S.bal -= p.xmp;
+    S.hist.forEach(function (h) { h.fresh = false; });
+    S.hist.unshift({ t: 'Just now', s: p.s, side: p.side === 'buy' ? 'Buy' : 'Sell', lots: p.lots, pl: pl, xmp: p.xmp, fresh: true });
+    S.pos = null; S.scene = 'c'; render();
+    XM.toast('Position closed' + (cr ? ' &middot; ' + money(cr) + ' XMP credit posted' : ''));
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button, a'); if (!t) return;
+    if (t.tagName === 'A' && t.getAttribute('href') === '#') e.preventDefault();
+    if (t.hasAttribute('data-scene')) { scene(t.getAttribute('data-scene')); return; }
+    if (t.hasAttribute('data-tier')) { S.tier = t.getAttribute('data-tier'); render(); return; }
+    if (t.hasAttribute('data-sym')) { S.sym = t.getAttribute('data-sym'); if (S.scene !== 'a') S.scene = 'a'; S.xmp = STEP; render(); return; }
+    if (t.hasAttribute('data-side')) { S.side = t.getAttribute('data-side'); render(); return; }
+    if (t.hasAttribute('data-lot')) { var d = t.getAttribute('data-lot') === '+' ? .01 : -.01; S.lots = Math.min(10, Math.max(.01, Math.round((S.lots + d) * 100) / 100)); render(); return; }
+    if (t.hasAttribute('data-x')) { S.xmp += t.getAttribute('data-x') === '+' ? STEP : -STEP; fit(); render(); return; }
+    if (t.id === 'xon') { S.on = !S.on; render(); return; }
+    if (t.id === 'place') { openPos(); S.scene = 'b'; render(); return; }
+    if (t.id === 'close') { closePos(); return; }
+  });
+  /* lot buttons repeat while held would be nice; keep it simple: click only */
+
+  /* ---------- live quotes ---------- */
+  setInterval(function () {
+    if (S.scene === 'c') return;
+    var r = Math.random;
+    INS.forEach(function (i) {
+      var nb = i.bid + (r() - .5) * i.tick; if (Math.abs(nb - i.cs[i.cs.length - 2].c) > i.amp * i.bid * .5) return;
+      i.bid = nb; var c = i.cs[i.cs.length - 1]; c.c = nb; c.h = Math.max(c.h, nb); c.l = Math.min(c.l, nb);
+    });
+    var i = cur();
+    chartSVG();
+    INS.forEach(function (x) { var el = document.querySelector('[data-wp="' + x.s + '"]'); if (el) el.textContent = px(x, x.bid); });
+    var pS = $('#pS'), pB = $('#pB'), pP = $('#pPl'); if (pS) { pS.textContent = px(i, i.bid); pB.textContent = px(i, ask()); pP.textContent = px(i, S.side === 'buy' ? ask() : i.bid); }
+    if (S.scene === 'b' && S.pos) {
+      var pl = plOf(S.pos), el = $('#plv'); if (el) { el.textContent = money(pl, 1); el.className = 'pl ' + (pl < 0 ? 'dn' : 'up'); }
+      var mk = $('#mk'), pi = ins(S.pos.s); if (mk) mk.textContent = px(pi, S.pos.side === 'buy' ? pi.bid : pi.bid + pi.spr);
+    }
+  }, 1500);
+  window.addEventListener('resize', function () { chartSVG(); });
+
+  $('#logo').innerHTML = XM.logo(false);
+  $('#rail').innerHTML = ['home', 'chart', 'wallet', 'gift', 'user'].map(function (n, k) { return '<a href="#" tabindex="-1"' + (k === 1 ? ' class="on"' : '') + '>' + XM.icon(n) + '</a>'; }).join('');
+  render();
+
+  XM.notes({
+    title: 'XMP Spread Saver (idea 10)',
+    today: 'XMPs are earned by trading but hard to feel: there is no moment where a client can see what they are worth while they trade.',
+    proposed: 'Eligible Platinum clients see an estimated XMP offset of the spread on the order ticket, pick an amount and confirm. History shows trading P/L and the XMP credit separately. Concept ratio: 15 XMP = $1 withdrawable value.',
+    why: 'Making loyalty value tangible at the moment of the trade may lift adoption, repeat use and activity. The economics still need validation.',
+    metric: 'Adoption among eligible clients, XMP redemption and repeat use, incremental activity vs holdout, net contribution after XMP cost.'
+  });
+})();
+</script>
+<script src="../../assets/js/review.js" data-idea="10"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Password gate: keep this line first. -->
+<script src="../../assets/js/gate.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} · XMTrading</title>
+<link rel="stylesheet" href="../../assets/css/xm.css">
+<style>
+/* =====================================================================
+   IDEA {{ID}} · {{TITLE}}
+   Keep ALL styles for this idea in this file. Shared tokens (colours, radii, shadows)
+   come from assets/css/xm.css: --g, --ink, --mut, --line, --soft, --up, --dn, --sh-s, --sh-m, --sh-l.
+   Shared building blocks: .btn, .btn-primary, .tag, .card, .pill-tabs, .browser, .phone, .field.
+   ===================================================================== */
+body { background: #f5f5f5; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 96px; }
+
+/* header: eyebrow, title, one-line summary, scene tabs */
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 22px 0 14px; }
+.head h1 { font-size: clamp(26px, 3vw, 36px); line-height: 1.1; letter-spacing: -.025em; margin-top: 4px; }
+.head p { color: var(--ink-2); max-width: 640px; font-size: 14.5px; margin-top: 6px; }
+.head .pill-tabs { box-shadow: var(--sh-s); }
+.head .pill-tabs button { padding: 10px 20px; transition: background .15s, color .15s; }
+
+/* caption strip: says what the viewer is looking at in the current scene */
+.cap { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 11px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+.cap .n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.cap b { color: var(--ink); }
+
+/* TODO: your own styles below */
+.scene { background: #fff; border: 1px solid var(--line-2); border-radius: 20px; box-shadow: var(--sh-l); padding: 28px; min-height: 480px; }
+
+@media (max-width: 860px) {
+  .wrap { padding: 0 14px 90px; }
+  .head .pill-tabs { width: 100%; overflow-x: auto; }
+  .head .pill-tabs button { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+  .scene { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <span class="eyebrow">Idea {{ID}} &middot; {{AREA}}</span>
+      <h1>{{TITLE}}</h1>
+      <p>One sentence that tells a first-time viewer what they are about to see.</p>
+    </div>
+    <!-- One button per scene. Remove the tabs entirely if the idea is a single screen. -->
+    <div class="pill-tabs" role="tablist" aria-label="Scenes">
+      <button class="on" role="tab" data-scene="a">A &middot; First scene</button>
+      <button role="tab" data-scene="b">B &middot; Second scene</button>
+    </div>
+  </div>
+
+  <div class="cap" id="cap"></div>
+
+  <section class="scene" id="sceneA">
+    <h2>Scene A</h2>
+    <p>Build the screen here. Use real-looking data, clickable controls and realistic empty, error and success states.</p>
+  </section>
+  <section class="scene" id="sceneB" hidden>
+    <h2>Scene B</h2>
+    <p>The next step of the flow.</p>
+  </section>
+</main>
+
+<script src="../../assets/js/common.js"></script>
+<script>
+(function () {
+  var $ = XM.$, $$ = XM.$$;
+
+  /* Caption per scene: [badge, html] */
+  var CAPS = {
+    a: ['A', '<b>First scene.</b> What the viewer sees and what they can do here.'],
+    b: ['B', '<b>Second scene.</b> What changes next.']
+  };
+
+  function scene(s) {
+    if (!CAPS[s]) s = 'a';
+    $$('.scene').forEach(function (el) { el.hidden = el.id !== 'scene' + s.toUpperCase(); });
+    $$('[data-scene]').forEach(function (b) { var on = b.getAttribute('data-scene') === s; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+    $('#cap').innerHTML = '<span class="n">' + CAPS[s][0] + '</span><span>' + CAPS[s][1] + '</span>';
+    try { history.replaceState(null, '', '#' + s); } catch (e) {}
+  }
+  $$('[data-scene]').forEach(function (b) { b.addEventListener('click', function () { scene(b.getAttribute('data-scene')); }); });
+  scene(XM.qs('scene') || location.hash.replace('#', '') || 'a');
+
+  /* "What changes?" panel in the corner. Keep it short and honest. */
+  XM.notes({
+    title: '{{TITLE}} (idea {{ID}})',
+    today: 'What happens today and why it is a problem.',
+    proposed: 'What this prototype shows.',
+    why: 'Why it may help. Say "may", we have not validated it yet.',
+    metric: 'The numbers that would tell us it worked.'
+  });
+})();
+</script>
+<!-- Comments, votes and the idea switcher. data-idea must equal the id in assets/js/ideas.js. -->
+<script src="../../assets/js/review.js" data-idea="{{ID}}"></script>
+</body>
+</html>

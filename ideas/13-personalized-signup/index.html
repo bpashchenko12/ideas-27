@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="../../assets/js/gate.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personalized Sign-Up Page · XMTrading</title>
+<link rel="stylesheet" href="../../assets/css/xm.css">
+<style>
+/* =====================================================================
+   IDEA 13 · Personalized sign-up page (XMTD Affiliates)
+   A: affiliate editor with live desktop / mobile preview
+   B: XMTrading review (simulated approval)
+   C: what a visitor sees
+   Layout follows the "My Sign-Up Page" frame on slide 20 of the 2027 deck.
+   ===================================================================== */
+body { background: #f5f5f5; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 96px; }
+
+/* ---------- head ---------- */
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 22px 0 14px; }
+.head h1 { font-size: clamp(26px, 3vw, 36px); line-height: 1.1; letter-spacing: -.025em; margin-top: 4px; }
+.head p { color: var(--ink-2); max-width: 640px; font-size: 14.5px; margin-top: 6px; }
+.head .pill-tabs { box-shadow: var(--sh-s); }
+.head .pill-tabs button { padding: 10px 20px; transition: background .15s, color .15s; }
+.cap { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 11px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+.cap .n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.cap b { color: var(--ink); }
+
+/* ---------- partner portal frame ---------- */
+.app { display: grid; grid-template-columns: 200px minmax(0, 1fr); min-height: 720px; background: #fff; border: 1px solid var(--line-2); border-radius: 20px; overflow: hidden; box-shadow: var(--sh-l); }
+.nav { border-right: 1px solid var(--line); padding: 18px 12px; background: #fcfcfd; }
+.nav .xm-logo svg { height: 20px; } .nav small { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); margin: 4px 0 18px; }
+.nav a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); cursor: default; margin-bottom: 2px; }
+.nav a svg { width: 18px; height: 18px; flex: none; } .nav a.on { background: var(--g-l); color: var(--g); font-weight: 600; }
+.main { padding: 22px 26px 28px; min-width: 0; }
+.ph { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.ph h2 { font-size: 22px; letter-spacing: -.01em; }
+.ph .tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+/* status stamp */
+.st { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--mut); }
+.stamp { display: inline-block; padding: 4px 14px; border: 2.5px double currentColor; border-radius: 8px; font-weight: 800; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; transform: rotate(-4deg); opacity: .88; }
+.stamp.approved { color: #2e9e72; } .stamp.pending { color: #c26a00; } .stamp.draft { color: #7b828b; }
+
+/* ---------- editor ---------- */
+.ed { display: grid; grid-template-columns: minmax(0, 1fr) 430px; gap: 28px; margin-top: 18px; align-items: start; }
+.rv { background: #fff4e0; border: 1px solid #f3d9a8; border-radius: 12px; padding: 10px 14px; font-size: 13px; color: #8a5200; margin-bottom: 14px; }
+.row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; align-items: start; padding: 13px 0; border-top: 1px solid var(--line); }
+.row:first-of-type { border-top: 0; }
+.row > label, .row > .lb { font-size: 13.5px; font-weight: 600; padding-top: 10px; text-align: right; }
+.row .hint { font-size: 11.5px; color: var(--mut); margin-top: 6px; line-height: 1.45; }
+.inp, .ta { width: 100%; border: 1.5px solid var(--line-2); border-radius: 10px; padding: 10px 12px; font-size: 14px; background: #fff; transition: border-color .15s, box-shadow .15s; }
+.inp:focus, .ta:focus { outline: 0; border-color: var(--g); box-shadow: 0 0 0 3px rgba(0, 132, 84, .15); }
+.ta { resize: vertical; min-height: 72px; line-height: 1.45; }
+.cnt { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; color: var(--mut); margin-top: 5px; }
+.bad { color: var(--red); font-weight: 600; } .inp.err, .ta.err { border-color: var(--red); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { border: 1.5px solid var(--line-2); background: #fff; border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 500; transition: .15s; }
+.chip:hover { border-color: var(--ink); } .chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.avs { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.avb { border: 2px solid transparent; border-radius: 50%; padding: 2px; background: none; } .avb.on { border-color: var(--g); }
+.tpls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tpl { border: 2px solid var(--line); border-radius: 14px; padding: 8px 8px 10px; text-align: left; background: #fff; position: relative; transition: .15s; }
+.tpl:hover { border-color: var(--line-2); } .tpl.on { border-color: var(--tc); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tc) 16%, transparent); }
+.tpl .th { height: 74px; border-radius: 8px; background: color-mix(in srgb, var(--tc) 10%, #fff); padding: 8px; display: grid; gap: 5px; align-content: start; }
+.tpl .th i { display: block; height: 7px; border-radius: 4px; background: color-mix(in srgb, var(--tc) 35%, #fff); } .tpl .th i:nth-child(1) { width: 55%; background: var(--tc); } .tpl .th i:nth-child(3) { width: 80%; }
+.tpl b { display: block; font-size: 13px; margin-top: 8px; } .tpl small { display: block; font-size: 11px; color: var(--mut); line-height: 1.35; }
+.tpl .ck { position: absolute; right: 8px; top: 8px; width: 20px; height: 20px; border-radius: 50%; background: var(--tc); color: #fff; display: none; place-items: center; } .tpl.on .ck { display: grid; } .tpl .ck svg { width: 12px; height: 12px; }
+.acts { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding-top: 14px; border-top: 1px solid var(--line); margin-top: 4px; }
+.acts .sp1 { flex: 1; }
+.guard { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--soft); font-size: 12.5px; color: var(--ink-2); line-height: 1.5; } .guard b { color: var(--ink); }
+
+/* preview column */
+.pvc { position: sticky; top: 14px; }
+.pvh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; } .pvh h3 { font-size: 15px; }
+.pvh .pill-tabs button { padding: 5px 14px; font-size: 12.5px; }
+.pvb .browser { box-shadow: var(--sh-m); } .pvb .bar { height: 34px; } .pvb .url { font-size: 11px; max-width: none; justify-content: flex-start; padding: 0 10px; color: var(--blue); overflow: hidden; white-space: nowrap; }
+.sv { overflow: auto; position: relative; background: #fff; } .sv .sz { position: relative; } .sv .scale { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.pvb .sv { max-height: 560px; }
+.pvm { display: flex; justify-content: center; } .pvm .phone { width: 318px; } .pvm .phone .scr { height: 590px; display: block; } .pvm .sv { height: 100%; }
+.pvn { font-size: 11.5px; color: var(--mut); margin-top: 8px; text-align: center; }
+
+/* ---------- visitor page (rendered at fixed widths, scaled in the preview) ---------- */
+.vp { background: #fff; color: #1d2024; font-size: 14px; line-height: 1.45; text-align: left; }
+.vp * { box-sizing: border-box; }
+.vp .nv { display: flex; justify-content: space-between; align-items: center; padding: 14px 28px; border-bottom: 1px solid var(--line); } .vp .nv .xm-logo svg { height: 20px; } .vp .nv span { font-size: 12.5px; color: var(--mut); font-weight: 600; }
+.vp .hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 30px; padding: 32px 28px; background: linear-gradient(135deg, color-mix(in srgb, var(--ac) 14%, #fff), #fff 70%); align-items: start; }
+.av { width: 64px; height: 64px; border-radius: 50%; flex: none; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 26px; }
+.vp .who { display: flex; gap: 14px; align-items: flex-start; }
+.vp .who b { font-size: 17px; } .vp .who small { color: var(--mut); font-size: 12px; display: block; }
+.vp .bub { background: #fff; border: 1px solid var(--line); border-radius: 4px 14px 14px 14px; padding: 9px 14px; margin-top: 8px; font-size: 14px; box-shadow: var(--sh-s); }
+.vp .evt { display: inline-flex; align-items: center; gap: 8px; margin-top: 26px; padding: 4px 12px; border-radius: 999px; background: var(--ac); color: #fff; font-size: 11.5px; font-weight: 700; letter-spacing: .02em; }
+.vp h2 { font-size: 30px; line-height: 1.15; letter-spacing: -.02em; margin: 10px 0 8px; font-weight: 700; }
+.vp h2 em { font-style: normal; color: var(--ac); }
+.vp .pts { display: grid; gap: 9px; margin-top: 18px; } .vp .pts li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; } .vp .pts li i { flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--ac); color: #fff; display: grid; place-items: center; margin-top: 1px; } .vp .pts li i svg { width: 12px; height: 12px; }
+.vp .reg { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: var(--sh-m); }
+.vp .reg h3 { font-size: 18px; margin-bottom: 12px; }
+.vp .reg label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); margin-bottom: 10px; } .vp .reg input, .vp .reg select { display: block; width: 100%; margin-top: 4px; border: 1.5px solid var(--line-2); border-radius: 9px; padding: 9px 11px; font-size: 14px; background: #fff; }
+.vp .reg button { width: 100%; border: 0; border-radius: 10px; background: var(--ac); color: #fff; font-weight: 700; font-size: 15px; padding: 13px; margin-top: 4px; }
+.vp .reg p { font-size: 11px; color: var(--mut); margin-top: 10px; line-height: 1.45; }
+.vp .sec { padding: 26px 28px; border-top: 1px solid var(--line); } .vp .sec h4 { font-size: 16px; margin-bottom: 12px; }
+.vp .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } .vp .tiles div { border: 1px solid var(--line); border-radius: 12px; padding: 14px; font-size: 13px; } .vp .tiles b { display: block; font-size: 22px; color: var(--ac); }
+.vp .risk { padding: 14px 28px 18px; background: #f5f5f5; font-size: 10.5px; color: var(--mut); line-height: 1.5; }
+.vp.m .nv { padding: 12px 16px; } .vp.m .hero { grid-template-columns: 1fr; padding: 20px 16px; gap: 18px; } .vp.m h2 { font-size: 23px; } .vp.m .evt { margin-top: 18px; } .vp.m .sec { padding: 20px 16px; } .vp.m .tiles { grid-template-columns: 1fr; } .vp.m .risk { padding: 12px 16px 16px; }
+
+/* full visitor scene */
+.vis .browser { max-width: 1100px; margin: 0 auto; } .vis .url { max-width: 520px; }
+.vis .pubnote { max-width: 1100px; margin: 0 auto 12px; }
+.vis-w { background: #eef0f3; padding: 26px; }
+.pubnote { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
+
+/* ---------- review desk ---------- */
+.rd { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 28px; margin-top: 18px; align-items: start; }
+.tlv { display: flex; align-items: center; gap: 8px; margin: 4px 0 20px; flex-wrap: wrap; }
+.tlv .s { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--mut); } .tlv .s i { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line-2); display: grid; place-items: center; font-style: normal; font-size: 11px; } .tlv .s.on { color: var(--ink); } .tlv .s.on i { border-color: var(--g); background: var(--g); color: #fff; } .tlv .s.cur i { box-shadow: 0 0 0 4px rgba(0, 132, 84, .18); }
+.tlv .ln { width: 36px; height: 2px; background: var(--line-2); } .tlv .ln.on { background: var(--g); }
+.chk { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.chk div { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-top: 1px solid var(--line); font-size: 13.5px; } .chk div:first-child { border-top: 0; }
+.chk i { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--up); margin-top: 1px; } .chk i svg { width: 13px; height: 13px; } .chk .x i { background: var(--red); }
+.chk b { display: block; font-size: 13.5px; } .chk small { color: var(--mut); font-size: 12px; }
+.dec { border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: var(--sh-s); }
+.dec h3 { font-size: 16px; margin-bottom: 4px; } .dec p { font-size: 13px; color: var(--mut); margin-bottom: 14px; }
+.dec .btn { width: 100%; margin-top: 8px; }
+.emp { text-align: center; padding: 60px 20px; color: var(--mut); } .emp h3 { color: var(--ink); font-size: 18px; margin-bottom: 6px; } .emp .btn { margin-top: 16px; }
+.ok { background: var(--g-l); color: #0b5b3b; border-radius: 12px; padding: 12px 14px; font-size: 13px; margin-top: 12px; }
+
+@media (max-width: 1100px) { .ed, .rd { grid-template-columns: 1fr; } .pvc { position: static; } }
+@media (max-width: 860px) {
+  .wrap { padding: 0 14px 90px; } .app { grid-template-columns: 1fr; } .nav { display: none; } .main { padding: 16px; }
+  .row { grid-template-columns: 1fr; gap: 6px; } .row > label, .row > .lb { text-align: left; padding-top: 0; }
+  .tpls { grid-template-columns: 1fr; } .head .pill-tabs { width: 100%; overflow-x: auto; } .head .pill-tabs button { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+  .vis-w { padding: 10px; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <span class="eyebrow">Idea 13 &middot; XMTD Affiliates</span>
+      <h1>A sign-up page with your name on it.</h1>
+      <p>Affiliates shape an approved template and see a live desktop and mobile preview. XMTrading reviews the page, then it goes live with the registration form and the risk warning locked in.</p>
+    </div>
+    <div class="pill-tabs" role="tablist" aria-label="Scenes">
+      <button class="on" role="tab" data-scene="a">A &middot; Affiliate editor</button>
+      <button role="tab" data-scene="b">B &middot; XMTrading review</button>
+      <button role="tab" data-scene="c">C &middot; Visitor view</button>
+    </div>
+  </div>
+
+  <div class="cap" id="cap"></div>
+  <div id="stage"></div>
+</main>
+
+<script src="../../assets/js/common.js"></script>
+<script>
+(function () {
+  var $ = XM.$, $$ = XM.$$, esc = XM.esc;
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+  var CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+
+  /* Illustrative templates, copy and offers. XMTrading owns the real, approved versions. */
+  var TPL = {
+    rewards:   { n: 'General Rewards',    d: 'Welcome offer and reward steps', c: '#008454', pts: ['Welcome offer for new clients, terms apply', 'Rewards for active trading', 'Support in your language'], tiles: [['Demo', 'Free practice account'], ['24/5', 'Multilingual support'], ['1000+', 'Instruments']] },
+    education: { n: 'Trading Education',  d: 'Webinars, guides and demo practice', c: '#2f62f0', pts: ['Free demo account to practise first', 'Live webinars and market guides', 'Step-by-step platform tutorials'], tiles: [['Live', 'Webinars every week'], ['Demo', 'Practise with virtual funds'], ['Guides', 'Platform walkthroughs']] },
+    community: { n: 'Community',          d: 'Trade alongside people you know', c: '#8a3fd1', pts: ['Join a community of traders', 'Share ideas in your own language', 'Take part in community events'], tiles: [['Chat', 'Talk to other traders'], ['Events', 'Competitions and Q&As'], ['Support', 'Help when you need it']] }
+  };
+  var EVENTS = ['Welcome offer', 'Trading competition', 'Educational webinars'];
+  var LANG = {
+    en: { n: 'English',  join: 'Join XMTrading with', code: 'Referral code', partner: 'XMTrading partner', ev: 'Event', create: 'Create your account', first: 'First name', email: 'Email', ctry: 'Country of residence', pw: 'Password', cta: 'Open account', get: 'What you get', login: 'Log in' },
+    es: { n: 'Espa\u00f1ol', join: '\u00danete a XMTrading con', code: 'C\u00f3digo de referido', partner: 'Socio de XMTrading', ev: 'Evento', create: 'Crea tu cuenta', first: 'Nombre', email: 'Correo electr\u00f3nico', ctry: 'Pa\u00eds de residencia', pw: 'Contrase\u00f1a', cta: 'Abrir cuenta', get: 'Qu\u00e9 obtienes', login: 'Acceder' },
+    ja: { n: '\u65e5\u672c\u8a9e', join: 'XMTrading\u306b\u53c2\u52a0\uff1a', code: '\u7d39\u4ecb\u30b3\u30fc\u30c9', partner: 'XMTrading\u30d1\u30fc\u30c8\u30ca\u30fc', ev: '\u30a4\u30d9\u30f3\u30c8', create: '\u53e3\u5ea7\u958b\u8a2d', first: '\u540d', email: '\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9', ctry: '\u5c45\u4f4f\u56fd', pw: '\u30d1\u30b9\u30ef\u30fc\u30c9', cta: '\u53e3\u5ea7\u3092\u958b\u8a2d', get: '\u7279\u5178', login: '\u30ed\u30b0\u30a4\u30f3' }
+  };
+  var AVS = [
+    { bg: 'linear-gradient(135deg,#1d2024,#4a5058)', fg: '#fff' }, { bg: 'linear-gradient(135deg,#008454,#3bbf8a)', fg: '#fff' },
+    { bg: 'linear-gradient(135deg,#f59f00,#ffd43b)', fg: '#1d2024' }, { bg: 'linear-gradient(135deg,#2f62f0,#74a0ff)', fg: '#fff' }
+  ];
+  /* Claims XMTrading does not allow in affiliate copy (illustrative list) */
+  var BANNED = [/guarantee/i, /risk[- ]?free/i, /no risk/i, /sure (profit|win|thing)/i, /100\s?% ?(profit|win|return)/i, /get rich/i, /double your money/i, /can'?t lose/i];
+  var REF = '4821';
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  var S = {
+    scene: 'a', dev: 'desktop', status: 'approved', note: '', stage: 0,
+    draft: { photo: 1, name: 'Thomas', lang: 'en', tpl: 'rewards', about: 'Join me on XMTrading!', ev: 0, benefit: 'Welcome offer for new clients' }
+  };
+  S.pub = clone(S.draft);
+  var CAPS = {
+    a: ['A', '<b>Affiliate editor.</b> Pick an approved template, write a short introduction and see the page update live, on desktop or mobile.'],
+    b: ['B', '<b>XMTrading review.</b> Approved templates keep their structure; claims are checked before anything is published. Simulated, no real review happens.'],
+    c: ['C', '<b>Visitor view.</b> The published page: the affiliate context, one registration form and the standard risk warning. Illustrative content only.']
+  };
+
+  function issues(m) {
+    var out = [];
+    [['about', m.about, 'About me'], ['benefit', m.benefit, 'Benefit description'], ['name', m.name, 'Profile name']].forEach(function (f) {
+      BANNED.forEach(function (re) { var x = re.exec(f[1] || ''); if (x) out.push({ f: f[0], label: f[2], word: x[0] }); });
+    });
+    return out;
+  }
+  function avHTML(i, name, sz) {
+    var a = AVS[i % AVS.length], t = (name || '?').trim().charAt(0).toUpperCase() || '?';
+    return '<span class="av" style="background:' + a.bg + ';color:' + a.fg + (sz ? ';width:' + sz + 'px;height:' + sz + 'px;font-size:' + Math.round(sz * .4) + 'px' : '') + '">' + esc(t) + '</span>';
+  }
+  function slug(n) { return (n || 'partner').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'partner'; }
+  function urlOf(m) { return 'xmtrading.com/' + m.lang + '/join/' + slug(m.name) + '-' + REF; }
+
+  /* ---------- the published page (shared by preview and visitor view) ---------- */
+  function pageHTML(m, mobile) {
+    var T = TPL[m.tpl], L = LANG[m.lang], name = m.name || 'Your name';
+    return '<div class="vp' + (mobile ? ' m' : '') + '" style="--ac:' + T.c + '">' +
+      '<div class="nv"><span class="xm-logo">' + XM.logo(false) + '</span><span>' + esc(L.n) + ' &middot; ' + esc(L.login) + '</span></div>' +
+      '<div class="hero"><div>' +
+        '<div class="who">' + avHTML(m.photo, name) + '<div><b>' + esc(name) + '</b><small>' + esc(L.partner) + ' &middot; ' + esc(L.code) + ' ' + REF + '</small>' + (m.about ? '<div class="bub">' + esc(m.about) + '</div>' : '') + '</div></div>' +
+        '<span class="evt">' + esc(L.ev) + ' &middot; ' + esc(EVENTS[m.ev]) + '</span>' +
+        '<h2>' + esc(L.join) + ' <em>' + esc(name) + '</em><br>' + esc(m.benefit || '') + '</h2>' +
+        '<ul class="pts">' + T.pts.map(function (p) { return '<li><i>' + CHECK + '</i><span>' + esc(p) + '</span></li>'; }).join('') + '</ul>' +
+      '</div>' +
+      '<form class="reg" onsubmit="return false"><h3>' + esc(L.create) + '</h3>' +
+        '<label>' + esc(L.first) + '<input type="text" placeholder="Alex" tabindex="-1"></label><label>' + esc(L.email) + '<input type="email" placeholder="name@example.com" tabindex="-1"></label>' +
+        '<label>' + esc(L.ctry) + '<select tabindex="-1"><option>Cyprus</option></select></label><label>' + esc(L.pw) + '<input type="password" value="password" tabindex="-1"></label>' +
+        '<button type="button" data-reg>' + esc(L.cta) + '</button><p>Illustrative form. The real registration is the standard XMTrading flow with the referral code ' + REF + ' attached.</p></form></div>' +
+      '<div class="sec"><h4>' + esc(L.get) + '</h4><div class="tiles">' + T.tiles.map(function (t) { return '<div><b>' + esc(t[0]) + '</b>' + esc(t[1]) + '</div>'; }).join('') + '</div></div>' +
+      '<div class="risk">Trading leveraged products such as CFDs carries a high level of risk and may result in the loss of your invested capital. Locked text added by XMTrading, not editable by the affiliate. Illustrative prototype.</div></div>';
+  }
+  function mount(host, m, mobile, w) {
+    var sv = $('.sv', host), sz = $('.sz', sv), sc = $('.scale', sz);
+    sc.style.width = w + 'px'; sc.innerHTML = pageHTML(m, mobile);
+    var k = (sv.clientWidth || w) / w; sc.style.transform = 'scale(' + k + ')';
+    sz.style.height = Math.ceil(sc.offsetHeight * k) + 'px'; sz.style.width = (sv.clientWidth || w) + 'px';
+  }
+
+  /* ---------- shell ---------- */
+  function stampHTML() { var t = { approved: 'Approved', pending: 'In review', draft: S.pubDirty ? 'Draft' : 'Draft' }[S.status]; return '<span class="stamp ' + S.status + '">' + t + '</span>'; }
+  function portal(title, tools, body) {
+    return '<div class="app"><nav class="nav"><span class="xm-logo">' + XM.logo(false) + '</span><small>Partner portal</small>' +
+      [['home', 'Overview'], ['share', 'Links'], ['trophy', 'Campaigns'], ['globe', 'Sign-up page', 1], ['chart', 'Reports'], ['wallet', 'Payments']].map(function (n) { return '<a href="#" tabindex="-1"' + (n[2] ? ' class="on"' : '') + '>' + XM.icon(n[0]) + n[1] + '</a>'; }).join('') + '</nav>' +
+      '<div class="main"><div class="ph"><h2>' + title + '</h2><div class="tools">' + tools + '</div></div>' + body + '</div></div>';
+  }
+
+  /* ---------- scene A ---------- */
+  function renderA() {
+    var m = S.draft, I = issues(m), dirty = JSON.stringify(S.draft) !== JSON.stringify(S.pub);
+    var tools = '<span class="st">Status ' + stampHTML() + '</span>';
+    var body = '<div class="ed"><div class="card" style="padding:8px 22px 18px">' +
+      (S.note ? '<div class="rv" style="margin-top:14px"><b>Note from XMTrading:</b> ' + esc(S.note) + '</div>' : '') +
+      '<div class="row"><span class="lb">Profile photo</span><div><div class="avs">' + AVS.map(function (a, i) { return '<button class="avb' + (m.photo === i ? ' on' : '') + '" data-photo="' + i + '" aria-label="Sample photo ' + (i + 1) + '">' + avHTML(i, m.name, 52) + '</button>'; }).join('') + '</div><div class="hint">Approved photo or logo only. Reviewed by XMTrading before it goes live.</div></div></div>' +
+      '<div class="row"><label for="fName">Profile name</label><div><input class="inp" id="fName" maxlength="30" value="' + esc(m.name) + '"><div class="cnt"><span id="eName"></span><span id="cName"></span></div></div></div>' +
+      '<div class="row"><span class="lb">Language</span><div><div class="chips" role="group" aria-label="Language">' + Object.keys(LANG).map(function (k) { return '<button class="chip' + (m.lang === k ? ' on' : '') + '" data-lang="' + k + '">' + esc(LANG[k].n) + '</button>'; }).join('') + '</div><div class="hint">Each language is its own version of the page, with its own review.</div></div></div>' +
+      '<div class="row"><span class="lb">Template</span><div class="tpls">' + Object.keys(TPL).map(function (k) { var t = TPL[k]; return '<button class="tpl' + (m.tpl === k ? ' on' : '') + '" data-tpl="' + k + '" style="--tc:' + t.c + '"><span class="ck">' + CHECK + '</span><div class="th"><i></i><i></i><i></i></div><b>' + esc(t.n) + '</b><small>' + esc(t.d) + '</small></button>'; }).join('') + '</div></div>' +
+      '<div class="row"><label for="fAbout">About me</label><div><textarea class="ta" id="fAbout" maxlength="140" rows="3">' + esc(m.about) + '</textarea><div class="cnt"><span id="eAbout"></span><span id="cAbout"></span></div></div></div>' +
+      '<div class="row"><span class="lb">Event highlight</span><div><div class="chips" role="group" aria-label="Event highlight">' + EVENTS.map(function (e, i) { return '<button class="chip' + (m.ev === i ? ' on' : '') + '" data-ev="' + i + '">' + esc(e) + '</button>'; }).join('') + '</div><div class="hint">Choose from events XMTrading has approved for partners.</div></div></div>' +
+      '<div class="row"><label for="fBen">Benefit description</label><div><input class="inp" id="fBen" maxlength="70" value="' + esc(m.benefit) + '"><div class="cnt"><span id="eBen"></span><span id="cBen"></span></div></div></div>' +
+      '<div class="acts"><span class="mut" id="dnote" style="font-size:12.5px"></span><span class="sp1"></span><button class="btn btn-outline" id="reset">Reset</button><button class="btn btn-primary" id="submit">Submit for review</button></div>' +
+      '<div class="guard"><b>What XMTrading controls:</b> approved templates, compliant claims, the registration form and the risk warning. Affiliates control the personal parts above.</div>' +
+      '</div>' +
+      '<div class="pvc"><div class="pvh"><h3>Page Preview</h3><div class="pill-tabs" role="tablist" aria-label="Preview device"><button class="' + (S.dev === 'desktop' ? 'on' : '') + '" data-dev="desktop">Desktop</button><button class="' + (S.dev === 'mobile' ? 'on' : '') + '" data-dev="mobile">Mobile</button></div></div><div class="pvb" id="pvb"></div><div class="pvn">Updates as you type. Illustrative content.</div></div></div>';
+    $('#stage').innerHTML = portal('My Sign-Up Page', tools, body);
+    renderPreview(); feedback();
+  }
+  function renderPreview() {
+    var host = $('#pvb'); if (!host) return;
+    var m = S.draft;
+    if (S.dev === 'desktop') {
+      host.innerHTML = '<div class="browser"><div class="bar"><i></i><i></i><i></i><span class="url">' + esc(urlOf(m)) + '</span></div><div class="sv"><div class="sz"><div class="scale"></div></div></div></div>';
+      mount(host, m, false, 900);
+    } else {
+      host.innerHTML = '<div class="pvm"><div class="phone"><span class="notch"></span><div class="scr"><div class="sv" style="padding-top:26px;background:#fff"><div class="sz"><div class="scale"></div></div></div></div></div></div>';
+      mount(host, m, true, 390);
+    }
+  }
+  function feedback() {
+    var m = S.draft, I = issues(m);
+    function f(id, cid, eid, val, max, key) {
+      var e = $('#' + id); if (!e) return;
+      var bad = I.filter(function (x) { return x.f === key; });
+      e.classList.toggle('err', !!bad.length);
+      $('#' + cid).textContent = val.length + ' / ' + max;
+      $('#' + eid).innerHTML = bad.length ? '<span class="bad">&ldquo;' + esc(bad[0].word) + '&rdquo; is not allowed. Remove or rephrase it.</span>' : '';
+    }
+    f('fName', 'cName', 'eName', m.name, 30, 'name'); f('fAbout', 'cAbout', 'eAbout', m.about, 140, 'about'); f('fBen', 'cBen', 'eBen', m.benefit, 70, 'benefit');
+    var dirty = JSON.stringify(S.draft) !== JSON.stringify(S.pub), sb = $('#submit'), dn = $('#dnote');
+    if (!dirty && S.status === 'draft') S.status = 'approved';
+    if (sb) { sb.disabled = !!I.length || !m.name.trim() || S.status === 'pending' || (S.status === 'approved' && !dirty); sb.textContent = S.status === 'pending' ? 'In review' : 'Submit for review'; }
+    if (dn) dn.textContent = I.length ? I.length + ' claim' + (I.length > 1 ? 's' : '') + ' to fix before you can submit' : S.status === 'approved' && !dirty ? 'Published version. Edit anything to start a new draft.' : S.status === 'pending' ? 'Waiting for XMTrading. The published page has not changed.' : 'Changes are not live until XMTrading approves them.';
+    var st = $('.st'); if (st) st.innerHTML = 'Status ' + stampHTML();
+  }
+  function touched() { if (S.status !== 'draft') { S.status = 'draft'; } S.note = ''; }
+  function head() {
+    var c = CAPS[S.scene]; $('#cap').innerHTML = '<span class="n">' + c[0] + '</span><span>' + c[1] + '</span>';
+    $$('[data-scene]').forEach(function (b) { var on = b.getAttribute('data-scene') === S.scene; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+  }
+
+  /* ---------- scene B ---------- */
+  function renderB() {
+    var tools = '<span class="st">Status ' + stampHTML() + '</span>', body;
+    var m = S.draft, I = issues(m);
+    if (S.status === 'draft') {
+      body = '<div class="emp"><h3>Nothing waiting for review</h3>Submit a draft from the editor and it appears here for XMTrading.<br><button class="btn btn-primary" data-scene="a">Go to the editor</button></div>';
+    } else {
+      var steps = ['Draft', 'Submitted', 'Approved'], cur = S.status === 'approved' ? 2 : 1;
+      var tl = '<div class="tlv">' + steps.map(function (s, i) { return (i ? '<span class="ln' + (i <= cur ? ' on' : '') + '"></span>' : '') + '<span class="s' + (i <= cur ? ' on' : '') + (i === cur ? ' cur' : '') + '"><i>' + (i < cur || S.status === 'approved' ? CHECK.replace('<svg', '<svg width="12" height="12"') : i + 1) + '</i>' + s + '</span>'; }).join('') + '</div>';
+      var items = [
+        ['General', 'Approved template used', TPL[m.tpl].n + ' (' + LANG[m.lang].n + ')', 1],
+        ['Photo', 'Photo or logo meets the guidelines', 'Simulated check', 1],
+        ['Claims', 'No guaranteed or risk-free wording', I.length ? 'Found: ' + I.map(function (x) { return '\u201c' + x.word + '\u201d'; }).join(', ') : 'About me and benefit text are clean', !I.length],
+        ['Event', 'Event highlight is from the approved list', EVENTS[m.ev], 1],
+        ['Risk', 'Standard risk warning shown', 'Locked by XMTrading, cannot be edited', 1]
+      ];
+      var done = S.status === 'approved';
+      body = '<div class="rd"><div>' + tl + '<h3 style="font-size:15px;margin-bottom:10px">Review checklist</h3><div class="chk">' +
+        items.map(function (x) { return '<div class="' + (x[3] ? '' : 'x') + '"><i>' + (x[3] ? CHECK : CROSS) + '</i><span><b>' + x[1] + '</b><small>' + esc(x[2]) + '</small></span></div>'; }).join('') + '</div></div>' +
+        '<div class="dec"><h3>' + (done ? 'Approved and live' : 'Decision') + '</h3><p>' + (done ? 'The page below is what visitors now see.' : 'Reviewing <b>' + esc(m.name) + '</b>\u2019s page, ' + esc(LANG[m.lang].n) + ' version.') + '</p>' +
+        (done ? '<button class="btn btn-primary" data-scene="c">View the live page</button><button class="btn btn-outline" data-scene="a">Back to the editor</button>' :
+          '<button class="btn btn-primary" id="approve"' + (I.length ? ' disabled' : '') + '>Approve and publish</button><button class="btn btn-outline" id="changes">Request changes</button>') +
+        (done ? '<div class="ok">Published as <b>' + esc(urlOf(S.pub)) + '</b></div>' : '') + '</div></div>';
+    }
+    $('#stage').innerHTML = portal('Review: My Sign-Up Page', tools, body);
+  }
+
+  /* ---------- scene C ---------- */
+  function renderC() {
+    var m = S.pub, mobile = window.innerWidth < 760;
+    var behind = JSON.stringify(S.draft) !== JSON.stringify(S.pub);
+    $('#stage').innerHTML = '<div class="vis"><div class="pubnote"><span class="tag">Live</span><span>This is the <b>published</b> version.' + (behind ? ' Your draft changes are not live yet' + (S.status === 'pending' ? ', they are in review.' : '.') : '') + '</span></div>' +
+      '<div class="vis-w card" style="border-radius:20px"><div class="browser"><div class="bar"><i></i><i></i><i></i><span class="url">' + esc(urlOf(m)) + '</span></div>' + pageHTML(m, mobile) + '</div></div></div>';
+  }
+
+  function render() { head(); S.scene === 'a' ? renderA() : S.scene === 'b' ? renderB() : renderC(); }
+  function go(s) { S.scene = s; render(); }
+
+  /* ---------- events ---------- */
+  document.addEventListener('input', function (e) {
+    var id = e.target.id, m = S.draft; if (!id) return;
+    if (id === 'fName') m.name = e.target.value; else if (id === 'fAbout') m.about = e.target.value; else if (id === 'fBen') m.benefit = e.target.value; else return;
+    touched(); renderPreview(); feedback();
+  });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button, a'); if (!t) return;
+    if (t.tagName === 'A' && t.getAttribute('href') === '#') e.preventDefault();
+    var m = S.draft, d = function (k) { return t.getAttribute('data-' + k); };
+    if (t.hasAttribute('data-scene')) { go(d('scene')); return; }
+    if (t.hasAttribute('data-reg')) { XM.toast('Prototype: nothing is submitted'); return; }
+    if (t.hasAttribute('data-dev')) { S.dev = d('dev'); $$('[data-dev]').forEach(function (b) { b.classList.toggle('on', b === t); }); renderPreview(); return; }
+    if (t.hasAttribute('data-photo')) { m.photo = +d('photo'); touched(); renderA(); return; }
+    if (t.hasAttribute('data-lang')) { m.lang = d('lang'); touched(); renderA(); return; }
+    if (t.hasAttribute('data-tpl')) { m.tpl = d('tpl'); touched(); renderA(); return; }
+    if (t.hasAttribute('data-ev')) { m.ev = +d('ev'); touched(); renderA(); return; }
+    if (t.id === 'reset') { S.draft = clone(S.pub); S.status = 'approved'; S.note = ''; renderA(); return; }
+    if (t.id === 'submit') { S.status = 'pending'; S.note = ''; XM.toast('Submitted to XMTrading for review'); go('b'); return; }
+    if (t.id === 'approve') { S.pub = clone(S.draft); S.status = 'approved'; XM.toast('Approved. The page is live'); renderB(); return; }
+    if (t.id === 'changes') { S.status = 'draft'; S.note = 'Please make the introduction more specific to your audience and resubmit.'; XM.toast('Changes requested'); go('a'); return; }
+  });
+  window.addEventListener('resize', function () { if (S.scene === 'a') renderPreview(); else if (S.scene === 'c') renderC(); });
+
+  render();
+
+  XM.notes({
+    title: 'Personalized sign-up page (idea 13)',
+    today: 'Affiliates send traffic to generic XMTrading pages. Visitors do not see who invited them, so there is little personal trust at the moment of sign-up.',
+    proposed: 'Affiliates configure an approved photo, name, language, introduction, benefit and event highlight on an approved template, with a live desktop and mobile preview. XMTrading reviews it before publishing; the form and risk warning stay locked.',
+    why: 'A familiar face and a message in the visitor\u2019s language may lift visit-to-registration conversion while keeping claims compliant.',
+    metric: 'Visit-to-registration and registration-to-first-deposit conversion, funded clients per page, cost per funded client vs generic pages, content approval rate and compliance incidents.'
+  });
+})();
+</script>
+<script src="../../assets/js/review.js" data-idea="13"></script>
+</body>
+</html>
