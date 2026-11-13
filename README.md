@@ -15,7 +15,7 @@ python3 server.py          # http://localhost:8000
 python3 server.py 9000     # another port
 ```
 
-Open `http://localhost:8000/index.html`. The password is the same as the Website Strategy studio.
+Open `http://localhost:8000/index.html`. This studio has its own password, separate from the Website Strategy studio. Ask the product team for it, or set a new one with `python3 scripts/set_password.py`.
 
 `server.py` also stores votes and comments in `data/state.json` (not committed). Share the network URL it prints and everyone comments into the same file. On GitHub Pages there is no server, so comments stay in each reviewer's browser.
 

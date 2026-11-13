@@ -278,9 +278,9 @@
   var IDEAS = XM_IDEAS, AREAS = XM_AREAS, $ = XM.$, esc = XM.esc;
   function byId(id) { return IDEAS.filter(function (x) { return x.id === id; })[0]; }
   var hash = (location.hash || '').replace('#', '');
-  var sel = byId(hash) ? hash : (byId(localStorage.getItem('xm27.sel')) ? localStorage.getItem('xm27.sel') : IDEAS[0].id);
-  var view = localStorage.getItem('xm27.view') || 'area', filter = 'all', query = '', tab = localStorage.getItem('xm27.tab') || 'about';
-  var onlyShort = localStorage.getItem('xm27.short') === '1';
+  var sel = byId(hash) ? hash : (byId(localStorage.getItem('xm27.sel')) ? localStorage.getItem('xm27.sel') : (IDEAS.filter(function (i) { return i.shortlist; }).sort(function (a, b) { return a.shortlist.priority - b.shortlist.priority; })[0] || IDEAS[0]).id);
+  var view = localStorage.getItem('xm27.v2.view') || 'priority', filter = 'all', query = '', tab = localStorage.getItem('xm27.tab') || 'about';
+  var onlyShort = localStorage.getItem('xm27.v2.short') !== '0';
   var shut = {}; try { shut = JSON.parse(localStorage.getItem('xm27.shut') || '{}'); } catch (e) {}
   function lines(v) { return Array.isArray(v) ? v : (v ? [v] : []); }
   document.getElementById('logo').innerHTML = XM.logo(false);
@@ -503,8 +503,8 @@
     if (e.target.id === 'cmtTxt') $('#cmtPost').disabled = !e.target.value.trim();
   });
   document.addEventListener('click', function (e) {
-    var vw = e.target.closest('[data-view]'); if (vw) { view = vw.getAttribute('data-view'); localStorage.setItem('xm27.view', view); chrome(); groups(); ensureVisibleSel(); stage(); return; }
-    var sh = e.target.closest('[data-sh]'); if (sh) { onlyShort = !onlyShort; localStorage.setItem('xm27.short', onlyShort ? '1' : '0'); chrome(); groups(); var o2 = visibleOrder(); if (o2.length && o2.indexOf(sel) < 0) select(o2[0], { scroll: true }); else stage(); return; }
+    var vw = e.target.closest('[data-view]'); if (vw) { view = vw.getAttribute('data-view'); localStorage.setItem('xm27.v2.view', view); chrome(); groups(); ensureVisibleSel(); stage(); return; }
+    var sh = e.target.closest('[data-sh]'); if (sh) { onlyShort = !onlyShort; localStorage.setItem('xm27.v2.short', onlyShort ? '1' : '0'); chrome(); groups(); var o2 = visibleOrder(); if (o2.length && o2.indexOf(sel) < 0) select(o2[0], { scroll: true }); else stage(); return; }
     var f = e.target.closest('[data-f]'); if (f) { filter = f.getAttribute('data-f'); chrome(); groups(); var o = visibleOrder(); if (o.length && o.indexOf(sel) < 0) select(o[0], { scroll: true }); else stage(); return; }
     var gh = e.target.closest('[data-gh]'); if (gh) { var k = gh.getAttribute('data-gh'); shut[k] = !shut[k]; localStorage.setItem('xm27.shut', JSON.stringify(shut)); gh.closest('.grp').classList.toggle('shut', !!shut[k]); gh.setAttribute('aria-expanded', !shut[k]); return; }
     var row = e.target.closest('.row'); if (row) { select(row.getAttribute('data-id'), { open: true }); return; }

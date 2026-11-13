@@ -41,14 +41,6 @@ window.XM_AREAS = {
 window.XM_IDEAS = [
   /* ============================ PROMOTIONS ============================ */
   {
-    id: '01', slide: 3, area: 'promotions', status: 'deck',
-    title: 'Learn to Earn: Deposit Bonus x2',
-    short: 'Pass a course, earn a token for a higher deposit bonus',
-    assumption: 'The Learn and Research section of the website converts about 10x better than intended, so sending traffic there with a limited promotion should convert better.',
-    scope: 'Define an educational product MVP (mechanics and content, refer to Babypips courses) so that when a user passes a course they receive a token that results in a higher deposit bonus.',
-    metrics: 'Expected to boost cohort LTV by x1.2 and PWA platform usage for such users.'
-  },
-  {
     id: '02', slide: 4, area: 'promotions', status: 'deck',
     title: 'RAF progression',
     short: 'Referral milestones 0, 5, 10, 15 in the Client Portal',
