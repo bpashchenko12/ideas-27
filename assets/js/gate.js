@@ -4,8 +4,8 @@
    Only a salted PBKDF2 hash is stored here, never the password itself.
    This is a client-side gate: it keeps casual visitors out, it is not server security. */
 (function () {
-  var HASH = '3a4cadbad18bf922c62350a47310991b61077ea7d52c8f42109ca838688cf250';
-  var SALT = 'xmtrading-ideas-2027-b2aef54b359e3de5';
+  var HASH = 'fe2ac3c61684c36ddad49662596e2b186efc0c6659fbee407244c2a3e5b9c11a';
+  var SALT = 'xmtrading-ideas-2027-1d30a2b34cacb8f8';
   var ITER = 200000;
   var KEY = 'xm.access';
 

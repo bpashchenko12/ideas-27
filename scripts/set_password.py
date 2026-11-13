@@ -29,7 +29,16 @@ def main():
         return 1
     digest = hashlib.pbkdf2_hmac("sha256", pw.encode("utf-8"), salt.encode("utf-8"), iters).hex()
     GATE.write_text(re.sub(r"var HASH = '[0-9a-f]+'", "var HASH = '%s'" % digest, src), encoding="utf-8")
-    print("Updated assets/js/gate.js. Commit it and tell the team the new password.")
+    # Version the script URL so browsers and CDNs do not serve an old gate.js.
+    root = GATE.parent.parent.parent
+    for page in root.rglob("*.html"):
+        if ".git" in page.parts:
+            continue
+        text = page.read_text(encoding="utf-8")
+        new = re.sub(r'(assets/js/gate\.js)(\?v=\w+)?"', r'\1?v=%s"' % digest[:8], text)
+        if new != text:
+            page.write_text(new, encoding="utf-8")
+    print("Updated assets/js/gate.js and the page links. Commit and tell the team the new password.")
     return 0
 
 
