@@ -505,7 +505,7 @@
   document.addEventListener('click', function (e) {
     var vw = e.target.closest('[data-view]'); if (vw) { view = vw.getAttribute('data-view'); localStorage.setItem('xm27.v2.view', view); chrome(); groups(); ensureVisibleSel(); stage(); return; }
     var sh = e.target.closest('[data-sh]'); if (sh) { onlyShort = !onlyShort; localStorage.setItem('xm27.v2.short', onlyShort ? '1' : '0'); chrome(); groups(); var o2 = visibleOrder(); if (o2.length && o2.indexOf(sel) < 0) select(o2[0], { scroll: true }); else stage(); return; }
-    var f = e.target.closest('[data-f]'); if (f) { filter = f.getAttribute('data-f'); chrome(); groups(); var o = visibleOrder(); if (o.length && o.indexOf(sel) < 0) select(o[0], { scroll: true }); else stage(); return; }
+    var f = e.target.closest('[data-f]'); if (f) { var nf = f.getAttribute('data-f'); filter = (nf === filter && nf !== 'all') ? 'all' : nf; chrome(); groups(); var o = visibleOrder(); if (o.length && o.indexOf(sel) < 0) select(o[0], { scroll: true }); else stage(); return; }
     var gh = e.target.closest('[data-gh]'); if (gh) { var k = gh.getAttribute('data-gh'); shut[k] = !shut[k]; localStorage.setItem('xm27.shut', JSON.stringify(shut)); gh.closest('.grp').classList.toggle('shut', !!shut[k]); gh.setAttribute('aria-expanded', !shut[k]); return; }
     var row = e.target.closest('.row'); if (row) { select(row.getAttribute('data-id'), { open: true }); return; }
     var tb = e.target.closest('[data-tab]'); if (tb) { showTab(tb.getAttribute('data-tab')); return; }
