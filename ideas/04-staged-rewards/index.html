@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Password gate: keep this line first. -->
+<script src="../../assets/js/gate.js?v=fe2ac3c6"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Staged rewards based on trading milestones · XMTrading</title>
+<link rel="stylesheet" href="../../assets/css/xm.css">
+<style>
+/* =====================================================================
+   IDEA 04 · Staged rewards based on trading milestones (Promotions)
+   One mission path (deposit, then two volume milestones) shown in three places of the
+   client portal: a login popup, a Home widget, and My Profile next to the loyalty scale.
+   Layout of the portal follows the my.xmtrading.com screenshots. Amounts are illustrative.
+   ===================================================================== */
+body { background: #f5f5f5; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 96px; }
+.w14 { width: 14px; height: 14px; } .w18 { width: 18px; height: 18px; } .w28 { width: 28px; height: 28px; }
+
+/* ---------- header, caption, demo bar ---------- */
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 22px 0 14px; }
+.head h1 { font-size: clamp(26px, 3vw, 36px); line-height: 1.1; letter-spacing: -.025em; margin-top: 4px; }
+.head p { color: var(--ink-2); max-width: 680px; font-size: 14.5px; margin-top: 6px; }
+.head .pill-tabs { box-shadow: var(--sh-s); }
+.head .pill-tabs button { padding: 10px 20px; transition: background .15s, color .15s; }
+.cap { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 11px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+.cap .n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.cap b { color: var(--ink); }
+.demo { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; margin: 0 0 14px; padding: 10px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); font-size: 12.5px; }
+.demo .lbl { font-weight: 700; color: var(--mut); letter-spacing: .08em; text-transform: uppercase; font-size: 11px; margin-right: 8px; }
+.demo .grp { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.demo .pill-tabs { background: var(--soft); border-color: transparent; flex-wrap: wrap; border-radius: 18px; }
+.demo .pill-tabs button { padding: 6px 12px; font-size: 12.5px; }
+.demo .pill-tabs button.on { background: #fff; box-shadow: var(--sh-s); }
+.demo input[type=range] { width: 160px; accent-color: var(--g); }
+.demo output { font-weight: 600; min-width: 64px; font-variant-numeric: tabular-nums; }
+
+/* ---------- desktop portal frame ---------- */
+.app { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr); height: 720px; background: #fff; border: 1px solid var(--line-2); border-radius: 20px; overflow: hidden; box-shadow: var(--sh-l); }
+.app .pwa-rail { gap: 10px; }
+.app .pwa-rail .xm-mark { margin-bottom: 14px; }
+.app .pwa-rail a { cursor: default; }
+.ap-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.ap-top { flex: none; height: 56px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding: 0 20px; }
+.ib { position: relative; width: 38px; height: 38px; border-radius: 50%; border: 0; background: transparent; display: grid; place-items: center; color: var(--ink); }
+.ib:hover { background: var(--soft); }
+.ib .rd { position: absolute; top: 8px; right: 9px; width: 8px; height: 8px; border-radius: 50%; background: #e5373f; border: 2px solid #fff; }
+.ap-scroll { flex: 1; min-height: 0; overflow: auto; }
+.ban { display: flex; align-items: center; justify-content: center; gap: 10px; background: #000; color: #fff; font-size: 13px; font-weight: 500; padding: 14px 16px; text-align: center; }
+.ban .bi { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #f6a821; color: #f6a821; display: grid; place-items: center; flex: none; }
+.ban .bi svg { width: 11px; height: 11px; }
+.chp { border: 0; border-radius: 999px; background: #f6a821; color: #1d2024; font-weight: 600; font-size: 12px; padding: 5px 14px; }
+.col { max-width: 600px; margin: 0 auto; padding: 22px 20px 36px; display: grid; gap: 16px; }
+.r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* balance + details + quick actions */
+.bal { border-radius: 22px; padding: 14px; color: #fff; background: linear-gradient(135deg, #d6246e 0%, #5b1b9a 42%, #0a1fd8 100%); display: flex; flex-direction: column; gap: 8px; min-height: 230px; }
+.bal .ac { display: flex; align-items: center; gap: 8px; }
+.bal .acs { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .18); border-radius: 999px; padding: 5px 10px; font-size: 12.5px; font-weight: 500; white-space: nowrap; }
+.bal .acs span { overflow: hidden; text-overflow: ellipsis; }
+.flag { width: 20px; height: 20px; border-radius: 50%; background: #fff; display: grid; place-items: center; flex: none; }
+.flag::after { content: ''; width: 9px; height: 9px; border-radius: 50%; background: #d7263d; }
+.bal .plus { width: 30px; height: 30px; border-radius: 50%; background: rgba(255, 255, 255, .2); display: grid; place-items: center; font-size: 18px; line-height: 1; flex: none; }
+.bal .tg { display: flex; gap: 6px; margin-top: 6px; }
+.bal .tg span { border: 1px solid rgba(255, 255, 255, .6); border-radius: 6px; padding: 1px 7px; font-size: 10px; }
+.bal .amt { font-size: 32px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+.bal .sub { align-self: flex-start; background: rgba(255, 255, 255, .25); border-radius: 999px; padding: 1px 9px; font-size: 10px; }
+.bal .bt { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: auto; }
+.bal .bt button { border: 0; border-radius: 999px; background: #fff; color: #111; font-weight: 600; font-size: 13px; padding: 9px 6px; display: flex; gap: 6px; justify-content: center; align-items: center; }
+.det { background: #f1f3f7; border-radius: 22px; padding: 16px 18px; }
+.det h4 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+.det dl { margin: 0; display: grid; gap: 5px; font-size: 12.5px; }
+.det dl div { display: flex; justify-content: space-between; gap: 8px; color: var(--mut); }
+.det dd { margin: 0; color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+.det dd.hi { color: var(--g); font-weight: 700; }
+.qa { background: #f1f3f7; border-radius: 22px; padding: 14px 10px; display: grid; grid-template-columns: repeat(4, 1fr); }
+.qa button { border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; cursor: default; }
+.qa .c { width: 46px; height: 46px; border-radius: 50%; background: #e4e7ee; display: grid; place-items: center; }
+.pr { display: flex; gap: 12px; overflow: hidden; }
+.pr > div { flex: none; width: 250px; height: 92px; border-radius: 16px; padding: 14px; color: #fff; font-size: 11.5px; }
+.pr b { display: block; font-size: 14px; margin-bottom: 4px; }
+.pr .a { background: linear-gradient(120deg, #8c2118, #b9382a); } .pr .b { background: linear-gradient(120deg, #14543a, #1e7a55); }
+.pf-h { font-size: 20px; font-weight: 600; }
+.empty { height: 90px; border-radius: 22px; background: #f1f3f7; }
+
+/* ---------- reward widget (home) ---------- */
+.wg { position: relative; border-radius: 22px; padding: 16px 18px 16px; background: linear-gradient(180deg, #eaf8f1 0%, #fff 55%); border: 1px solid #bfe3d0; box-shadow: var(--sh-s); transition: box-shadow .25s; }
+.wg.hl { box-shadow: 0 0 0 3px rgba(0, 132, 84, .22), var(--sh-m); }
+.wg-h { display: flex; align-items: center; gap: 10px; }
+.wg-h .ti { width: 36px; height: 36px; border-radius: 11px; background: var(--g); color: #fff; display: grid; place-items: center; flex: none; }
+.wg-h .tx { flex: 1; min-width: 0; line-height: 1.25; }
+.wg-h .tx b { font-size: 15px; display: block; }
+.wg-h .tx small { font-size: 12px; color: var(--mut); }
+.wg .more { border: 0; background: none; color: var(--g); font-weight: 600; font-size: 12.5px; padding: 4px 0 0; display: inline-flex; align-items: center; gap: 4px; }
+
+/* node + track */
+.nd { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: #fff; border: 3px solid var(--line-2); color: var(--mut); flex: none; position: relative; z-index: 1; }
+.nd svg { width: 20px; height: 20px; }
+.nd.claimed { background: var(--g); border-color: var(--g); color: #fff; }
+.nd.ready { background: #f6a821; border-color: #f6a821; color: #fff; animation: pulseGold 1.6s infinite; }
+.nd.active { border-color: var(--g); color: var(--g); box-shadow: 0 0 0 5px rgba(0, 132, 84, .12); }
+.nd.next { background: var(--soft); }
+.nd.pop { animation: popIn .5s cubic-bezier(.2, .9, .3, 1.4); }
+@keyframes pulseGold { 0% { box-shadow: 0 0 0 0 rgba(246, 168, 33, .55); } 70% { box-shadow: 0 0 0 10px rgba(246, 168, 33, 0); } 100% { box-shadow: 0 0 0 0 rgba(246, 168, 33, 0); } }
+@keyframes popIn { 0% { transform: scale(.6); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+.trk { display: grid; grid-template-columns: repeat(3, 1fr); margin: 16px 0 12px; }
+.ts { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; --p: 0%; }
+.ts::before { content: ''; position: absolute; top: 20px; height: 6px; border-radius: 3px; left: -50%; width: 100%; background: linear-gradient(90deg, var(--g) var(--p), var(--line-2) var(--p)); }
+.ts:first-child::before { left: 0; width: 50%; }
+.ts b { font-size: 15px; margin-top: 7px; line-height: 1.2; }
+.ts b.k { color: var(--g); }
+.ts small { font-size: 11.5px; color: var(--mut); line-height: 1.3; margin-top: 1px; }
+.ts.s-next b, .ts.s-next small { opacity: .6; }
+.fr { display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+.fr .fi { flex: 1; min-width: 0; }
+.fr .fi small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mut); }
+.fr .fi b { display: block; font-size: 15px; line-height: 1.25; margin-top: 1px; }
+.fr .fi span { font-size: 12px; color: var(--ink-2); }
+.fr.done { background: var(--g-l); border-color: transparent; }
+.bar { height: 8px; border-radius: 99px; background: var(--soft); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2fb27d, var(--g)); transition: width .45s; }
+.bt2 { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: var(--mut); margin-top: 5px; font-variant-numeric: tabular-nums; }
+.fr .bar { margin-top: 8px; }
+
+/* ---------- vertical mission list (popup + profile) ---------- */
+.vl { list-style: none; margin: 0; padding: 0; }
+.vi { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; }
+.vi:last-child { padding-bottom: 0; }
+.vi::before { content: ''; position: absolute; left: 18.5px; top: 40px; bottom: -2px; width: 3px; border-radius: 2px; background: var(--line-2); }
+.vi:last-child::before { display: none; }
+.vi.claimed::before, .vi.ready::before { background: var(--g); }
+.vl .nd { width: 40px; height: 40px; border-width: 3px; }
+.vl .nd svg { width: 18px; height: 18px; }
+.vi .tt { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.vi .tt b { font-size: 14.5px; line-height: 1.25; }
+.vi .sb { font-size: 12px; color: var(--mut); margin: 1px 0 6px; }
+.rw { flex: none; font-size: 11.5px; font-weight: 700; background: var(--amber-l); color: var(--amber); border-radius: 999px; padding: 2px 9px; }
+.vi.claimed .rw { background: var(--g-l); color: var(--g); }
+.vi.next .tt b { color: var(--ink-2); }
+.vi .ok { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--g); }
+.vi .ok svg { width: 14px; height: 14px; }
+.vi .lk { font-size: 12px; color: var(--mut); }
+.vi .rdy { display: block; font-size: 12.5px; font-weight: 600; color: var(--amber); margin-bottom: 8px; }
+
+/* ---------- login popup ---------- */
+.ovl { position: absolute; inset: 0; z-index: 30; background: rgba(15, 18, 22, .55); display: grid; place-items: center; animation: fadeIn .25s; }
+.pop { position: relative; width: 460px; max-width: calc(100% - 28px); max-height: calc(100% - 28px); overflow: auto; background: #fff; border-radius: 24px; box-shadow: var(--sh-l); animation: fadeUp .35s; }
+.ph { position: relative; overflow: hidden; display: flex; align-items: center; gap: 14px; padding: 22px 56px 22px 22px; color: #fff; background: linear-gradient(135deg, #00402d 0%, #008454 62%, #2fb27d 100%); }
+.ph::after { content: ''; position: absolute; right: -30px; top: -40px; width: 150px; height: 150px; border-radius: 50%; background: rgba(255, 255, 255, .09); }
+.ph::before { content: ''; position: absolute; right: 60px; bottom: -50px; width: 90px; height: 90px; border-radius: 50%; background: rgba(246, 168, 33, .22); }
+.ph .gi { position: relative; z-index: 1; width: 56px; height: 56px; border-radius: 17px; background: rgba(255, 255, 255, .18); display: grid; place-items: center; flex: none; }
+.ph .gt { position: relative; z-index: 1; min-width: 0; }
+.ph small { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
+.ph h3 { font-size: 22px; line-height: 1.15; letter-spacing: -.01em; margin: 2px 0 3px; }
+.ph p { font-size: 12.5px; opacity: .9; line-height: 1.4; }
+.pcl { position: absolute; z-index: 2; right: 12px; top: 12px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, .2); color: #fff; display: grid; place-items: center; }
+.pcl:hover { background: rgba(255, 255, 255, .32); }
+.pcl svg { width: 16px; height: 16px; }
+.pb { padding: 20px 22px 6px; }
+.rf { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--ink-2); background: var(--blue-l); border-radius: 12px; padding: 9px 12px; margin: 14px 0 0; line-height: 1.45; }
+.rf svg { flex: none; width: 16px; height: 16px; color: var(--blue); margin-top: 1px; }
+.pf { padding: 14px 22px 6px; display: flex; gap: 8px; }
+.pf .btn-primary, .pf .btn-dark { flex: 1; }
+.fine { font-size: 11px; color: var(--mut); padding: 4px 22px 16px; line-height: 1.4; }
+
+/* ---------- My Profile drawer ---------- */
+.dov { position: absolute; inset: 0; z-index: 30; background: rgba(15, 18, 22, .5); display: flex; justify-content: flex-end; animation: fadeIn .2s; }
+.drw { width: 370px; max-width: 100%; height: 100%; overflow: auto; background: #fff; padding: 18px 20px 20px; animation: slideIn .28s cubic-bezier(.2, .8, .2, 1); display: flex; flex-direction: column; gap: 16px; }
+@keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.pp-h { display: flex; align-items: center; justify-content: space-between; }
+.pp-h h3 { font-size: 20px; font-weight: 600; }
+.pp-h .ib { width: 34px; height: 34px; }
+.wl2 { display: flex; align-items: center; gap: 12px; }
+.av { width: 44px; height: 44px; border-radius: 50%; background: #86c5ff; color: #fff; font-weight: 600; font-size: 14px; display: grid; place-items: center; flex: none; }
+.wl2 b { font-size: 18px; display: block; line-height: 1.2; } .wl2 span { font-size: 12.5px; color: var(--ink-2); }
+.lc { border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.lc-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
+.lc-top small { display: block; font-size: 11px; color: var(--mut); } .lc-top b { font-size: 15px; }
+.lc-top .v { text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; } .lc-top .v span { color: var(--mut); font-weight: 500; }
+.scl { display: grid; grid-template-columns: 24px minmax(0, 1fr) 24px; align-items: center; gap: 8px; margin: 12px 0 0; padding: 22px 0 22px; }
+.scl .rail { position: relative; height: 8px; border-radius: 99px; background: var(--soft); }
+.scl .rail > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: inherit; background: linear-gradient(90deg, #b87333, #e0a063); min-width: 8px; transition: width .45s; }
+.mk { position: absolute; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: #fff; border: 3px solid var(--line-2); }
+.mk.hit { background: var(--g); border-color: var(--g); }
+.mk em { position: absolute; left: 50%; transform: translateX(-50%); font-style: normal; font-size: 10.5px; font-weight: 700; color: var(--mut); white-space: nowrap; }
+.mk.up em { bottom: 18px; } .mk.dn em { top: 18px; }
+.mk.hit em { color: var(--g); }
+.lc .hint { font-size: 11.5px; color: var(--mut); margin: 0 0 12px; line-height: 1.4; }
+.lc hr { border: 0; height: 1px; background: var(--line); margin: 4px 0 14px; }
+.lc .lh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.lc .lh b { font-size: 14px; }
+.soon { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line-2); font-size: 11.5px; color: var(--mut); align-items: center; }
+.soon span.c { display: inline-flex; gap: 4px; align-items: center; background: var(--soft); border-radius: 999px; padding: 2px 9px; }
+.soon svg { width: 11px; height: 11px; }
+.vrf { display: flex; align-items: center; justify-content: space-between; background: #f1f3f7; border-radius: 14px; padding: 14px; font-size: 13px; color: var(--mut); }
+.menu { background: #f1f3f7; border-radius: 14px; padding: 4px 14px; }
+.menu button { width: 100%; display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 12px 0; font-size: 13.5px; font-weight: 500; border-bottom: 1px solid var(--line-2); text-align: left; cursor: default; }
+.menu button:last-child { border-bottom: 0; }
+.menu button span { flex: 1; } .menu .rt { color: var(--mut); } .menu .rt svg { transform: rotate(-90deg); }
+.out { background: #f1f3f7; border-radius: 14px; padding: 13px 14px; color: var(--red); font-size: 13.5px; font-weight: 500; border: 0; text-align: left; cursor: default; }
+.fb { margin-top: auto; background: #e9e4ff; border-radius: 14px; padding: 13px 14px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+
+/* confetti */
+.cf { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 60; }
+.cf i { position: absolute; top: -14px; width: 8px; height: 13px; border-radius: 2px; animation: cfall 1.7s cubic-bezier(.3, .6, .5, 1) forwards; }
+@keyframes cfall { to { transform: translateY(760px) rotate(600deg); opacity: .85; } }
+
+/* ---------- mobile (phone) ---------- */
+.mwrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.mtabs { box-shadow: var(--sh-s); }
+.mwrap .phone { width: 372px; }
+.mwrap .phone .scr { height: 720px; background: #fff; }
+.mstat { flex: none; display: flex; justify-content: space-between; padding: 12px 24px 6px; font-size: 12px; font-weight: 600; }
+.mscroll { flex: 1; min-height: 0; overflow: auto; padding: 4px 14px 18px; display: grid; gap: 14px; align-content: start; }
+.mh { display: flex; align-items: center; justify-content: space-between; padding: 6px 2px 0; }
+.mh h2 { font-size: 22px; font-weight: 600; }
+.mh .ib svg { width: 22px; height: 22px; }
+.mscroll .bal { min-height: 188px; }
+.mscroll .bal .amt { font-size: 30px; }
+.mscroll .qa { background: none; padding: 0; }
+.mscroll .qa .c { width: 52px; height: 52px; background: #f1f3f7; }
+.mscroll .qa button { font-size: 11px; }
+.mscroll .pr > div { width: 220px; height: 84px; }
+.mscroll .wg { padding: 14px; }
+.mscroll .ts b { font-size: 14px; }
+.mscroll .fr { flex-wrap: wrap; }
+.mscroll .fr .btn { width: 100%; }
+.mban { flex: none; display: flex; align-items: center; gap: 10px; background: #000; color: #fff; font-size: 12.5px; font-weight: 500; padding: 10px 14px; line-height: 1.35; }
+.mban .bi { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #f6a821; color: #f6a821; display: grid; place-items: center; flex: none; }
+.mban .bi svg { width: 11px; height: 11px; }
+.mnav { flex: none; display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px 4px 14px; border-top: 1px solid var(--line); background: #fff; }
+.mnav span { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 500; color: #5a6475; }
+.mnav span.on { color: #0e1116; font-weight: 600; } .mnav span.on svg { color: var(--up); }
+.mnav svg { width: 22px; height: 22px; }
+.mback { display: flex; align-items: center; gap: 8px; padding: 6px 0 2px; }
+.mback .ib { width: 34px; height: 34px; margin-left: -8px; } .mback .ib svg { transform: rotate(90deg); }
+.mback h2 { font-size: 20px; font-weight: 600; }
+.sov { position: absolute; inset: 0; z-index: 30; background: rgba(15, 18, 22, .55); display: flex; align-items: flex-end; animation: fadeIn .25s; }
+.pop.sheet { width: 100%; max-width: 100%; max-height: 92%; border-radius: 26px 26px 0 0; animation: sheetUp .35s cubic-bezier(.2, .8, .2, 1); }
+.pop.sheet .ph { padding: 18px 54px 18px 18px; } .pop.sheet .ph h3 { font-size: 19px; }
+.pop.sheet .pb { padding: 16px 16px 4px; } .pop.sheet .pf { padding: 12px 16px 4px; } .pop.sheet .fine { padding: 4px 16px 18px; }
+@keyframes sheetUp { from { transform: translateY(60px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+@media (max-width: 1080px) { .app { height: 700px; } }
+@media (max-width: 860px) {
+  .wrap { padding: 0 14px 90px; }
+  .head .pill-tabs { width: 100%; overflow-x: auto; }
+  .head .pill-tabs button { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+  .head .pill-tabs button[data-scene="d"], .mtabs { display: none; }
+  .demo { padding: 10px 12px; }
+  .demo input[type=range] { width: 130px; }
+  .mwrap .phone { width: 100%; max-width: 392px; padding: 0; border-radius: 26px; background: #fff; box-shadow: var(--sh-m); border: 1px solid var(--line-2); }
+  .mwrap .phone .scr { height: min(700px, calc(100vh - 150px)); min-height: 560px; border-radius: 26px; }
+  .phone .notch, .mstat { display: none; }
+  .scr .mscroll { padding-top: 12px; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <span class="eyebrow">Idea 04 &middot; Promotions</span>
+      <h1>Missions that make the first rewards feel close.</h1>
+      <p>Three clear missions replace one big requirement: deposit, then two trading volume milestones. The same path shows on login, on Home and next to the loyalty scale in My Profile.</p>
+    </div>
+    <div class="pill-tabs" role="tablist" aria-label="Scenes">
+      <button class="on" role="tab" data-scene="a">A &middot; Login popup</button>
+      <button role="tab" data-scene="b">B &middot; Home widget</button>
+      <button role="tab" data-scene="c">C &middot; Profile sidebar</button>
+      <button role="tab" data-scene="d">D &middot; Mobile</button>
+    </div>
+  </div>
+
+  <div class="cap" id="cap"></div>
+
+  <div class="demo" id="demo">
+    <span class="lbl">Demo client</span>
+    <div class="grp pill-tabs" role="group" aria-label="Progress presets">
+      <button data-pre="p0">Just verified</button>
+      <button data-pre="p1">Funded</button>
+      <button data-pre="p2">Trading</button>
+      <button data-pre="p3">Mission 2 reached</button>
+      <button data-pre="p4">Mission 3 reached</button>
+    </div>
+    <label class="grp" for="vol">Volume <input id="vol" type="range" min="0" max="600000" step="5000" value="0"><output id="volv">$0</output></label>
+    <div class="grp pill-tabs" role="group" aria-label="Client type">
+      <button data-who="new">New client</button>
+      <button data-who="ref">Referred client</button>
+    </div>
+    <button class="btn btn-outline btn-sm" data-act="replay">Replay login</button>
+  </div>
+
+  <!-- Desktop portal (scenes A, B, C) -->
+  <section id="sceneDesk">
+    <div class="app" id="app">
+      <aside class="pwa-rail" aria-hidden="true"></aside>
+      <div class="ap-main">
+        <div class="ap-top">
+          <button class="ib" aria-label="Notifications" data-act="noop" id="dBell"></button>
+          <button class="ib" aria-label="Wallet" data-act="noop" id="dWal"></button>
+          <button class="ib" aria-label="My Profile" data-act="profile" id="dUsr"></button>
+        </div>
+        <div class="ap-scroll" id="dHome"></div>
+      </div>
+      <div class="ovl" id="dPop" hidden></div>
+      <div class="dov" id="dDrwO" hidden></div>
+    </div>
+  </section>
+
+  <!-- Mobile (scene D, and every scene on narrow screens) -->
+  <section id="sceneM" hidden>
+    <div class="mwrap">
+      <div class="phone"><span class="notch"></span><div class="scr" id="phoneScr"></div></div>
+      <div class="pill-tabs mtabs" role="tablist" aria-label="Mobile screens">
+        <button data-mv="popup">Login popup</button>
+        <button data-mv="home">Home</button>
+        <button data-mv="profile">Profile</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="../../assets/js/common.js"></script>
+<script>
+(function () {
+  var $ = XM.$, $$ = XM.$$;
+  var NARROW = window.matchMedia('(max-width: 860px)');
+  var RATE = 150;            /* illustrative JPY per USD for the Credit line */
+  var LOY = 2000000;         /* volume needed for the next loyalty tier */
+
+  /* ---------- mission definition (amounts are illustrative) ---------- */
+  var STG = [
+    { id: 1, key: 'dep', goal: 100,    reward: 20,  icon: 'wallet', short: 'Deposit $100',     sub: 'Fund your trading account' },
+    { id: 2, key: 'vol', goal: 300000, reward: 50,  icon: 'chart',  short: 'Trade $300,000',   sub: 'In dollarized trading volume' },
+    { id: 3, key: 'vol', goal: 500000, reward: 100, icon: 'trophy', short: 'Trade $500,000',   sub: 'In dollarized trading volume' }
+  ];
+  var TOTAL = STG.reduce(function (a, g) { return a + g.reward; }, 0);
+  var PRE = {
+    p0: { dep: 0,   vol: 0,      cl: {} },
+    p1: { dep: 100, vol: 0,      cl: {} },
+    p2: { dep: 100, vol: 7305,   cl: { 1: 1 } },
+    p3: { dep: 100, vol: 300000, cl: { 1: 1 } },
+    p4: { dep: 100, vol: 500000, cl: { 1: 1, 2: 1 } }
+  };
+  var S = { scene: 'a', mv: 'popup', pre: 'p0', who: 'new', dep: 0, vol: 0, cl: {}, just: 0 };
+  var V2S = { popup: 'a', home: 'b', profile: 'c' }, S2V = { a: 'popup', b: 'home', c: 'profile', d: 'popup' };
+  var sc = {};
+
+  function usd(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+  function yen(n) { return '\u00a5' + Math.round(n).toLocaleString('en-US'); }
+  function ic(n, s) { return XM.icon(n, 'w' + s); }
+
+  /* ---------- state -> view model ---------- */
+  function model() {
+    var list = STG.map(function (g, i) {
+      var v = g.key === 'dep' ? S.dep : S.vol;
+      return { g: g, v: Math.min(v, g.goal), pct: Math.min(1, v / g.goal), done: false, cl: !!S.cl[g.id], i: i };
+    });
+    list.forEach(function (s, i) {
+      var raw = (s.g.key === 'dep' ? S.dep : S.vol) >= s.g.goal;
+      s.done = raw && (i === 0 || list[i - 1].done);
+    });
+    var act = -1, rdy = -1;
+    list.forEach(function (s, i) { if (act < 0 && !s.done) act = i; if (rdy < 0 && s.done && !s.cl) rdy = i; });
+    list.forEach(function (s, i) { s.st = s.cl ? 'claimed' : s.done ? 'ready' : (i === act && rdy < 0) ? 'active' : 'next'; });
+    var credit = 0, n = 0;
+    list.forEach(function (s) { if (s.cl) { credit += s.g.reward; n++; } });
+    return { list: list, act: act, rdy: rdy, focus: rdy >= 0 ? rdy : act, credit: credit, claimedN: n, all: n === STG.length };
+  }
+
+  /* ---------- shared pieces ---------- */
+  function nodeIcon(s) { return s.st === 'claimed' ? 'check' : s.st === 'ready' ? 'gift' : s.st === 'next' ? 'lock' : s.g.icon; }
+  function node(s) { return '<span class="nd ' + s.st + (S.just === s.g.id ? ' pop' : '') + '">' + XM.icon(nodeIcon(s)) + '</span>'; }
+  function barHTML(s) {
+    var w = s.pct > 0 ? Math.max(3, Math.round(s.pct * 100)) : 0;
+    var goalTxt = usd(s.g.goal);
+    return '<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(s.pct * 100) + '"><i style="width:' + w + '%"></i></div>' +
+      '<div class="bt2"><span>' + usd(s.v) + ' of ' + goalTxt + '</span><span>' + usd(s.g.goal - s.v) + ' to go</span></div>';
+  }
+  function subtitle(m) {
+    if (m.all) return 'You completed every mission. More missions may be added over time.';
+    if (m.rdy >= 0) return 'A reward is ready. Claim it, then keep going.';
+    return 'Three missions. Each one may unlock Trading Credit, up to ' + usd(TOTAL) + ' in total.';
+  }
+  function referredNote() {
+    return S.who === 'ref' ? '<div class="rf">' + XM.icon('users') + '<span>You joined with an invite from <b>Kenji S.</b> The same missions apply to you, and stages you complete may also move Kenji toward their referral reward.</span></div>' : '';
+  }
+  function cta(m, cls) {
+    var s = m.list[m.focus];
+    if (m.all || !s) return '';
+    cls = cls || 'btn btn-primary btn-sm';
+    if (s.st === 'ready') return '<button class="' + cls + '" data-act="claim" data-id="' + s.g.id + '">' + XM.icon('gift', 'w16') + 'Claim ' + usd(s.g.reward) + ' credit</button>';
+    if (s.g.key === 'dep') return '<button class="' + cls + '" data-act="dep">Deposit ' + usd(s.g.goal) + '</button>';
+    return '<button class="' + cls + '" data-act="trade">Trade now</button>';
+  }
+
+  /* horizontal track used by the Home widget */
+  function trackHTML(m) {
+    return '<div class="trk">' + m.list.map(function (s, i) {
+      var p = (i === 0 || m.list[i - 1].done) ? Math.round(s.pct * 100) : 0;
+      return '<div class="ts s-' + s.st + '" style="--p:' + p + '%">' + node(s) +
+        '<b class="' + (s.st === 'claimed' ? 'k' : '') + '">' + usd(s.g.reward) + '</b><small>' + s.g.short + '</small></div>';
+    }).join('') + '</div>';
+  }
+
+  /* vertical list used by the popup and the profile */
+  function listHTML(m) {
+    return '<ol class="vl">' + m.list.map(function (s, i) {
+      var body;
+      if (s.st === 'claimed') body = '<span class="ok">' + XM.icon('check') + 'Reward claimed</span>';
+      else if (s.st === 'ready') body = '<span class="rdy">Goal reached. Your reward is unlocked.</span><button class="btn btn-primary btn-sm" data-act="claim" data-id="' + s.g.id + '">Claim ' + usd(s.g.reward) + ' credit</button>';
+      else if (s.st === 'active') body = barHTML(s);
+      else body = '<span class="lk">Starts after mission ' + i + '</span>';
+      return '<li class="vi ' + s.st + '">' + node(s) + '<div><div class="tt"><b>' + s.g.short + '</b><span class="rw">' + usd(s.g.reward) + ' credit</span></div><div class="sb">' + s.g.sub + '</div>' + body + '</div></li>';
+    }).join('') + '</ol>';
+  }
+
+  /* ---------- A. login popup ---------- */
+  function popupHTML(m, sheet) {
+    var f = m.list[m.focus];
+    var primary = m.all ? '<button class="btn btn-dark btn-lg" data-act="close">Done</button>' : cta(m, 'btn btn-primary btn-lg');
+    return '<div class="pop' + (sheet ? ' sheet' : '') + '" role="dialog" aria-modal="true" aria-label="Your rewards path">' +
+      '<div class="ph"><span class="gi">' + ic('trophy', 28) + '</span><div class="gt"><small>Welcome missions</small><h3>' + (m.all ? 'All missions complete' : 'Your rewards path') + '</h3><p>' + subtitle(m) + '</p></div>' +
+      '<button class="pcl" data-act="close" aria-label="Close">' + XM.icon('close') + '</button></div>' +
+      '<div class="pb">' + listHTML(m) + referredNote() + '</div>' +
+      '<div class="pf">' + primary + (m.all ? '' : '<button class="btn btn-ghost btn-lg" data-act="close">Maybe later</button>') + '</div>' +
+      '<p class="fine">Illustrative amounts. Rewards are credited as Trading Credit and may be subject to terms and eligibility.</p></div>';
+  }
+
+  /* ---------- B. home widget ---------- */
+  function widgetHTML(m, hl) {
+    var f = m.list[m.focus], tagTxt, tagCls = 'tag';
+    if (m.all) tagTxt = 'Complete'; else if (m.rdy >= 0) { tagTxt = 'Reward ready'; tagCls = 'tag amber'; } else tagTxt = 'Mission ' + (m.act + 1) + ' of ' + STG.length;
+    var row;
+    if (m.all) {
+      row = '<div class="fr done"><div class="fi"><small>All missions complete</small><b>You earned ' + usd(m.credit) + ' in Trading Credit</b><span>More missions may be added over time.</span></div></div>';
+    } else if (f.st === 'ready') {
+      row = '<div class="fr"><div class="fi"><small>Mission ' + (f.i + 1) + ' complete</small><b>' + f.g.short + ': done</b><span>Unlock ' + usd(f.g.reward) + ' Trading Credit</span></div>' + cta(m) + '</div>';
+    } else {
+      row = '<div class="fr"><div class="fi"><small>Mission ' + (f.i + 1) + ' &middot; next up</small><b>' + f.g.short + '</b><span>Unlocks ' + usd(f.g.reward) + ' Trading Credit</span>' + barHTML(f) + '</div>' + cta(m) + '</div>';
+    }
+    return '<div class="wg' + (hl ? ' hl' : '') + '"><div class="wg-h"><span class="ti">' + ic('trophy', 18) + '</span><div class="tx"><b>Rewards path</b><small>' + (S.who === 'ref' ? 'Referred by Kenji S. &middot; you both progress' : 'Welcome missions') + '</small></div><span class="' + tagCls + '">' + tagTxt + '</span></div>' +
+      trackHTML(m) + row +
+      '<button class="more" data-act="profile">View all missions ' + ic('arrow', 14) + '</button></div>';
+  }
+
+  /* ---------- C. profile: loyalty scale + missions ---------- */
+  function medal(c1, c2) {
+    return '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 2l8.5 4.9v10.2L12 22l-8.5-4.9V6.9L12 2z" fill="' + c1 + '"/><path d="M12 6l5 2.9v6.2L12 18l-5-2.9V8.9L12 6z" fill="' + c2 + '"/></svg>';
+  }
+  function loyaltyHTML(m) {
+    var p = Math.min(1, S.vol / LOY), w = (p * 100).toFixed(2);
+    var ticks = STG.filter(function (g) { return g.key === 'vol'; }).map(function (g, i) {
+      var hit = S.vol >= g.goal;
+      return '<span class="mk ' + (i === 0 ? 'up' : 'dn') + (hit ? ' hit' : '') + '" style="left:' + (g.goal / LOY * 100) + '%"><em>$' + (g.goal / 1000) + 'K</em></span>';
+    }).join('');
+    var next = S.vol < 300000 ? 'Mission 2 sits ' + usd(300000 - S.vol) + ' ahead' : S.vol < 500000 ? 'Mission 3 sits ' + usd(500000 - S.vol) + ' ahead' : 'Both volume missions reached';
+    return '<div class="lc"><div class="lc-top"><div><small>Loyalty Tier</small><b>Bronze</b></div><div class="v">' + usd(S.vol) + ' <span>/ ' + usd(LOY) + '</span></div></div>' +
+      '<div class="scl">' + medal('#b87333', '#e6b17c') + '<div class="rail"><i style="width:' + w + '%"></i>' + ticks + '</div>' + medal('#9aa3ad', '#dfe3e8') + '</div>' +
+      '<p class="hint">The volume missions sit on the way to Silver. ' + next + '.</p>' +
+      '<hr><div class="lh"><b>Rewards path</b><span class="tag' + (m.rdy >= 0 ? ' amber' : '') + '">' + (m.all ? 'Complete' : m.rdy >= 0 ? 'Reward ready' : m.claimedN + ' of ' + STG.length + ' claimed') + '</span></div>' +
+      listHTML(m) + referredNote() +
+      '<div class="soon"><span>More missions may follow:</span><span class="c">' + ic('lock', 14) + 'First trade</span><span class="c">' + ic('lock', 14) + 'Trade a selected instrument</span><span class="c">' + ic('lock', 14) + 'Stay active</span></div></div>';
+  }
+  function profileBody(m) {
+    return '<div class="wl2"><span class="av">TT</span><div><b>Welcome</b><span>taro.example@mail.com</span></div></div>' +
+      loyaltyHTML(m) +
+      '<div class="vrf"><span>Verification</span><span class="tag">Verified</span></div>' +
+      '<div class="menu"><button data-act="noop">' + ic('grid', 18) + '<span>Settings</span><i class="rt">' + XM.icon('chev') + '</i></button><button data-act="noop">' + ic('book', 18) + '<span>Legal</span><i class="rt">' + XM.icon('chev') + '</i></button><button data-act="noop">' + ic('headset', 18) + '<span>Support</span><i class="rt">' + XM.icon('chev') + '</i></button></div>' +
+      '<button class="out" data-act="noop">Sign Out</button>' +
+      '<div class="fb">' + ic('bolt', 18) + '<span>Suggest new features or share your opinion</span></div>';
+  }
+  function drawerHTML(m) {
+    return '<aside class="drw" id="dDrw" role="dialog" aria-label="My Profile"><div class="pp-h"><h3>My Profile</h3><button class="ib" data-act="close" aria-label="Close">' + XM.icon('close', 'w20') + '</button></div>' + profileBody(m) + '</aside>';
+  }
+
+  /* ---------- portal home (desktop + mobile share the pieces) ---------- */
+  function balCard(m, mob) {
+    return '<div class="bal"><div class="ac"><div class="acs"><i class="flag"></i><span>Standard #70600835</span>' + ic('chev', 14) + '</div><span class="plus">+</span></div>' +
+      '<div class="tg"><span>Real</span><span>MT5 Standard</span></div><div class="amt">' + yen(1398558) + '</div><div class="sub">' + yen(0) + '</div>' +
+      '<div class="bt"><button data-act="noop">Manage</button><button data-act="dep">' + ic('arrow', 14).replace('<svg', '<svg style="transform:rotate(-90deg)"') + 'Deposit</button></div></div>';
+  }
+  function detCard(m) {
+    var row = function (k, v, c) { return '<div><span>' + k + '</span><dd class="' + (c || '') + '">' + v + '</dd></div>'; };
+    return '<div class="det"><h4>Account details</h4><dl>' + row('Unrealized P/L', yen(0)) + row('Balance', yen(1398558)) + row('Margin', yen(0)) + row('Free Margin', yen(1398558)) + row('Margin Level', '-') +
+      row('Credit', yen(m.credit * RATE), m.credit ? 'hi' : '') + row('Leverage', '1000:1') + '</dl></div>';
+  }
+  function qaCard() {
+    var it = [['bolt', 'Promotions'], ['users', 'Refer a Friend'], ['gift', 'Bonuses'], ['copy', 'Copy Trading']];
+    return '<div class="qa">' + it.map(function (x) { return '<button data-act="noop"><span class="c">' + ic(x[0], 20) + '</span>' + x[1] + '</button>'; }).join('') + '</div>';
+  }
+  function promos() { return '<div class="pr"><div class="a"><b>Seasonal prize draw</b>Illustrative campaign card for active clients.</div><div class="b"><b>Refer a Friend</b>Invite friends and track progress together.</div><div class="a"><b>Another offer</b>More promotions appear here.</div></div>'; }
+  function bannerHTML(cls) {
+    return '<div class="' + cls + '"><span class="bi">' + XM.icon('check') + '</span><span>Your account is verified! Deposit to claim your 100% Deposit Bonus.</span>' + (cls === 'ban' ? '<button class="chp" data-act="dep">Deposit</button>' : '') + '</div>';
+  }
+
+  function deskHome(m) {
+    return bannerHTML('ban') + '<div class="col"><div class="r2">' + balCard(m) + detCard(m) + '</div>' + qaCard() + widgetHTML(m, S.scene === 'b') + promos() + '<h4 class="pf-h">Portfolio</h4><div class="empty"></div></div>';
+  }
+  function mobHome(m) {
+    return '<div class="mh"><h2>Home</h2><div><button class="ib" data-act="noop" aria-label="Notifications">' + XM.icon('bell') + '<i class="rd"></i></button><button class="ib" data-act="noop" aria-label="Wallet">' + XM.icon('wallet') + '</button><button class="ib" data-act="profile" aria-label="My Profile">' + XM.icon('user') + '</button></div></div>' +
+      balCard(m, true) + qaCard() + widgetHTML(m, true) + promos() + '<h4 class="pf-h">Portfolio</h4><div class="empty"></div>';
+  }
+  function mobNav() {
+    var it = [['home', 'Home', 1], ['chart', 'Markets'], ['bolt', 'Trade'], ['wallet', 'Portfolio'], ['grid', 'More']];
+    return '<nav class="mnav">' + it.map(function (x) { return '<span class="' + (x[2] ? 'on' : '') + '">' + XM.icon(x[0]) + x[1] + '</span>'; }).join('') + '</nav>';
+  }
+
+  /* ---------- render ---------- */
+  function mview() { return NARROW.matches ? S2V[S.scene] : S.mv; }
+  function keep() { ['dHome', 'dDrw', 'mScroll'].forEach(function (id) { var e = $('#' + id); if (e) sc[id] = e.scrollTop; }); }
+  function restore() { Object.keys(sc).forEach(function (id) { var e = $('#' + id); if (e) e.scrollTop = sc[id]; }); }
+
+  var CAPS = {
+    a: ['A', '<b>Login popup.</b> A mission-style card opens after sign-in: three stages, one clear next step. Try <b>Deposit $100</b>, then <b>Claim</b>. The demo bar above moves the client along.'],
+    b: ['B', '<b>Home widget.</b> The same path stays on Home as a compact track, so progress is visible without opening anything. <b>Trade now</b> adds illustrative volume.'],
+    c: ['C', '<b>Profile sidebar.</b> Missions sit under the loyalty scale. The $300K and $500K marks show how the volume missions fall on the way to the next tier.'],
+    d: ['D', '<b>Mobile.</b> The popup becomes a bottom sheet, the widget sits under quick actions, and My Profile holds the full path. Switch screens under the phone.']
+  };
+
+  function render() {
+    keep();
+    var m = model(), mob = NARROW.matches || S.scene === 'd';
+    $('#sceneDesk').hidden = mob; $('#sceneM').hidden = !mob;
+    $$('[data-scene]').forEach(function (b) { var on = b.getAttribute('data-scene') === S.scene; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+    $('#cap').innerHTML = '<span class="n">' + CAPS[S.scene][0] + '</span><span>' + CAPS[S.scene][1] + '</span>';
+    $$('[data-pre]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-pre') === S.pre); });
+    $$('[data-who]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-who') === S.who); });
+    $('#vol').value = S.vol; $('#volv').textContent = usd(S.vol);
+
+    if (!mob) {
+      $('#dHome').innerHTML = deskHome(m);
+      var pop = $('#dPop'), dr = $('#dDrwO');
+      pop.hidden = S.scene !== 'a'; dr.hidden = S.scene !== 'c';
+      pop.innerHTML = S.scene === 'a' ? popupHTML(m, false) : '';
+      dr.innerHTML = S.scene === 'c' ? drawerHTML(m) : '';
+    } else {
+      var v = mview();
+      $$('[data-mv]').forEach(function (b) { var on = b.getAttribute('data-mv') === v; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+      var html = '<div class="mstat"><span>9:41</span><span>5G &nbsp;100%</span></div>';
+      if (v === 'profile') {
+        html += '<div class="mscroll" id="mScroll"><div class="mback"><button class="ib" data-act="close" aria-label="Back">' + XM.icon('chev') + '</button><h2>My Profile</h2></div>' + profileBody(m) + '</div>';
+      } else {
+        html += '<div class="mscroll" id="mScroll">' + mobHome(m) + '</div>' + bannerHTML('mban') + mobNav();
+        if (v === 'popup') html += '<div class="sov" id="mPop">' + popupHTML(m, true) + '</div>';
+      }
+      $('#phoneScr').innerHTML = html;
+    }
+    restore();
+  }
+
+  function scene(s) {
+    if (!CAPS[s]) s = 'a';
+    S.scene = s; sc = {};
+    if (s === 'd') S.mv = 'popup';
+    try { history.replaceState(null, '', '#' + s); } catch (e) {}
+    render();
+  }
+  function go(v) {
+    if (NARROW.matches || S.scene !== 'd') scene(V2S[v]);
+    else { S.mv = v; sc = {}; render(); }
+  }
+
+  function burst() {
+    var host = $(NARROW.matches || S.scene === 'd' ? '#phoneScr' : '#app'); if (!host) return;
+    var cols = ['#008454', '#f6a821', '#2f62f0', '#d6336c', '#12a56a', '#8a3fd1'], h = '';
+    for (var i = 0; i < 34; i++) h += '<i style="left:' + Math.round(Math.random() * 100) + '%;background:' + cols[i % cols.length] + ';animation-delay:' + (Math.random() * .35).toFixed(2) + 's;transform:rotate(' + Math.round(Math.random() * 90) + 'deg)"></i>';
+    var el = XM.el('<div class="cf">' + h + '</div>'); host.appendChild(el);
+    setTimeout(function () { el.remove(); }, 2300);
+  }
+
+  /* ---------- actions ---------- */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button'); if (!t) { var o = e.target.closest('.ovl,.dov,.sov'); if (o && e.target === o) go('home'); return; }
+    var g;
+    if ((g = t.getAttribute('data-scene'))) { scene(g); return; }
+    if ((g = t.getAttribute('data-mv'))) { S.mv = g; sc = {}; render(); return; }
+    if ((g = t.getAttribute('data-pre'))) { var P = PRE[g]; S.pre = g; S.dep = P.dep; S.vol = P.vol; S.cl = JSON.parse(JSON.stringify(P.cl)); render(); return; }
+    if ((g = t.getAttribute('data-who'))) { S.who = g; render(); return; }
+    g = t.getAttribute('data-act'); if (!g) return;
+    if (g === 'close') go('home');
+    else if (g === 'profile') go('profile');
+    else if (g === 'replay') { go('popup'); }
+    else if (g === 'dep') {
+      if (S.dep < 100) { S.dep = 100; S.pre = ''; render(); XM.toast('Demo: a $100 deposit arrived. Mission 1 is complete.'); }
+      else XM.toast('The deposit flow would open here.');
+    } else if (g === 'trade') {
+      S.vol = Math.min(600000, S.vol + 50000); S.pre = ''; render(); XM.toast('Demo trade filled: +$50,000 trading volume.');
+    } else if (g === 'claim') {
+      var id = +t.getAttribute('data-id'), st = STG[id - 1];
+      S.cl[id] = 1; S.just = id; S.pre = ''; render(); burst();
+      XM.toast('Mission ' + id + ' complete. ' + usd(st.reward) + ' Trading Credit added (illustrative).');
+      setTimeout(function () { S.just = 0; }, 800);
+    } else if (g === 'noop') XM.toast('Not part of this prototype.');
+  });
+  $('#vol').addEventListener('input', function () {
+    S.vol = +this.value; S.pre = '';
+    var keepFocus = this; render(); keepFocus.focus();
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('#sceneDesk').hidden && S.scene !== 'b') go('home'); });
+  (NARROW.addEventListener ? NARROW.addEventListener('change', render) : NARROW.addListener(render));
+
+  $('.pwa-rail').innerHTML = '<span class="xm-mark">XM</span>' + ['home', 'chart', 'wallet', 'copy', 'trophy', 'bolt', 'grid'].map(function (n, i) { return '<a class="' + (i === 0 ? 'on' : '') + '">' + XM.icon(n) + '</a>'; }).join('');
+  $('#dBell').innerHTML = XM.icon('bell', 'w20') + '<i class="rd"></i>';
+  $('#dWal').innerHTML = XM.icon('wallet', 'w20');
+  $('#dUsr').innerHTML = XM.icon('user', 'w20');
+
+  var start = XM.qs('scene') || location.hash.replace('#', '') || 'a';
+  scene(CAPS[start] ? start : 'a');
+
+  /* "What changes?" panel in the corner. */
+  XM.notes({
+    title: 'Staged rewards based on trading milestones (idea 04)',
+    today: 'A single large requirement can feel distant, and clients may not see what is next or how close they are.',
+    proposed: 'Three missions (deposit $100, trade $300,000, trade $500,000) shown as a login popup, a Home widget and a list under the loyalty scale in My Profile. The same structure could be offered to referred clients. All amounts here are illustrative.',
+    why: 'Smaller, visible steps may feel easier to understand and more achievable, may encourage continued engagement and may reduce drop-off before the 3-lot requirement.',
+    metric: 'Mission 1 completion, progress to missions 2 and 3, drop-off before 3 lots, popup and widget engagement, and tier progress, compared with a control group.'
+  });
+})();
+</script>
+<!-- Comments, votes and the idea switcher. data-idea must equal the id in assets/js/ideas.js. -->
+<script src="../../assets/js/review.js" data-idea="04"></script>
+</body>
+</html>

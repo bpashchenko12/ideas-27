@@ -57,9 +57,11 @@ window.XM_IDEAS = [
     metrics: 'PWA RAF dashboard adoption, repeat visits, shares per active referrer, referral-to-funded conversion, funded-to-3-lot completion, time to payout, support contact rate, qualified referrals per 1,000 eligible clients.'
   },
   {
-    id: '04', slide: 6, area: 'promotions', status: 'todo',
+    id: '04', slide: 6, area: 'promotions', status: 'built',
     title: 'Staged rewards based on trading milestones',
     short: 'Missions: deposit, then volume milestones unlock rewards',
+    path: 'ideas/04-staged-rewards/index.html',
+    shows: ['Login popup with three missions: deposit $100, trade $300,000, trade $500,000, each with its own reward and progress', 'Home widget: a compact track with the current mission, progress bar and one clear next action', 'My Profile sidebar: missions listed under the loyalty scale, with the $300K and $500K marks on the way to the next tier', 'Deposit, trade and claim actually work: nodes unlock, Credit updates, confetti on claim; presets and a volume slider move the demo client', 'Referred-client variant and a mobile view (bottom-sheet popup, Home, Profile)', 'Illustrative values only: rewards and thresholds are placeholders'],
     shortlist: { priority: 2, impact: 'High', confidence: '', notes: '' },
     assumption: 'A mission-based reward structure feels easier to understand and more achievable than a single large requirement.',
     scope: ['Test a tiered reward structure built around clear missions, for example: deposit $100 to unlock the first reward; reach $300,000 in dollarized trading volume to unlock the next; reach $500,000 to unlock an additional reward.', 'More missions over time: first trade, trade a selected instrument, stay active in a defined period.', 'The same mission structure can be offered to referred clients, so both referrer and referee progress toward rewards.'],
