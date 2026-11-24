@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Password gate: keep this line first. -->
+<script src="../../assets/js/gate.js?v=fe2ac3c6"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New currency in wallet · XMTrading</title>
+<link rel="stylesheet" href="../../assets/css/xm.css">
+<style>
+/* =====================================================================
+   IDEA 09 · New currency in wallet (Promotions)
+   MyWallet gets a second currency, starting with JPY. Rewards can be credited straight
+   into it, and funds are only converted when the client moves them to an account in another
+   currency. Rates and amounts are illustrative.
+   ===================================================================== */
+body { background: #f5f5f5; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 96px; }
+.w16 { width: 16px; height: 16px; } .w20 { width: 20px; height: 20px; }
+
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 22px 0 14px; }
+.head h1 { font-size: clamp(26px, 3vw, 36px); line-height: 1.1; letter-spacing: -.025em; margin-top: 4px; }
+.head p { color: var(--ink-2); max-width: 680px; font-size: 14.5px; margin-top: 6px; }
+.head .pill-tabs { box-shadow: var(--sh-s); }
+.head .pill-tabs button { padding: 10px 20px; transition: background .15s, color .15s; }
+.cap { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 11px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+.cap .n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.cap .t { flex: 1; min-width: 0; }
+.cap b { color: var(--ink); }
+
+/* ---------- stage: portal frame with a centred panel ---------- */
+.stage .body { background: #eceef2; padding: 32px 20px 40px; display: grid; justify-items: center; align-items: start; min-height: 640px; }
+.panel { position: relative; width: 100%; max-width: 520px; background: #fff; border-radius: 24px; box-shadow: var(--sh-m); overflow: hidden; }
+.panel .pc { padding: 20px 22px 24px; display: grid; gap: 18px; }
+.mut { color: var(--mut); font-size: 13px; line-height: 1.55; }
+.cc { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--soft); display: grid; place-items: center; font-weight: 700; font-size: 17px; color: var(--ink-2); }
+.cc.jp { background: #fdecee; color: #c62b34; }
+.cc.us { background: var(--blue-l); color: var(--blue); }
+.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; background: rgba(255, 255, 255, .14); }
+.seg button { border: 0; background: none; color: rgba(255, 255, 255, .75); font-weight: 600; font-size: 12px; padding: 5px 12px; border-radius: 999px; }
+.seg button.on { background: #fff; color: #0b1020; }
+.seg.lt { background: var(--soft); }
+.seg.lt button { color: var(--mut); } .seg.lt button.on { background: #fff; color: var(--ink); box-shadow: var(--sh-s); }
+
+/* A: wallet */
+.wp-h { position: relative; overflow: hidden; color: #fff; padding: 18px 22px 22px; background: linear-gradient(180deg, #05080f 0%, #0c1530 100%); display: grid; gap: 14px; }
+.wp-t { display: flex; align-items: center; gap: 10px; font-size: 16px; }
+.wp-t .bk svg { width: 20px; height: 20px; transform: rotate(180deg); display: block; }
+.wp-h small { display: block; font-size: 13px; opacity: .85; }
+.wp-h .big { font-size: 38px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; margin: 2px 0 10px; font-variant-numeric: tabular-nums; }
+.wp-h .cn { position: absolute; right: 20px; top: 26px; display: flex; gap: 0; pointer-events: none; }
+.wp-h .cn i { width: 46px; height: 46px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #e6e9f2, #8e97ad); color: #3c4560; font-style: normal; font-weight: 700; display: grid; place-items: center; font-size: 20px; margin-left: -10px; box-shadow: 0 6px 14px rgba(0, 0, 0, .35); }
+.wp-h .cn i:nth-child(2) { transform: translateY(14px); }
+.wl { display: grid; gap: 10px; }
+.wr { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+.wr .nm { flex: 1; min-width: 0; line-height: 1.25; }
+.wr .nm b { font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.wr .nm small { font-size: 12px; color: var(--mut); }
+.wr .am { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.wr.new { border-color: #bfe3d0; background: linear-gradient(180deg, #f3fbf7, #fff); animation: pop .45s; }
+.add { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; border: 1.5px dashed var(--line-2); border-radius: 16px; padding: 12px 14px; background: #fff; transition: border-color .15s, background .15s; }
+.add:hover { border-color: var(--g); background: var(--g-l); }
+.add .nm { flex: 1; line-height: 1.25; } .add .nm b { font-size: 14px; display: block; } .add .nm small { font-size: 12px; color: var(--mut); }
+.add .pl { width: 30px; height: 30px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-size: 20px; line-height: 1; }
+.hh { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 16px; }
+.hh b { font-size: 16px; }
+.hl { list-style: none; margin: 0; padding: 0; display: grid; }
+.hl li { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.hl li:last-child { border-bottom: 0; }
+.hl .ic { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--soft); display: grid; place-items: center; color: var(--ink-2); }
+.hl .ic svg { width: 17px; height: 17px; }
+.hl .tx { flex: 1; min-width: 0; line-height: 1.3; } .hl .tx b { font-size: 13.5px; display: block; } .hl .tx small { font-size: 12px; color: var(--mut); }
+.hl .v { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hl .v.p { color: var(--up); } .hl .v.m { color: var(--ink); }
+.emp { text-align: center; padding: 26px 0 8px; color: var(--mut); font-size: 13.5px; }
+.emp .o { width: 64px; height: 64px; margin: 0 auto 10px; border-radius: 50%; border: 8px solid #eef0f5; box-shadow: inset 0 0 0 8px #e2e6ee; }
+.sov { position: absolute; inset: 0; z-index: 10; background: rgba(15, 18, 22, .5); display: flex; align-items: flex-end; animation: fade .2s; }
+.sh { width: 100%; background: #fff; border-radius: 24px 24px 0 0; padding: 22px 22px 24px; animation: up .3s cubic-bezier(.2, .8, .2, 1); display: grid; gap: 12px; }
+.sh h4 { font-size: 19px; display: flex; align-items: center; gap: 10px; }
+.ck { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.ck li { display: flex; gap: 8px; align-items: flex-start; line-height: 1.45; }
+.ck svg { flex: none; width: 16px; height: 16px; color: var(--g); margin-top: 2px; }
+.bt { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+
+/* B: reward credited */
+.camp { border: 1px solid #bfe3d0; border-radius: 20px; background: linear-gradient(180deg, #eaf8f1, #fff 60%); padding: 18px; display: grid; gap: 14px; }
+.camp .top { display: flex; gap: 12px; align-items: center; }
+.camp .gi { flex: none; width: 46px; height: 46px; border-radius: 14px; background: var(--g); color: #fff; display: grid; place-items: center; }
+.camp .gi svg { width: 22px; height: 22px; }
+.camp .top small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); }
+.camp .top b { font-size: 17px; line-height: 1.25; }
+.amt { font-size: 34px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.amt small { display: block; font-size: 12.5px; font-weight: 500; color: var(--ink-2); letter-spacing: 0; margin-top: 4px; }
+.flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12.5px; }
+.flow span { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; font-weight: 500; }
+.flow span.on { border-color: var(--g); color: var(--g); font-weight: 600; background: var(--g-l); }
+.flow svg { width: 14px; height: 14px; color: var(--mut); }
+.nt { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 1.5; border-radius: 12px; padding: 10px 12px; }
+.nt svg { flex: none; width: 16px; height: 16px; margin-top: 2px; }
+.nt.am { background: var(--amber-l); color: #7a4500; } .nt.bl { background: var(--blue-l); color: #1f3f9e; } .nt.gr { background: var(--g-l); color: #00573a; } .nt.rd { background: var(--red-l); color: #a1232a; }
+.nt .btn { margin-top: 8px; }
+.done { text-align: center; display: grid; gap: 10px; justify-items: center; padding: 6px 0; }
+.done .ok { width: 52px; height: 52px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; animation: pop .45s; }
+.done .ok svg { width: 26px; height: 26px; }
+.done b { font-size: 18px; }
+
+/* C: use funds */
+.lbl { display: block; font-size: 12px; font-weight: 600; color: var(--mut); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 8px; }
+.src { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.src button { display: flex; align-items: center; gap: 10px; text-align: left; border: 1.5px solid var(--line-2); background: #fff; border-radius: 14px; padding: 10px 12px; }
+.src button.on { border-color: var(--g); background: var(--g-l); }
+.src button[disabled] { opacity: .5; }
+.src b { display: block; font-size: 14px; line-height: 1.2; } .src small { font-size: 12px; color: var(--mut); }
+.src .cc { width: 34px; height: 34px; font-size: 15px; }
+.acct { display: flex; align-items: center; gap: 12px; background: #f1f3f7; border-radius: 16px; padding: 12px 14px; }
+.acct .nm { flex: 1; line-height: 1.25; } .acct b { font-size: 14px; display: block; } .acct small { font-size: 12px; color: var(--mut); }
+.acct .am { font-weight: 700; font-variant-numeric: tabular-nums; }
+.amtw { position: relative; }
+.amtw .inp { padding-left: 38px; font-size: 18px; font-weight: 600; height: 54px; font-variant-numeric: tabular-nums; }
+.amtw .sy { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-weight: 600; color: var(--mut); font-size: 17px; }
+.amtw .mx { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
+.sm { display: grid; gap: 8px; font-size: 13px; background: var(--soft); border-radius: 14px; padding: 12px 14px; }
+.sm div { display: flex; justify-content: space-between; gap: 12px; color: var(--mut); }
+.sm dd { margin: 0; color: var(--ink); font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.sm div.tt { border-top: 1px solid var(--line-2); padding-top: 8px; color: var(--ink); font-weight: 600; }
+.sm div.tt dd { font-size: 15px; color: var(--g); }
+#cOut { display: grid; gap: 12px; }
+
+
+@keyframes pop { 0% { transform: scale(.94); opacity: .4; } 60% { transform: scale(1.02); } 100% { transform: none; opacity: 1; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+@media (max-width: 860px) {
+  .wrap { padding: 0 14px 90px; }
+  .head .pill-tabs { width: 100%; overflow-x: auto; }
+  .head .pill-tabs button { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+  .stage > .bar { display: none; }
+  .stage .body { padding: 14px 0 20px; min-height: 0; background: #fff; }
+  .stage { border-radius: 20px; }
+  .panel { box-shadow: none; border-radius: 0; }
+  .panel .pc { padding: 18px 16px 22px; }
+  .wp-h { padding: 16px; } .wp-h .big { font-size: 32px; } .wp-h .cn i { width: 38px; height: 38px; font-size: 17px; }
+  .cap { align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <span class="eyebrow">Idea 09 &middot; Promotions</span>
+      <h1>A yen wallet, so rewards arrive in yen.</h1>
+      <p>MyWallet gets a second currency, starting with JPY. Rewards are credited directly in it, and funds are converted only when the client moves them to an account in another currency.</p>
+    </div>
+    <div class="pill-tabs" role="tablist" aria-label="Scenes">
+      <button class="on" role="tab" data-scene="a">A &middot; MyWallet</button>
+      <button role="tab" data-scene="b">B &middot; Reward in JPY</button>
+      <button role="tab" data-scene="c">C &middot; Use the funds</button>
+    </div>
+  </div>
+
+  <div class="cap" id="cap"></div>
+
+  <div class="browser stage">
+    <div class="bar"><i></i><i></i><i></i><span class="url">my.xmtrading.com/member</span></div>
+    <div class="body"><div class="panel" id="view"></div></div>
+  </div>
+</main>
+
+<script src="../../assets/js/common.js"></script>
+<script>
+(function () {
+  var $ = XM.$, $$ = XM.$$, esc = XM.esc;
+  var RATE = 150;            /* illustrative JPY per 1 USD */
+  var REWARD_USD = 20;
+
+  function usd(n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function yen(n) { return '\u00a5' + Math.round(n).toLocaleString('en-US'); }
+  function fmt(c, n) { return c === 'JPY' ? yen(n) : usd(n); }
+
+  var CAPS = {
+    a: ['A', '<b>MyWallet.</b> Add a JPY wallet next to USD. The total can be viewed in either currency.'],
+    b: ['B', '<b>Reward credited.</b> Switch between today and the proposal, then claim to see where the reward lands.'],
+    c: ['C', '<b>Use the funds.</b> Move money to a JPY trading account. Conversion is shown only when it is needed.']
+  };
+
+  var S;
+  function init() {
+    S = {
+      scene: S ? S.scene : 'a', jpy: false, bal: { USD: 40, JPY: 0 }, acct: 1398558, disp: 'USD',
+      hist: [{ lbl: 'Refer a Friend reward', sub: '3 Nov &middot; Credited to USD wallet', cur: 'USD', amt: 40 }],
+      mode: 'new', claimed: null, sheet: false, src: 'USD', amt: '', done: ''
+    };
+  }
+  init();
+
+  function total() { return S.bal.USD + S.bal.JPY / RATE; }
+
+  /* ---------- A: MyWallet ---------- */
+  function histHTML() {
+    if (!S.hist.length) return '<div class="emp"><div class="o"></div>No records found.</div>';
+    return '<ul class="hl">' + S.hist.map(function (h) {
+      var ic = h.amt === null ? 'wallet' : (h.amt >= 0 ? 'gift' : 'arrow');
+      var v = h.amt === null ? '' : '<span class="v ' + (h.amt >= 0 ? 'p' : 'm') + '">' + (h.amt >= 0 ? '+' : '\u2212') + fmt(h.cur, Math.abs(h.amt)) + '</span>';
+      return '<li><span class="ic">' + XM.icon(ic) + '</span><span class="tx"><b>' + esc(h.lbl) + '</b><small>' + h.sub + '</small></span>' + v + '</li>';
+    }).join('') + '</ul>';
+  }
+  function walletsHTML() {
+    var h = '<div class="wr"><span class="cc us">$</span><span class="nm"><b>US Dollar</b><small>USD</small></span><span class="am">' + usd(S.bal.USD) + '</span></div>';
+    if (S.jpy) h += '<div class="wr new"><span class="cc jp">\u00a5</span><span class="nm"><b>Japanese Yen <span class="tag">New</span></b><small>JPY</small></span><span class="am">' + yen(S.bal.JPY) + '</span></div>';
+    else h += '<button class="add" data-act="sheet"><span class="cc jp">\u00a5</span><span class="nm"><b>Add Japanese yen wallet</b><small>Receive rewards and benefits in JPY</small></span><span class="pl">+</span></button>';
+    return '<div class="wl">' + h + '</div>';
+  }
+  function sheetHTML() {
+    return '<div class="sov" data-act="sheetx"><div class="sh"><h4><span class="cc jp">\u00a5</span>Add JPY wallet</h4>' +
+      '<ul class="ck">' +
+      '<li>' + XM.icon('check') + 'Rewards and benefits can be credited directly in JPY.</li>' +
+      '<li>' + XM.icon('check') + 'JPY stays separate from your USD balance.</li>' +
+      '<li>' + XM.icon('check') + 'Funds are converted only when you move them to an account in another currency, at the rate shown before you confirm.</li></ul>' +
+      '<div class="bt"><button class="btn btn-outline" data-act="sheetx">Not now</button><button class="btn btn-primary" data-act="addjpy">Add JPY wallet</button></div></div></div>';
+  }
+  function vA() {
+    var tot = S.disp === 'JPY' ? yen(total() * RATE) : usd(total());
+    var seg = S.jpy ? '<div class="seg" role="group" aria-label="Display currency"><button class="' + (S.disp === 'USD' ? 'on' : '') + '" data-act="disp" data-v="USD">USD</button><button class="' + (S.disp === 'JPY' ? 'on' : '') + '" data-act="disp" data-v="JPY">JPY</button></div>' : '';
+    return '<div class="wp-h"><div class="wp-t"><span class="bk">' + XM.icon('arrow') + '</span><b>MyWallet</b></div>' +
+      '<div><small>Total balance</small><div class="big">' + tot + '</div>' + seg + '</div><div class="cn" aria-hidden="true"><i>$</i><i>\u00a5</i></div></div>' +
+      '<div class="pc"><p class="mut">Manage the funds you\u2019ve earned from our programs and use them in the trading account of your choice.' + (S.jpy ? ' The total uses an illustrative rate of 1 USD = \u00a5' + RATE + '.' : '') + '</p>' +
+      walletsHTML() + '<div class="hh"><b>Transaction History</b></div>' + histHTML() + '</div>' + (S.sheet ? sheetHTML() : '');
+  }
+
+  /* ---------- B: reward credited ---------- */
+  function vB() {
+    var prop = S.mode === 'new';
+    var seg = '<div class="seg lt" role="group" aria-label="Compare"><button class="' + (!prop ? 'on' : '') + '" data-act="mode" data-v="old">Today</button><button class="' + (prop ? 'on' : '') + '" data-act="mode" data-v="new">With a JPY wallet</button></div>';
+    var head = '<div class="top"><span class="gi">' + XM.icon('gift') + '</span><div><small>Welcome reward &middot; Japan</small><b>Your reward is ready</b></div></div>';
+    var body;
+    if (S.claimed) {
+      body = '<div class="done"><span class="ok">' + XM.icon('check') + '</span><b>' + fmt(S.claimed.cur, S.claimed.amt) + ' credited</b><span class="mut">Added to your ' + S.claimed.cur + ' wallet. ' + (S.claimed.cur === 'JPY' ? 'No conversion was needed.' : 'It is converted only if you move it to a JPY account.') + '</span>' +
+        '<div class="bt"><button class="btn btn-outline" data-act="go" data-v="a">View MyWallet</button><button class="btn btn-primary" data-act="go" data-v="c">Use the funds</button></div></div>';
+    } else if (prop) {
+      body = '<div class="amt">' + yen(REWARD_USD * RATE) + '<small>Credited directly to your JPY wallet</small></div>' +
+        '<div class="flow"><span class="on">Reward in JPY</span>' + XM.icon('arrow') + '<span class="on">JPY account</span></div>' +
+        (S.jpy ? '<div class="nt gr">' + XM.icon('check') + '<span>Same currency as your trading account, so there is nothing to convert.</span></div>'
+               : '<div class="nt am">' + XM.icon('warn') + '<span>You do not have a JPY wallet yet. Add it to receive this reward in yen.<br><button class="btn btn-primary btn-sm" data-act="addjpy">Add JPY wallet</button></span></div>') +
+        '<button class="btn btn-primary btn-lg btn-block" data-act="claim"' + (S.jpy ? '' : ' disabled') + '>Claim ' + yen(REWARD_USD * RATE) + '</button>';
+    } else {
+      body = '<div class="amt">' + usd(REWARD_USD) + '<small>About ' + yen(REWARD_USD * RATE) + ' at today\u2019s illustrative rate</small></div>' +
+        '<div class="flow"><span class="on">Reward in USD</span>' + XM.icon('arrow') + '<span>Convert</span>' + XM.icon('arrow') + '<span>JPY account</span></div>' +
+        '<div class="nt am">' + XM.icon('warn') + '<span>Credited in USD. To use it on a JPY account it has to be converted, so the final yen amount may differ from what you first saw.</span></div>' +
+        '<button class="btn btn-primary btn-lg btn-block" data-act="claim">Claim ' + usd(REWARD_USD) + '</button>';
+    }
+    return '<div class="pc"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><b style="font-size:16px">Rewards</b>' + (S.claimed ? '' : seg) + '</div><div class="camp">' + head + body + '</div>' +
+      '<p class="mut">Illustrative amounts. Rewards may be subject to terms and eligibility.</p></div>';
+  }
+
+  /* ---------- C: use the funds ---------- */
+  function outC() {
+    var cur = S.src, bal = S.bal[cur], raw = S.amt.trim(), n = parseFloat(raw), err = '', h = '';
+    if (raw !== '') {
+      if (!isFinite(n) || n <= 0) err = 'Enter an amount greater than zero.';
+      else if (n > bal + 1e-9) err = 'This is more than your ' + cur + ' wallet balance (' + fmt(cur, bal) + ').';
+      else if (cur === 'JPY' && n !== Math.floor(n)) err = 'JPY amounts are whole yen.';
+    }
+    var ok = raw !== '' && !err;
+    if (S.done) h += '<div class="nt gr">' + XM.icon('check') + '<span>' + S.done + '</span></div>';
+    if (cur === 'JPY' && bal === 0 && !S.done) h += '<div class="nt bl">' + XM.icon('warn') + '<span>Your JPY wallet is empty. Claim the reward in scene B to add yen.</span></div>';
+    if (err) h += '<div class="nt rd">' + XM.icon('warn') + '<span>' + err + '</span></div>';
+    if (ok) {
+      var rec = cur === 'JPY' ? n : n * RATE;
+      h += '<dl class="sm"><div><dt>You send</dt><dd>' + fmt(cur, n) + '</dd></div>' +
+        '<div><dt>Conversion</dt><dd>' + (cur === 'USD' ? '1 USD = \u00a5' + RATE + '.00 (illustrative)' : 'None, same currency') + '</dd></div>' +
+        '<div class="tt"><dt>You receive</dt><dd>' + yen(rec) + '</dd></div></dl>';
+    }
+    return h + '<button class="btn btn-primary btn-lg btn-block" data-act="xfer"' + (ok ? '' : ' disabled') + '>Transfer</button>';
+  }
+  function vC() {
+    var j = S.jpy;
+    return '<div class="pc"><b style="font-size:18px">Transfer to trading account</b>' +
+      '<div><span class="lbl">From wallet</span><div class="src">' +
+      '<button class="' + (S.src === 'USD' ? 'on' : '') + '" data-act="src" data-v="USD"><span class="cc us">$</span><span><b>USD</b><small>' + usd(S.bal.USD) + '</small></span></button>' +
+      '<button class="' + (S.src === 'JPY' ? 'on' : '') + '" data-act="src" data-v="JPY"' + (j ? '' : ' disabled') + '><span class="cc jp">\u00a5</span><span><b>JPY</b><small>' + (j ? yen(S.bal.JPY) : 'Not added') + '</small></span></button></div></div>' +
+      '<div><span class="lbl">To account</span><div class="acct"><span class="cc jp">\u00a5</span><span class="nm"><b>Standard #70600835</b><small>MT5 Standard &middot; JPY account</small></span><span class="am">' + yen(S.acct) + '</span></div></div>' +
+      '<div><span class="lbl">Amount (' + S.src + ')</span><div class="amtw"><span class="sy">' + (S.src === 'JPY' ? '\u00a5' : '$') + '</span><input class="inp" id="amt" inputmode="decimal" autocomplete="off" placeholder="0" value="' + esc(S.amt) + '" aria-label="Amount"><button class="btn btn-ghost btn-sm mx" data-act="max">Max</button></div></div>' +
+      '<div id="cOut">' + outC() + '</div></div>';
+  }
+
+  /* ---------- render + actions ---------- */
+  function render() {
+    $('#view').innerHTML = { a: vA, b: vB, c: vC }[S.scene]();
+    $$('[data-scene]').forEach(function (b) { var on = b.getAttribute('data-scene') === S.scene; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+    $('#cap').innerHTML = '<span class="n">' + CAPS[S.scene][0] + '</span><span class="t">' + CAPS[S.scene][1] + '</span><button class="btn btn-outline btn-sm" data-act="reset">Reset demo</button>';
+    try { history.replaceState(null, '', '#' + S.scene); } catch (e) {}
+  }
+  function go(s) { if (!CAPS[s]) s = 'a'; S.scene = s; render(); }
+
+  function act(a, v) {
+    if (a === 'sheet') S.sheet = true;
+    else if (a === 'sheetx') S.sheet = false;
+    else if (a === 'addjpy') { S.jpy = true; S.sheet = false; S.hist.unshift({ lbl: 'JPY wallet added', sub: 'Today &middot; Ready to receive rewards', cur: 'JPY', amt: null }); XM.toast('JPY wallet added'); }
+    else if (a === 'disp') S.disp = v;
+    else if (a === 'mode') S.mode = v;
+    else if (a === 'go') { S.scene = v; }
+    else if (a === 'reset') { init(); }
+    else if (a === 'claim') {
+      var cur = S.mode === 'new' && S.jpy ? 'JPY' : 'USD', amt = cur === 'JPY' ? REWARD_USD * RATE : REWARD_USD;
+      S.bal[cur] += amt; S.claimed = { cur: cur, amt: amt };
+      S.hist.unshift({ lbl: 'Welcome reward', sub: 'Today &middot; Credited to ' + cur + ' wallet', cur: cur, amt: amt });
+      XM.toast(fmt(cur, amt) + ' credited to your ' + cur + ' wallet');
+    }
+    else if (a === 'src') { S.src = v; S.amt = ''; S.done = ''; }
+    else if (a === 'max') { S.amt = S.src === 'JPY' ? String(S.bal.JPY) : S.bal.USD.toFixed(2); S.done = ''; }
+    else if (a === 'xfer') {
+      var n = parseFloat(S.amt), c = S.src; if (!isFinite(n) || n <= 0 || n > S.bal[c] + 1e-9) return;
+      var rec = c === 'JPY' ? n : n * RATE;
+      S.bal[c] -= n; S.acct += rec;
+      S.hist.unshift({ lbl: 'Transfer to #70600835', sub: 'Today &middot; ' + (c === 'USD' ? 'Converted at 1 USD = \u00a5' + RATE : 'No conversion'), cur: c, amt: -n });
+      S.done = fmt(c, n) + ' sent. ' + yen(rec) + ' added to your JPY account.'; S.amt = '';
+      XM.toast('Transfer complete');
+    }
+    render();
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-act]'); if (!t || t.disabled) return;
+    if (t.classList.contains('sov') && e.target !== t) return;
+    act(t.getAttribute('data-act'), t.getAttribute('data-v'));
+  });
+  document.addEventListener('input', function (e) {
+    if (e.target.id === 'amt') { S.amt = e.target.value; S.done = ''; $('#cOut').innerHTML = outC(); }
+  });
+  $$('[data-scene]').forEach(function (b) { b.addEventListener('click', function () { go(b.getAttribute('data-scene')); }); });
+  go(XM.qs('scene') || location.hash.replace('#', '') || 'a');
+
+  XM.notes({
+    title: 'New currency in wallet (idea 09)',
+    today: 'MyWallet holds one currency. Rewards arrive in USD and are converted when used on a JPY account, so the yen amount a client first sees can differ from what they end up with.',
+    proposed: 'A JPY wallet next to USD. Rewards and benefits are credited straight into it, funds convert only when moved to an account in a different currency.',
+    why: 'It may reduce currency-related friction, make local campaigns easier to run, and could raise claim and redemption rates. Not yet validated.',
+    metric: 'Benefit claim and utilisation rate, conversion in JPY-targeted campaigns, wallet activity and redemption, retention and engagement, currency-related support contacts.'
+  });
+})();
+</script>
+<!-- Comments, votes and the idea switcher. data-idea must equal the id in assets/js/ideas.js. -->
+<script src="../../assets/js/review.js" data-idea="09"></script>
+</body>
+</html>

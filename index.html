@@ -55,11 +55,11 @@
   .rows { position: relative; margin-left: 15px; padding-left: 2px; }
   .rows::before { content: ''; position: absolute; left: 7px; top: 14px; bottom: 14px; width: 2px; background: var(--line-2); border-radius: 2px; }
 
-  .row { position: relative; width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; border: 1.5px solid transparent; background: transparent; border-radius: 14px; padding: 9px 10px 9px 26px; cursor: pointer; transition: background .12s, border-color .12s; color: var(--ink); }
+  .row { position: relative; width: calc(100% - 18px); margin-left: 18px; display: flex; align-items: center; gap: 12px; text-align: left; border: 1.5px solid transparent; background: transparent; border-radius: 14px; padding: 9px 10px 9px 8px; cursor: pointer; transition: background .12s, border-color .12s; color: var(--ink); }
   .row:hover { background: var(--bg); }
   .row.sel { background: var(--g-l); border-color: rgba(0, 132, 84, .35); }
   .row.off .tx b { color: var(--mut); }
-  .dot { position: absolute; left: -2px; top: 50%; margin-top: -8px; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid #c3c8cf; display: grid; place-items: center; box-sizing: border-box; }
+  .dot { position: absolute; left: -22px; top: 50%; margin-top: -8px; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid #c3c8cf; display: grid; place-items: center; box-sizing: border-box; }
   .dot svg { width: 9px; height: 9px; color: #fff; display: none; }
   .row.light .dot { border-color: var(--amber); }
   .row.off .dot { border-style: dashed; }

@@ -383,7 +383,7 @@ body { background: #f5f5f5; }
   function subtitle(m) {
     if (m.all) return 'You completed every mission. More missions may be added over time.';
     if (m.rdy >= 0) return 'A reward is ready. Claim it, then keep going.';
-    return 'Three missions. Each one may unlock Trading Credit, up to ' + usd(TOTAL) + ' in total.';
+    return 'Three missions. Each one may unlock a reward, up to ' + usd(TOTAL) + ' in total.';
   }
   function referredNote() {
     return S.who === 'ref' ? '<div class="rf">' + XM.icon('users') + '<span>You joined with an invite from <b>Kenji S.</b> The same missions apply to you, and stages you complete may also move Kenji toward their referral reward.</span></div>' : '';
@@ -392,7 +392,7 @@ body { background: #f5f5f5; }
     var s = m.list[m.focus];
     if (m.all || !s) return '';
     cls = cls || 'btn btn-primary btn-sm';
-    if (s.st === 'ready') return '<button class="' + cls + '" data-act="claim" data-id="' + s.g.id + '">' + XM.icon('gift', 'w16') + 'Claim ' + usd(s.g.reward) + ' credit</button>';
+    if (s.st === 'ready') return '<button class="' + cls + '" data-act="claim" data-id="' + s.g.id + '">' + XM.icon('gift', 'w16') + 'Claim ' + usd(s.g.reward) + ' reward</button>';
     if (s.g.key === 'dep') return '<button class="' + cls + '" data-act="dep">Deposit ' + usd(s.g.goal) + '</button>';
     return '<button class="' + cls + '" data-act="trade">Trade now</button>';
   }
@@ -411,10 +411,10 @@ body { background: #f5f5f5; }
     return '<ol class="vl">' + m.list.map(function (s, i) {
       var body;
       if (s.st === 'claimed') body = '<span class="ok">' + XM.icon('check') + 'Reward claimed</span>';
-      else if (s.st === 'ready') body = '<span class="rdy">Goal reached. Your reward is unlocked.</span><button class="btn btn-primary btn-sm" data-act="claim" data-id="' + s.g.id + '">Claim ' + usd(s.g.reward) + ' credit</button>';
+      else if (s.st === 'ready') body = '<span class="rdy">Goal reached. Your reward is unlocked.</span><button class="btn btn-primary btn-sm" data-act="claim" data-id="' + s.g.id + '">Claim ' + usd(s.g.reward) + ' reward</button>';
       else if (s.st === 'active') body = barHTML(s);
       else body = '<span class="lk">Starts after mission ' + i + '</span>';
-      return '<li class="vi ' + s.st + '">' + node(s) + '<div><div class="tt"><b>' + s.g.short + '</b><span class="rw">' + usd(s.g.reward) + ' credit</span></div><div class="sb">' + s.g.sub + '</div>' + body + '</div></li>';
+      return '<li class="vi ' + s.st + '">' + node(s) + '<div><div class="tt"><b>' + s.g.short + '</b><span class="rw">' + usd(s.g.reward) + ' reward</span></div><div class="sb">' + s.g.sub + '</div>' + body + '</div></li>';
     }).join('') + '</ol>';
   }
 
@@ -427,7 +427,7 @@ body { background: #f5f5f5; }
       '<button class="pcl" data-act="close" aria-label="Close">' + XM.icon('close') + '</button></div>' +
       '<div class="pb">' + listHTML(m) + referredNote() + '</div>' +
       '<div class="pf">' + primary + (m.all ? '' : '<button class="btn btn-ghost btn-lg" data-act="close">Maybe later</button>') + '</div>' +
-      '<p class="fine">Illustrative amounts. Rewards are credited as Trading Credit and may be subject to terms and eligibility.</p></div>';
+      '<p class="fine">Illustrative amounts. Rewards may be subject to terms and eligibility.</p></div>';
   }
 
   /* ---------- B. home widget ---------- */
@@ -436,11 +436,11 @@ body { background: #f5f5f5; }
     if (m.all) tagTxt = 'Complete'; else if (m.rdy >= 0) { tagTxt = 'Reward ready'; tagCls = 'tag amber'; } else tagTxt = 'Mission ' + (m.act + 1) + ' of ' + STG.length;
     var row;
     if (m.all) {
-      row = '<div class="fr done"><div class="fi"><small>All missions complete</small><b>You earned ' + usd(m.credit) + ' in Trading Credit</b><span>More missions may be added over time.</span></div></div>';
+      row = '<div class="fr done"><div class="fi"><small>All missions complete</small><b>You earned ' + usd(m.credit) + ' in rewards</b><span>More missions may be added over time.</span></div></div>';
     } else if (f.st === 'ready') {
-      row = '<div class="fr"><div class="fi"><small>Mission ' + (f.i + 1) + ' complete</small><b>' + f.g.short + ': done</b><span>Unlock ' + usd(f.g.reward) + ' Trading Credit</span></div>' + cta(m) + '</div>';
+      row = '<div class="fr"><div class="fi"><small>Mission ' + (f.i + 1) + ' complete</small><b>' + f.g.short + ': done</b><span>Unlock ' + usd(f.g.reward) + ' reward</span></div>' + cta(m) + '</div>';
     } else {
-      row = '<div class="fr"><div class="fi"><small>Mission ' + (f.i + 1) + ' &middot; next up</small><b>' + f.g.short + '</b><span>Unlocks ' + usd(f.g.reward) + ' Trading Credit</span>' + barHTML(f) + '</div>' + cta(m) + '</div>';
+      row = '<div class="fr"><div class="fi"><small>Mission ' + (f.i + 1) + ' &middot; next up</small><b>' + f.g.short + '</b><span>Unlocks ' + usd(f.g.reward) + ' reward</span>' + barHTML(f) + '</div>' + cta(m) + '</div>';
     }
     return '<div class="wg' + (hl ? ' hl' : '') + '"><div class="wg-h"><span class="ti">' + ic('trophy', 18) + '</span><div class="tx"><b>Rewards path</b><small>' + (S.who === 'ref' ? 'Referred by Kenji S. &middot; you both progress' : 'Welcome missions') + '</small></div><span class="' + tagCls + '">' + tagTxt + '</span></div>' +
       trackHTML(m) + row +
@@ -592,7 +592,7 @@ body { background: #f5f5f5; }
     } else if (g === 'claim') {
       var id = +t.getAttribute('data-id'), st = STG[id - 1];
       S.cl[id] = 1; S.just = id; S.pre = ''; render(); burst();
-      XM.toast('Mission ' + id + ' complete. ' + usd(st.reward) + ' Trading Credit added (illustrative).');
+      XM.toast('Mission ' + id + ' complete. ' + usd(st.reward) + ' reward added (illustrative).');
       setTimeout(function () { S.just = 0; }, 800);
     } else if (g === 'noop') XM.toast('Not part of this prototype.');
   });

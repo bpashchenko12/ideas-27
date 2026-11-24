@@ -63,9 +63,9 @@ window.XM_IDEAS = [
     path: 'ideas/04-staged-rewards/index.html',
     shows: ['Login popup with three missions: deposit $100, trade $300,000, trade $500,000, each with its own reward and progress', 'Home widget: a compact track with the current mission, progress bar and one clear next action', 'My Profile sidebar: missions listed under the loyalty scale, with the $300K and $500K marks on the way to the next tier', 'Deposit, trade and claim actually work: nodes unlock, Credit updates, confetti on claim; presets and a volume slider move the demo client', 'Referred-client variant and a mobile view (bottom-sheet popup, Home, Profile)', 'Illustrative values only: rewards and thresholds are placeholders'],
     shortlist: { priority: 2, impact: 'High', confidence: '', notes: '' },
-    assumption: 'A mission-based reward structure feels easier to understand and more achievable than a single large requirement.',
-    scope: ['Test a tiered reward structure built around clear missions, for example: deposit $100 to unlock the first reward; reach $300,000 in dollarized trading volume to unlock the next; reach $500,000 to unlock an additional reward.', 'More missions over time: first trade, trade a selected instrument, stay active in a defined period.', 'The same mission structure can be offered to referred clients, so both referrer and referee progress toward rewards.'],
-    metrics: 'Expected benefit: easier to understand, continued engagement, less drop-off before completing the 3-lot requirement, stronger sense of progression for both participants.'
+    assumption: 'Clients are more likely to finish a reward when it is split into small, visible missions than when it hangs on one large requirement.',
+    scope: ['Three starter missions, each with its own reward: deposit $100, reach $300,000 trading volume, reach $500,000 trading volume.', 'One mission track, shown in the login popup, on the Home page and next to the loyalty scale in My Profile, always pointing to the next step.', 'Later missions: first trade, a chosen instrument, staying active over a set period.', 'Referred clients get the same missions, so referrer and referee both see progress.'],
+    metrics: 'Primary: share of clients who complete the 3-lot requirement. Also track: first-deposit rate, drop-off between missions, mission completion rate, repeat visits and trading volume per client. Goal: a clearer path and a stronger sense of progress for both sides.'
   },
   {
     id: '05', slide: 6, area: 'promotions', status: 'deck',
@@ -98,9 +98,11 @@ window.XM_IDEAS = [
     metrics: 'Primary KPI: incremental qualified referrals per 1,000 eligible clients at acceptable reward cost. Secondary: link-to-registration, registration-to-funded, funded-to-qualified, friend activation, 30/90-day retention, LTV and fraud rate.'
   },
   {
-    id: '09', slide: 10, area: 'promotions', status: 'todo',
+    id: '09', slide: 10, area: 'promotions', status: 'built',
     title: 'New currency in wallet',
     short: 'JPY as a wallet currency, benefits credited in JPY',
+    path: 'ideas/09-new-currency-in-wallet/index.html',
+    shows: ['MyWallet with a USD wallet and a one-tap Add JPY wallet step; the total can be viewed in USD or JPY', 'Reward claim compared: today (USD, converted later) versus a JPY wallet (credited in yen, nothing to convert)', 'Transfer to a JPY trading account with a conversion summary, whole-yen check and insufficient-balance error', 'Balances and transaction history update across scenes; Reset demo restores the start', 'Illustrative values only: the rate is 1 USD = ¥150'],
     shortlist: { priority: 2, impact: 'Medium', confidence: '', notes: '' },
     assumption: 'Adding more currencies to the client wallet, starting with JPY, gives greater flexibility when offering promotional benefits and rewards in the clients\' preferred currency, with fewer currency conversions.',
     scope: ['Add JPY as an available wallet currency.', 'Allow promotional benefits, bonuses and rewards to be credited directly in JPY.', 'More flexibility for country-specific campaigns and promotions.', 'Proper currency conversion and wallet balance management where applicable.', 'Consistent experience across supported wallet currencies.'],
@@ -117,7 +119,7 @@ window.XM_IDEAS = [
     assumption: 'Applying XMPs to eligible spread cost could make loyalty value more tangible for traders; the benefit and trading economics need validation.',
     scope: 'Eligible Platinum traders see an estimated XMP offset on the order ticket, choose an amount and confirm. Trade history shows trading P/L and any XMP credit separately. Concept ratio: 15 XMP = $1 withdrawable value.',
     metrics: ['Trader: adoption among eligible Platinum clients; XMP redemption and repeat-use rate; understanding of the history credit; support contacts about spread offset.', 'XMTrading: incremental activity vs eligible holdout; net contribution after XMP cost; XMP cost per retained active trader; support or dispute rate after redemption.'],
-    shows: ['PWA order ticket with the "XMP spread relief" card: toggle, XMP stepper, estimated spread cost, XMP credit and net spread cost (15 XMP = $1)', 'Lots and instrument change the estimate live; the amount is capped by the spread cost and the XMP balance', 'Platinum-only: a Gold client sees why it is locked and how to unlock it', 'Open position, close it, then history shows trading P/L and XMP credit as separate lines', 'Illustrative values only: ratio, caps and eligibility are placeholders'],
+    shows: ['PWA order ticket with the "XMP spread saver" card: toggle, XMP stepper, estimated spread cost, XMP credit and net spread cost (15 XMP = $1)', 'Lots and instrument change the estimate live; the amount is capped by the spread cost and the XMP balance', 'Platinum-only: a Gold client sees why it is locked and how to unlock it', 'Open position, close it, then history shows trading P/L and XMP credit as separate lines', 'Illustrative values only: ratio, caps and eligibility are placeholders'],
     images: ['assets/deck/s13-xmp-spread-saver.png'],
     links: [{ label: 'Figma prototype', url: 'https://www.figma.com/design/JDbhXCVI8YjN12s1M02ez2/XMTrading-XMP-Spread-Saver?node-id=4-2' }]
   },
@@ -144,11 +146,11 @@ window.XM_IDEAS = [
   {
     id: '13', slide: '19-21', area: 'affiliates', status: 'built',
     title: 'Personalized sign-up page',
-    short: 'Affiliate-branded sign-up page with live preview',
+    short: 'Affiliate configurator with live preview and a dedicated sign-up page',
     path: 'ideas/13-personalized-signup/index.html',
     shortlist: { priority: 2, impact: 'Medium', confidence: '', notes: '' },
     assumption: 'A trusted, affiliate-branded introduction may help prospective clients understand the offer and complete registration.',
-    scope: 'Allow affiliates to configure an approved photo/logo, display name, language, introduction, benefits and campaign highlights. Show a live desktop/mobile preview before publishing; XMTrading controls compliant claims and approved templates.',
+    scope: 'A configurator for affiliates: set an approved photo or logo, display name, language, introduction, benefits and campaign highlights, check a live desktop and mobile preview, then publish a dedicated sign-up page with their own tracked link. XMTrading controls compliant claims and approved templates.',
     metrics: ['Affiliate: page visits and unique visitors; visitor-to-registration conversion; registration-to-first-deposit conversion; leads and funded clients attributed to the page.', 'XMTrading: incremental qualified funded clients; cost per funded client versus generic pages; 30/90-day activation and retention; content approval rate and compliance incidents.'],
     shows: ['Affiliate platform editor: profile photo, display name, language, approved template, about me, event highlight and benefit description', 'Live preview next to the form, switchable between desktop and mobile', 'Approval status: Draft, Pending XMTrading review, Approved (simulated), with the approved-claims guardrails', 'Visitor view: the published page with the affiliate context, the XMTrading offer and the registration form', 'Illustrative copy and offers only; templates and claims are placeholders'],
     images: ['assets/deck/s20-personalized-signup.png']

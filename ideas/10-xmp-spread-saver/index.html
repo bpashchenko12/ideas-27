@@ -9,7 +9,7 @@
 <style>
 /* =====================================================================
    IDEA 10 · XMP Spread Saver (Client Loyalty)
-   PWA order ticket with an "XMP spread relief" card, then position and history.
+   PWA order ticket with an "XMP spread saver" card, then position and history.
    Layout and values follow the Figma frame on slide 13 of the 2027 deck.
    ===================================================================== */
 body { background: #f5f5f5; }
@@ -84,7 +84,7 @@ body { background: #f5f5f5; }
 .mrg { font-size: 12px; color: var(--ink-2); } .mrg i { display: block; height: 4px; border-radius: 4px; background: var(--soft); margin-top: 5px; } .mrg i span { display: block; height: 100%; width: 6%; background: var(--up); border-radius: 4px; }
 .mrg .r { display: flex; justify-content: space-between; }
 
-/* XMP spread relief card */
+/* XMP spread saver card */
 .xc { border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; background: #fff; transition: border-color .2s, box-shadow .2s; }
 .xc.on { border-color: rgba(0, 132, 84, .45); box-shadow: 0 0 0 4px rgba(0, 132, 84, .08); }
 .xh { display: flex; align-items: center; gap: 10px; }
@@ -154,7 +154,7 @@ body { background: #f5f5f5; }
         <div class="pill-tabs" role="tablist" aria-label="Client tier"><button class="on" role="tab" data-tier="platinum">Platinum</button><button role="tab" data-tier="gold">Gold</button></div>
       </div>
       <div class="pill-tabs" role="tablist" aria-label="Steps">
-        <button class="on" role="tab" data-scene="a">1 &middot; Use XMPs</button>
+        <button class="on" role="tab" data-scene="a">1 &middot; Plan your trade</button>
         <button role="tab" data-scene="b">2 &middot; Trade &amp; close</button>
         <button role="tab" data-scene="c">3 &middot; Review history</button>
       </div>
@@ -220,7 +220,7 @@ body { background: #f5f5f5; }
     ]
   };
   var CAPS = {
-    a: ['1', '<b>Use XMPs.</b> Eligible Platinum clients see the estimated offset before they confirm the order. Quote stays unchanged.'],
+    a: ['1', '<b>Plan your trade.</b> See how much of the spread you can pay with XMPs before you confirm the order. Quote stays unchanged.'],
     b: ['2', '<b>Trade &amp; close.</b> Open and close as usual. XMPs are reserved at order placement and offset the spread cost after a successful close.'],
     c: ['3', '<b>Review history.</b> Trading P/L and the XMP credit are separate, so the market result stays clear. Demo ratio: 15 XMP = $1.']
   };
@@ -284,8 +284,8 @@ body { background: #f5f5f5; }
   /* ---------- right column ---------- */
   function cardHTML() {
     var plat = S.tier === 'platinum', m = maxXmp(), i = cur();
-    var head = '<div class="xh"><span class="xl">X</span><div class="tt"><b>XMP spread relief</b><span class="tier ' + (plat ? '' : 'gold') + '">' + (plat ? 'PLATINUM' : 'PLATINUM ONLY') + '</span></div><button class="sw' + (plat && S.on ? ' on' : '') + '" id="xon" role="switch" aria-checked="' + (plat && S.on) + '" aria-label="Use XMPs toward the spread"' + (plat ? '' : ' disabled') + '></button></div>';
-    if (!plat) return '<div class="xc">' + head + '<div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>You are a <b>Gold</b> client. XMP spread relief is available to Platinum clients. <a href="#">See tier benefits</a></span></div></div>';
+    var head = '<div class="xh"><span class="xl">X</span><div class="tt"><b>XMP spread saver</b><span class="tier ' + (plat ? '' : 'gold') + '">' + (plat ? 'PLATINUM' : 'PLATINUM ONLY') + '</span></div><button class="sw' + (plat && S.on ? ' on' : '') + '" id="xon" role="switch" aria-checked="' + (plat && S.on) + '" aria-label="Use XMPs toward the spread"' + (plat ? '' : ' disabled') + '></button></div>';
+    if (!plat) return '<div class="xc">' + head + '<div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>You are a <b>Gold</b> client. XMP spread saver is available to Platinum clients. <a href="#">See tier benefits</a></span></div></div>';
     if (!S.on) return '<div class="xc">' + head + '<p class="qn" style="margin-top:8px">Switch on to offset part of the spread with XMPs. You will see the estimate before you confirm.</p></div>';
     var body;
     if (m < STEP) {
