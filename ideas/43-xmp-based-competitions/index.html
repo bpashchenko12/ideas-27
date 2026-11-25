@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Password gate: keep this line first. -->
+<script src="../../assets/js/gate.js?v=fe2ac3c6"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XMP-based competitions · XMTrading</title>
+<link rel="stylesheet" href="../../assets/css/xm.css">
+<style>
+/* =====================================================================
+   IDEA 43 · XMP-based competitions (Samurai XMP Challenge)
+   A: public challenge page · B: PWA registration and progress · C: marketplace booster
+   ===================================================================== */
+body { background: #f5f5f5; }
+[hidden] { display: none !important; }
+main button { border: 0; background: none; font: inherit; color: inherit; cursor: pointer; padding: 0; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 96px; }
+
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 22px 0 14px; }
+.head h1 { font-size: clamp(26px, 3vw, 36px); line-height: 1.1; letter-spacing: -.025em; margin-top: 4px; }
+.head p { color: var(--ink-2); max-width: 680px; font-size: 14.5px; margin-top: 6px; }
+.head .pill-tabs { box-shadow: var(--sh-s); }
+.head .pill-tabs button { padding: 10px 20px; transition: background .15s, color .15s; }
+.cap { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 11px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+.cap .n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.cap b { color: var(--ink); }
+.btn-gold { background: #d3a762; color: #171719; }
+.btn-gold:hover { background: #e0b673; }
+.btn-red { background: var(--red); color: #fff; }
+
+/* ---------- A · public page (dark samurai theme) ---------- */
+.site { background: #121316; color: #fff; border-radius: 18px; overflow: hidden; box-shadow: var(--sh-l); }
+.nv { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 28px; background: #fff; color: var(--ink); }
+.nv .lks { display: flex; gap: 26px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.nv .acts { display: flex; gap: 8px; }
+.hero { position: relative; overflow: hidden; padding: 70px 40px 60px; background: radial-gradient(circle at 78% 50%, #6a2d2a 0, transparent 34%), linear-gradient(110deg, #18181b 35%, #261e1e 100%); }
+.hero .in { position: relative; z-index: 2; max-width: 560px; }
+.eb { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.eb::before { content: ''; width: 26px; height: 2px; background: var(--red); }
+.hero h2 { font-size: clamp(38px, 5vw, 62px); line-height: 1; letter-spacing: -.03em; margin: 20px 0; }
+.hero h2 span { color: #e6b96e; }
+.hero p { color: #c6c4c4; line-height: 1.7; font-size: 14.5px; max-width: 470px; }
+.hero .bt { display: flex; gap: 10px; margin: 26px 0 22px; flex-wrap: wrap; }
+.hero small { color: #a8a4a4; font-size: 11.5px; }
+.sun { position: absolute; right: 8%; top: 50%; transform: translateY(-50%); width: 330px; height: 330px; border-radius: 50%; background: linear-gradient(140deg, #d84739, #8c2525); opacity: .88; display: grid; place-items: center; box-shadow: 0 0 0 36px rgba(174,93,78,.07), 0 0 0 78px rgba(174,93,78,.05); }
+.sun b { font-size: 150px; color: #1a1415; line-height: 1; }
+.sun i { position: absolute; bottom: -34px; font-style: normal; font-size: 10px; letter-spacing: .4em; color: #b98472; white-space: nowrap; }
+.strip { display: grid; grid-template-columns: repeat(3, 1fr); background: #f7f6f3; color: var(--ink); }
+.strip div { padding: 18px 26px; border-right: 1px solid #e3e1dd; }
+.strip div:last-child { border: 0; }
+.strip small { display: block; color: #8b8986; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; margin-bottom: 5px; }
+.strip strong { font-size: 13px; }
+.sec { padding: 64px 40px; }
+.sec .eb { color: #e1b572; }
+.sec h3.big { font-size: clamp(30px, 3.6vw, 44px); line-height: 1.08; letter-spacing: -.03em; margin: 16px 0; }
+.sec h3.big span { color: #e4b46c; }
+.ld { color: #c1bfc0; line-height: 1.7; font-size: 14px; max-width: 520px; margin-bottom: 8px; }
+.sec.pot { background: #0f1012; }
+.pg { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 22px 0; }
+.fact { border: 1px solid #45403c; background: rgba(255,255,255,.03); padding: 14px 16px; border-radius: 8px; }
+.fact small { display: block; font-size: 10px; letter-spacing: .1em; color: #aca39a; text-transform: uppercase; margin-bottom: 6px; }
+.fact strong { font-size: 21px; color: #f2d09a; }
+.fine { font-size: 11px; color: #9a958f; line-height: 1.55; margin-top: 10px; }
+.sphere-w { position: relative; width: min(320px, 70vw); margin: 0 auto; }
+.sphere { --fill: 40%; position: relative; aspect-ratio: 1; border-radius: 50%; overflow: hidden; border: 2px solid rgba(244,227,193,.55); background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.27), transparent 23%), radial-gradient(circle at 50% 45%, rgba(101,90,80,.12), rgba(23,23,25,.66) 72%); box-shadow: inset 0 0 32px rgba(255,255,255,.2), inset -20px -20px 55px rgba(0,0,0,.7), 0 20px 50px rgba(0,0,0,.5); }
+.liq { position: absolute; left: 0; right: 0; bottom: 0; height: var(--fill); transition: height .5s ease; background: linear-gradient(180deg, #f6cf83, #b77a34 42%, #77410e); box-shadow: inset 0 8px 18px rgba(255,255,255,.45); }
+.sphere .ct { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; text-shadow: 0 2px 8px #000; text-align: center; }
+.sphere .ct small { font-size: 10px; letter-spacing: .2em; font-weight: 700; }
+.sphere .ct strong { font-size: clamp(24px, 3.4vw, 36px); margin: 8px 0; }
+.sphere .ct span { font-size: 11px; }
+.pdemo { max-width: 380px; margin: 28px auto 0; background: #242427; border: 1px solid #45403c; border-radius: 10px; padding: 14px; }
+.pdemo label { display: block; color: #ddd2c4; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+.pdemo .r { display: flex; gap: 8px; }
+.pdemo input { min-width: 0; width: 100%; background: #151619; color: #fff; border: 1px solid #55504c; border-radius: 8px; padding: 10px; font: inherit; }
+.pdemo p { margin-top: 8px; color: #aaa5a2; font-size: 11px; line-height: 1.5; }
+.pdemo p.bad { color: #ffb5a6; }
+.sec.lad { background: #f7f6f3; color: var(--ink); text-align: center; }
+.sec.lad .eb { justify-content: center; color: var(--red); }
+.sec.lad p.ld { color: var(--mut); margin: 0 auto; }
+.ladder { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 34px; text-align: left; }
+.rung { --c: #9aa3ad; position: relative; background: #fff; border: 1px solid #e5e1d8; border-top: 4px solid var(--c); border-radius: 10px; padding: 18px 16px; overflow: hidden; min-height: 200px; transition: transform .2s, box-shadow .2s; }
+.rung:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,.08); }
+.rung .st { font-size: 10px; font-weight: 800; letter-spacing: .15em; color: #8d8a84; }
+.rung h4 { font-size: 20px; margin: 10px 0 4px; }
+.rung .mn { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 20px; background: #f2efe8; padding: 3px 9px; margin-bottom: 10px; }
+.rung p { font-size: 12px; line-height: 1.55; color: var(--mut); position: relative; }
+.rung .jp { position: absolute; right: 8px; bottom: -8px; font-size: 62px; font-weight: 900; color: var(--c); opacity: .14; line-height: 1; }
+.rung.last { background: #151619; color: #fff; border-color: #2c2d31; }
+.rung.last .mn { background: #33302a; color: #f0c96a; } .rung.last p { color: #c7c3bc; } .rung.last .st { color: #bfae8d; }
+.lad .fine { color: #8a867f; text-align: center; max-width: 640px; margin: 22px auto 0; }
+.sec.lb { background: radial-gradient(circle at 50% 0, #332a25 0, #18191c 45%); }
+.lbt { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+.stt { border: 1px solid #56514d; border-radius: 30px; padding: 8px 13px; color: #ccc; font-size: 11px; }
+.shell { margin-top: 26px; border: 1px solid #45403b; border-radius: 10px; overflow: hidden; background: #1f2023; }
+.ctl { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; padding: 20px; border-bottom: 1px solid #393a3d; flex-wrap: wrap; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.tabs button { background: #2b2c30; border: 1px solid #404146; color: #aaa9ae; border-radius: 6px; padding: 11px 15px; text-align: left; }
+.tabs button.on { border-color: #b6925e; background: #3a332c; color: #fff; }
+.tabs b, .tabs small { display: block; } .tabs b { font-size: 13px; } .tabs small { font-size: 10px; margin-top: 4px; color: #b9b3ab; }
+.srch label { display: block; color: #aaa9ad; font-size: 11px; font-weight: 700; margin-bottom: 7px; }
+.srch .r { display: flex; gap: 8px; }
+.srch input { background: #17181b; color: #fff; border: 1px solid #494a4d; border-radius: 8px; padding: 11px; width: 200px; font: inherit; font-size: 13px; }
+.cpt { padding: 14px 20px; font-size: 12.5px; color: #b8b2ac; min-height: 40px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 20px 18px; }
+.stat { border: 1px solid #3d3a37; background: rgba(255,255,255,.03); border-radius: 8px; padding: 12px 14px; }
+.stat small { display: block; color: #a69f97; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+.stat strong { font-size: 18px; color: #f1d29e; }
+.podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 20px 18px; }
+.pc { background: linear-gradient(140deg, #39322d, #262628); border: 1px solid #5b4b3b; border-radius: 8px; padding: 15px; min-width: 0; }
+.pc:first-child { background: linear-gradient(135deg, #594232, #292624); border-color: #b39364; }
+.pc .rk { color: #eac18a; font-size: 11px; letter-spacing: .1em; font-weight: 700; }
+.pc .ac { font-size: 15px; font-weight: 800; margin: 12px 0 4px; }
+.pc .tr { color: #b4aaa0; font-size: 11px; }
+.pc .pt { color: #f3d09a; font-size: 18px; font-weight: 800; margin: 12px 0 10px; }
+.pc .pt small { font-size: 10px; font-weight: 500; }
+.sum { margin: 0 20px 18px; padding: 14px 16px; border: 1px solid #b39261; border-radius: 8px; background: #3a3129; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+.sum small { display: block; color: #cbb59b; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 5px; }
+.sum strong { font-size: 15px; } .sum span { font-size: 12px; color: #e1c89f; }
+.ttl { padding: 0 20px 12px; font-weight: 700; font-size: 15px; }
+.ttl small { font-weight: 400; color: #9a999d; margin-left: 8px; }
+.ts { overflow-x: auto; }
+.tb { width: 100%; border-collapse: collapse; min-width: 560px; text-align: left; }
+.tb th { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: #88898e; background: #292a2e; padding: 13px 20px; border-top: 1px solid #393a3d; }
+.tb td { padding: 13px 20px; border-top: 1px solid #393a3d; font-size: 13px; color: #e4e3e2; }
+.tb .rank { font-weight: 700; color: #d7b275; }
+.tb .rt { display: inline-flex; width: 28px; height: 28px; border: 1px solid #bd955d; border-radius: 50%; align-items: center; justify-content: center; }
+.tb .pts { font-weight: 700; color: #e9c084; }
+.tb tr.me td { background: #493b2d; }
+.tb tbody tr:hover td { background: #34302c; }
+.tag2 { font-size: 10px; background: #d8aa65; color: #1b1b1d; border-radius: 3px; padding: 2px 6px; margin-left: 8px; }
+.lvl { --c: #9aa3ad; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--c); color: var(--c); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.lvl i { font-style: normal; font-size: 12px; opacity: .9; }
+.foot { padding: 14px 20px; color: #8f9094; font-size: 11px; line-height: 1.6; }
+.cta { background: #f7f6f3; color: var(--ink); padding: 36px 40px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+.cta h3 { font-size: 22px; margin-bottom: 6px; } .cta p { color: var(--mut); font-size: 13px; }
+
+/* ---------- B/C · PWA ---------- */
+.pw { display: grid; grid-template-columns: 420px minmax(0, 1fr); gap: 28px; align-items: start; }
+.dev { position: relative; width: 100%; max-width: 400px; height: 740px; margin: 0 auto; border-radius: 40px; border: 8px solid #15171b; overflow: hidden; background: #f5f6f7; box-shadow: var(--sh-l); display: flex; flex-direction: column; }
+.sb { display: flex; justify-content: space-between; padding: 12px 24px 6px; font-size: 13px; font-weight: 700; background: #fff; }
+.ah { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 10px; background: #fff; border-bottom: 1px solid var(--line); }
+.ah .xm-logo svg { height: 20px; width: auto; }
+.ah button { font-size: 12px; font-weight: 600; color: var(--g); }
+.scr { flex: 1; overflow-y: auto; padding: 14px; position: relative; }
+.bal { border-radius: 24px; padding: 20px; color: #fff; background: linear-gradient(135deg, #3b0b34, #000e53 55%, #1400bb); }
+.bal .pill { display: inline-block; background: rgba(255,255,255,.2); border-radius: 30px; padding: 7px 12px; font-size: 12px; }
+.bal small { display: block; margin-top: 22px; font-size: 11px; }
+.bal b { font-size: 32px; display: block; margin: 4px 0 2px; }
+.bal em { font-style: normal; font-size: 11px; color: #c9cce7; }
+.dt { background: #fff; border-radius: 18px; padding: 14px 16px; margin-top: 12px; }
+.dt div { display: flex; justify-content: space-between; font-size: 13px; padding: 7px 0; color: var(--mut); }
+.dt div b { color: var(--ink); }
+.pm { margin-top: 12px; border-radius: 18px; padding: 16px; color: #fff; background: linear-gradient(115deg, #075b40, #003d2a); display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.pm h4 { font-size: 15px; margin-bottom: 4px; } .pm p { font-size: 11.5px; color: #cae2d8; line-height: 1.45; }
+.bn2 { margin-top: 12px; border-radius: 18px; padding: 16px; background: linear-gradient(120deg, #edeafc, #e8f0fb); display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.bn2 h4 { font-size: 14px; margin-bottom: 4px; } .bn2 p { font-size: 11.5px; color: #62728b; line-height: 1.45; }
+.shade { position: absolute; inset: 0; background: rgba(9,10,12,.55); z-index: 5; display: flex; align-items: flex-end; animation: fade .2s; }
+@keyframes fade { from { opacity: 0; } }
+.sheet { width: 100%; background: #fff; border-radius: 24px 24px 0 0; padding: 18px 18px 40px; max-height: 100%; overflow-y: auto; animation: up .28s ease-out; }
+@keyframes up { from { transform: translateY(100%); } }
+.promo { border-radius: 18px; color: #fff; overflow: hidden; background: linear-gradient(150deg, #006a40, #003925); }
+.promo .tm { background: #15ad70; padding: 12px; text-align: center; font-size: 12.5px; font-weight: 700; }
+.promo .bd { padding: 20px; position: relative; }
+.badge { display: inline-block; border: 1px solid #d7f0e2; border-radius: 4px; padding: 4px 8px; font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.reg { float: right; background: #19af71; border-radius: 5px; padding: 4px 8px; font-size: 10px; font-weight: 700; }
+.promo h3 { font-size: 24px; line-height: 1.1; margin: 14px 0 8px; }
+.promo p { color: #d7efe3; font-size: 13px; line-height: 1.55; }
+.promo .kan { text-align: center; font-size: 64px; color: #d1a365; margin: 8px 0 4px; font-weight: 700; }
+.promo .btn { width: 100%; margin-top: 8px; }
+.promo .btn-w { background: #fff; color: #101514; }
+.promo .btn-t { background: rgba(255,255,255,.25); color: #fff; }
+.sheet h3.t { font-size: 20px; letter-spacing: -.01em; }
+.sheet .sub { font-size: 13px; color: var(--ink-2); margin: 6px 0 14px; line-height: 1.5; }
+.f { margin-bottom: 12px; }
+.f label { display: block; font-size: 12px; color: var(--ink-2); margin-bottom: 5px; }
+.f input[type=text] { width: 100%; font: inherit; font-size: 15px; padding: 13px 14px; border: 1.5px solid var(--line-2); border-radius: 10px; background: var(--soft); outline: none; }
+.f input[type=text]:focus { border-color: var(--g); background: #fff; }
+.f.err input[type=text] { border-color: var(--red); background: var(--red-l); }
+.f .em { color: var(--red); font-size: 12px; margin-top: 4px; }
+.chk { display: flex; gap: 9px; align-items: flex-start; font-size: 12.5px; color: var(--ink-2); margin: 6px 0 14px; line-height: 1.45; }
+.lnk { font-size: 12px; color: var(--g); text-decoration: underline; }
+.prog .box { border: 1px solid #dfe5eb; border-radius: 12px; padding: 14px; margin: 12px 0; background: #fff; }
+.prog .box h4 { font-size: 13px; margin-bottom: 8px; }
+.kv { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; color: var(--mut); }
+.kv b { color: var(--ink); }
+.xmpn { text-align: center; padding: 8px 0; }
+.xmpn strong { font-size: 34px; letter-spacing: -.02em; display: block; }
+.xmpn span { font-size: 12px; color: var(--mut); }
+.lvh { display: flex; align-items: center; gap: 12px; }
+.lvj { width: 52px; height: 52px; border-radius: 14px; background: #151619; color: #f0c96a; display: grid; place-items: center; font-size: 19px; font-weight: 800; flex: none; }
+.lvh small { display: block; color: var(--mut); font-size: 11px; } .lvh strong { font-size: 18px; }
+progress { display: block; width: 100%; height: 9px; margin: 12px 0 8px; appearance: none; border: 0; border-radius: 10px; background: #e1e6eb; overflow: hidden; }
+progress::-webkit-progress-bar { background: #e1e6eb; border-radius: 10px; }
+progress::-webkit-progress-value { background: linear-gradient(90deg, #17ac70, #d9a441); border-radius: 10px; }
+progress::-moz-progress-bar { background: #17ac70; border-radius: 10px; }
+.note { font-size: 12px; color: var(--mut); line-height: 1.5; }
+.note.g { color: var(--g-d); background: var(--g-l); padding: 9px 12px; border-radius: 10px; }
+.mk { border-radius: 18px; background: #eff3f8; padding: 14px; }
+.ba { border-radius: 12px; min-height: 130px; padding: 18px; color: #fff; background: linear-gradient(135deg, #8274ee, #4b35e2); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ba strong { font-size: 44px; letter-spacing: -.03em; } .ba span { font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+.coin { width: 74px; height: 74px; display: grid; place-items: center; border-radius: 50%; background: linear-gradient(145deg, #fff, #9399a8); border: 4px solid #c7cbd4; color: #333849; font-weight: 800; transform: rotate(-15deg); }
+.mk h4 { margin: 14px 0 6px; font-size: 18px; }
+.mk .mt { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+.mk .mt div { background: #fff; border-radius: 8px; padding: 9px; font-size: 12px; }
+.mk .mt small { display: block; color: var(--mut); margin-bottom: 4px; }
+.side { display: grid; gap: 16px; }
+.panel { background: #fff; border: 1px solid var(--line-2); border-radius: 18px; box-shadow: var(--sh-m); padding: 20px; }
+.panel h3 { font-size: 16px; } .panel .sub { font-size: 12.5px; color: var(--mut); margin: 2px 0 12px; }
+.panel .row2 { display: flex; gap: 8px; flex-wrap: wrap; }
+.flow { display: grid; gap: 8px; margin-top: 8px; }
+.flow div { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+.flow b { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--g-l); color: var(--g-d); display: grid; place-items: center; font-size: 11px; }
+.flow div.on b { background: var(--g); color: #fff; }
+
+@media (max-width: 1000px) { .pw { grid-template-columns: 1fr; } .pg { grid-template-columns: 1fr; gap: 34px; } }
+@media (max-width: 860px) {
+  .wrap { padding: 0 14px 90px; }
+  .head .pill-tabs { width: 100%; overflow-x: auto; }
+  .head .pill-tabs button { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+  .nv { padding: 12px 16px; } .nv .lks { display: none; }
+  .hero { padding: 44px 20px; } .sun { display: none; }
+  .strip { grid-template-columns: 1fr; } .strip div { border-right: 0; border-bottom: 1px solid #e3e1dd; }
+  .sec { padding: 44px 18px; }
+  .ladder { grid-template-columns: 1fr 1fr; }
+  .stats { grid-template-columns: 1fr; gap: 6px; } .podium { grid-template-columns: 1fr; }
+  .srch input { width: 100%; } .srch .r { width: 100%; } .srch { width: 100%; }
+  .cta { padding: 26px 18px; }
+}
+@media (max-width: 520px) { .ladder { grid-template-columns: 1fr; } .dev { height: 680px; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <span class="eyebrow">Idea 43 &middot; Client Loyalty &middot; P1</span>
+      <h1>XMP-based competitions</h1>
+      <p>The Samurai XMP Challenge (Case 2): clients compete on XMP earned in a limited period, ranked inside their loyalty tier, while trading activity grows a prize pot that starts at $100,000.</p>
+    </div>
+    <div class="pill-tabs" role="tablist" aria-label="Scenes">
+      <button class="on" role="tab" data-scene="a">A &middot; Challenge page</button>
+      <button role="tab" data-scene="b">B &middot; PWA register and track</button>
+      <button role="tab" data-scene="c">C &middot; XMP booster</button>
+    </div>
+  </div>
+  <div class="cap" id="cap"></div>
+
+  <!-- A -->
+  <section id="sA" class="site">
+    <div class="nv"><span class="xm-logo" id="logoA"></span><div class="lks"><span>How it works</span><span>Prize pot</span><span>Leaderboard</span></div><div class="acts"><button class="btn btn-outline btn-sm" data-go="b">Log in</button><button class="btn btn-red btn-sm" data-go="b">Register</button></div></div>
+    <div class="hero"><div class="in"><div class="eb">The Samurai XMP Challenge</div><h2>Trade with purpose. <span>Rise through ranks.</span></h2><p>Every journey begins with a single trade. Join the challenge, collect XMPs through your trading activity and see how you rank among your peers.</p><div class="bt"><button class="btn btn-red" data-go="b">Join the challenge &rarr;</button><button class="btn btn-outline" style="color:#fff;border-color:#626266" id="toLb">View leaderboard</button></div><small><b style="color:#eee">Illustrative promotion period</b> &nbsp; 01&ndash;30 November 2026</small></div><div class="sun" aria-hidden="true"><b>侍</b><i>THE WAY OF THE SAMURAI</i></div></div>
+    <div class="strip"><div><small>Promotion period &middot; example</small><strong>01&ndash;30 November 2026</strong></div><div><small>Your score</small><strong>XMPs earned through real-account trading</strong></div><div><small>Two divisions</small><strong>Compete with your loyalty tier group</strong></div></div>
+
+    <div class="sec pot"><div class="pg"><div><div class="eb">The prize pot</div><h3 class="big">Every XMP<br><span>grows the pot.</span></h3><p class="ld">For every XMP participants earn through trading during the promotion, &yen;100 goes into the pot. The top earner in each tier division wins that tier&rsquo;s prize.</p><div class="facts"><div class="fact"><small>Guaranteed minimum</small><strong>$100,000</strong></div><div class="fact"><small>Pot contribution</small><strong>&yen;100 / XMP</strong></div></div><p class="ld">The pot is guaranteed to be at least $100,000. If accumulated contributions exceed that amount, the prize pot will be higher.</p><p class="fine">Illustrative concept, not live data. The contribution rule, currency conversion, timing and final prize allocation are to be confirmed.</p></div>
+      <div><div class="sphere-w"><div class="sphere" id="sphere" role="img" aria-label="Illustrative glass sphere"><div class="liq"></div><div class="ct"><small>EXAMPLE CONTRIBUTIONS</small><strong id="potAmt">&yen;0</strong><span>&yen;100 per XMP earned</span></div></div></div>
+      <div class="pdemo"><label for="potIn">Example XMPs earned by all accounts</label><div class="r"><input id="potIn" type="number" min="0" max="1000000000" step="1" inputmode="numeric"><button class="btn btn-gold btn-sm" id="potAdd" type="button">+ 1,000 XMP</button></div><p id="potSt" aria-live="polite"></p><p>Demo only: the sphere is full at 500,000 XMP for visualisation; this is not a pot cap.</p></div></div></div></div>
+
+    <div class="sec lad"><div class="eb">The path of the samurai</div><h3 class="big" style="color:#151619">Five levels. One summit.</h3><p class="ld">Every XMP you earn after registering moves you along the path, from Initiate to Shogun. Your level appears on the leaderboard and in your PWA.</p><div class="ladder" id="ladder"></div><p class="fine">Level names are a game concept, not an official historical ladder. XMP thresholds are illustrative and subject to final terms.</p></div>
+
+    <div class="sec lb" id="lbSec"><div class="lbt"><div><div class="eb">The arena</div><h3 class="big">The leaderboard</h3><p class="ld" style="margin:0">Two divisions by loyalty tier. One way to climb: XMPs earned through trading.</p></div><span class="stt">Illustrative standings &middot; not live</span></div>
+      <div class="shell"><div class="ctl"><div class="tabs" role="group" aria-label="Divisions"><button data-b="elite" class="on" aria-pressed="true"><b>Elite &amp; Platinum</b><small>Higher tiers &middot; Leaderboard 01</small></button><button data-b="gold" aria-pressed="false"><b>Bronze, Silver &amp; Gold</b><small>Lower tiers &middot; Leaderboard 02</small></button></div>
+        <form class="srch" id="sForm"><label for="sIn">Find your account</label><div class="r"><input id="sIn" inputmode="numeric" placeholder="Enter account ID" autocomplete="off"><button class="btn btn-red btn-sm" type="submit">Search</button></div></form></div>
+        <div class="cpt" id="cpt" role="status" aria-live="polite"></div><div class="stats" id="stats"></div>
+        <div class="ttl" style="padding-top:2px">Leading the way <small>TOP 3 &middot; EXAMPLE DATA</small></div><div class="podium" id="podium"></div>
+        <div class="sum" id="sum" hidden></div>
+        <div class="ttl">Full standings <small id="cnt"></small></div>
+        <div class="ts"><table class="tb"><thead><tr><th>Rank</th><th>Account ID</th><th>Tier</th><th>Samurai level</th><th>Promotion XMPs</th></tr></thead><tbody id="rows"></tbody></table></div>
+        <div class="foot">Example data only. Ranked by XMPs earned after registration within the promotion period, inside each tier division. Winner qualification and prize allocation are subject to final terms. Data would show when it was last refreshed.</div></div></div>
+    <div class="cta"><div><h3>Ready to find your place?</h3><p>Open the PWA, join the promotion and follow your progress.</p></div><button class="btn btn-red" data-go="b">Join the challenge &rarr;</button></div>
+  </section>
+
+  <!-- B / C -->
+  <section id="sP" hidden>
+    <div class="pw">
+      <div id="devHost"></div>
+      <div class="side">
+        <div class="panel"><h3>Workflow</h3><div class="sub">Where the client is in the Promo Tool flow.</div><div class="flow" id="flow"></div></div>
+        <div class="panel"><h3>Prototype controls</h3><div class="sub">Simulate what trading would do.</div><div class="row2"><button class="btn btn-primary btn-sm" id="simTrade" type="button">Simulate EUR/USD trading</button><button class="btn btn-outline btn-sm" id="resetDemo" type="button">Reset demo</button></div><p class="note" id="simNote" style="margin-top:10px">Register first, then simulate trading to move your XMP, level, rank and the prize pot.</p></div>
+        <div class="panel"><h3>How it works (from the proposal)</h3><div class="flow"><div><b>1</b>Discover: website card, PWA pop-up, email or landing page.</div><div><b>2</b>Register once in the Promo Tool, linked to your client ID.</div><div><b>3</b>Eligible trades across your real accounts earn XMP and feed the prize pot.</div><div><b>4</b>Private progress view and a public leaderboard.</div><div><b>5</b>Results are validated, then awards go to winners&rsquo; wallets.</div></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="../../assets/js/common.js"></script>
+<script>
+(function () {
+  var $ = XM.$, $$ = XM.$$, esc = XM.esc;
+  var CAPS = {
+    a: ['A', '<b>Challenge page.</b> The public page: prize pot, five samurai levels and two tier-based leaderboards. Search an account ID, or register in scene B and find yourself here.'],
+    b: ['B', '<b>PWA register and track.</b> The pop-up card leads to Promo Tool registration (client ID entered twice), then a private progress view.'],
+    c: ['C', '<b>XMP booster.</b> A marketplace booster for selected instruments. If enabled, simulated EUR/USD trading earns more XMP.']
+  };
+  var SAMPLE = [
+    ['2023722', 'Elite', 38420], ['2023699', 'Platinum', 34910], ['2023435', 'Elite', 29870], ['2023687', 'Platinum', 26340], ['2021581', 'Elite', 22180], ['2022931', 'Platinum', 18760],
+    ['2021904', 'Elite', 15230], ['2022417', 'Platinum', 12640], ['2023158', 'Elite', 9870], ['2021266', 'Platinum', 7310], ['2022780', 'Elite', 4950], ['2023341', 'Platinum', 2820],
+    ['2021718', 'Gold', 21540], ['2022824', 'Silver', 18390], ['2021714', 'Gold', 15960], ['2022298', 'Bronze', 13120], ['2023793', 'Silver', 10870], ['2021852', 'Gold', 8640],
+    ['2022569', 'Bronze', 6310], ['2023076', 'Silver', 4480], ['2021433', 'Bronze', 2950], ['2022115', 'Gold', 1720], ['2023604', 'Silver', 860], ['2021987', 'Bronze', 340]
+  ];
+  var LEVELS = [
+    { n: 'Initiate', jp: '入門', min: 0, c: '#9aa3ad', t: 'Your journey begins. Register and place your first trades.' },
+    { n: 'Disciple', jp: '弟子', min: 1000, c: '#4fbf86', t: 'Training in earnest as your XMPs start to build.' },
+    { n: 'Warrior', jp: '武士', min: 5000, c: '#e8693a', t: 'A proven competitor with a place on the leaderboard.' },
+    { n: 'Master', jp: '師範', min: 15000, c: '#d9a441', t: 'Among the strongest in your division.' },
+    { n: 'Shogun', jp: '将軍', min: 30000, c: '#f0c96a', t: 'The supreme commander, leading the way.' }
+  ];
+  var ME = { id: '370411064', tier: 'Gold' };
+  var SAMPLE_TOTAL = SAMPLE.reduce(function (s, e) { return s + e[2]; }, 0);
+  var S = { scene: 'a', board: 'elite', q: '', reg: false, xmp: 0, trades: 0, booster: false, potXmp: SAMPLE_TOTAL, app: 'home', popup: true, regErr: {}, regVals: { a: '', b: '', ok: false } };
+
+  function lvFor(p) { var l = LEVELS[0]; LEVELS.forEach(function (x) { if (p >= x.min) l = x; }); return l; }
+  function badge(p) { var l = lvFor(p); return '<span class="lvl" style="--c:' + l.c + '"><i aria-hidden="true">' + l.jp + '</i>' + l.n + '</span>'; }
+  function div(tier) { return (tier === 'Elite' || tier === 'Platinum') ? 'elite' : 'gold'; }
+  var LABEL = { elite: 'Elite & Platinum', gold: 'Bronze, Silver & Gold' };
+  function entries() { var e = SAMPLE.map(function (r) { return { id: r[0], tier: r[1], pts: r[2] }; }); if (S.reg) e.push({ id: ME.id, tier: ME.tier, pts: S.xmp, me: true }); return e; }
+  function rowsFor(b) { return entries().filter(function (e) { return div(e.tier) === b; }).sort(function (a, b2) { return b2.pts - a.pts || a.id.localeCompare(b2.id); }); }
+  function n(x) { return x.toLocaleString('en-US'); }
+
+  /* ------------------------------------------------ pot */
+  function drawPot(valid) {
+    var x = S.potXmp, fill = Math.min(x / 500000 * 100, 100);
+    $('#sphere').style.setProperty('--fill', fill + '%');
+    $('#sphere').setAttribute('aria-label', 'Illustrative glass sphere, ' + Math.round(fill) + ' percent full on the example visual scale');
+    $('#potAmt').textContent = '\u00a5' + n(x * 100);
+    if ($('#potIn') !== document.activeElement) $('#potIn').value = x;
+    if (valid !== false) { $('#potSt').className = ''; $('#potSt').textContent = n(x) + ' example XMPs \u00d7 \u00a5100 = \u00a5' + n(x * 100) + '.'; }
+  }
+  $('#potIn').addEventListener('input', function (e) {
+    var v = e.target.valueAsNumber;
+    if (!Number.isInteger(v) || v < 0 || v > 1e9) { $('#potSt').className = 'bad'; $('#potSt').textContent = 'Enter a whole number between 0 and 1,000,000,000. The sphere shows the last valid example.'; return; }
+    S.potXmp = v; drawPot();
+  });
+  $('#potAdd').addEventListener('click', function () { if (S.potXmp + 1000 > 1e9) { $('#potSt').className = 'bad'; $('#potSt').textContent = 'The demo supports up to 1,000,000,000 example XMPs.'; return; } S.potXmp += 1000; drawPot(); });
+
+  /* ------------------------------------------------ ladder + board */
+  $('#ladder').innerHTML = LEVELS.map(function (l, i) { return '<article class="rung' + (i === 4 ? ' last' : '') + '" style="--c:' + l.c + '"><div class="st">LEVEL 0' + (i + 1) + '</div><h4>' + l.n + '</h4><span class="mn">' + (i ? n(l.min) + '+ XMP' : 'From 0 XMP') + '</span><p>' + l.t + '</p><div class="jp" aria-hidden="true">' + l.jp + '</div></article>'; }).join('');
+  function drawBoard() {
+    var q = S.q, all = entries(), found = q ? all.filter(function (e) { return e.id === q; })[0] : null;
+    if (found) S.board = div(found.tier);
+    $$('[data-b]').forEach(function (b) { var on = b.getAttribute('data-b') === S.board; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+    var rows = rowsFor(S.board);
+    $('#podium').innerHTML = rows.slice(0, 3).map(function (e, i) { return '<div class="pc"><div class="rk">#' + (i + 1) + '</div><div class="ac">' + e.id + (e.me ? '<span class="tag2">YOU</span>' : '') + '</div><div class="tr">' + e.tier + '</div><div class="pt">' + n(e.pts) + ' <small>XMP</small></div>' + badge(e.pts) + '</div>'; }).join('');
+    $('#cnt').textContent = rows.length + ' example accounts';
+    var tot = rows.reduce(function (s, e) { return s + e.pts; }, 0);
+    $('#stats').innerHTML = [['Accounts ranked', n(rows.length)], ['XMPs in this division', n(tot) + ' XMP'], ['Top level', rows.length ? lvFor(rows[0].pts).n : '-']].map(function (s) { return '<div class="stat"><small>' + s[0] + '</small><strong>' + s[1] + '</strong></div>'; }).join('');
+    var sum = $('#sum'); sum.hidden = !found;
+    if (found) { var idx = rows.indexOf(rows.filter(function (e) { return e.id === found.id; })[0]); sum.innerHTML = '<div><small>Account ' + esc(found.id) + '</small><strong>Rank #' + (idx + 1) + ' \u00b7 ' + n(found.pts) + ' XMP \u00b7 ' + lvFor(found.pts).n + '</strong></div><span>' + (idx === 0 ? 'Leading this division' : n(rows[idx - 1].pts - found.pts) + ' XMP behind the next account') + '</span>'; }
+    $('#rows').innerHTML = rows.map(function (e, i) { return '<tr class="' + ((q && e.id === q) || (e.me && !q) ? 'me' : '') + '"><td class="rank"><span class="' + (i < 3 ? 'rt' : '') + '">' + (i + 1) + '</span></td><td><b>' + e.id + '</b>' + (e.me ? '<span class="tag2">YOU</span>' : '') + '</td><td>' + e.tier + '</td><td>' + badge(e.pts) + '</td><td class="pts">' + n(e.pts) + ' XMP</td></tr>'; }).join('');
+    $('#cpt').textContent = q && !found ? 'No account found for \u201c' + q + '\u201d. Check the ID, or register in the PWA (scene B) to appear here.' : found ? 'Showing account ' + found.id + ' in ' + LABEL[S.board] + '.' : LABEL[S.board] + ' \u00b7 Sample rankings, sorted by promotion XMPs';
+  }
+  $$('[data-b]').forEach(function (b) { b.addEventListener('click', function () { S.board = b.getAttribute('data-b'); S.q = ''; $('#sIn').value = ''; drawBoard(); }); });
+  $('#sForm').addEventListener('submit', function (e) { e.preventDefault(); var q = $('#sIn').value.trim(); if (!q) { S.q = ''; drawBoard(); $('#cpt').textContent = 'Enter an account ID to search.'; return; } S.q = q; drawBoard(); });
+  $('#toLb').addEventListener('click', function () { $('#lbSec').scrollIntoView({ behavior: 'smooth' }); });
+  $$('[data-go]').forEach(function (b) { b.addEventListener('click', function () { if (b.getAttribute('data-go') === 'b') { S.app = 'home'; S.popup = true; } setScene(b.getAttribute('data-go')); }); });
+
+  /* ------------------------------------------------ PWA */
+  function nextLv() { var l = lvFor(S.xmp), i = LEVELS.indexOf(l), nx = LEVELS[i + 1]; return { l: l, nx: nx, pct: nx ? (S.xmp - l.min) / (nx.min - l.min) * 100 : 100 }; }
+  function rankInfo() { var rows = rowsFor(div(ME.tier)); var i = rows.findIndex(function (e) { return e.me; }); return { rank: i + 1, of: rows.length }; }
+  function appHTML() {
+    var h = '<div class="dev"><div class="sb"><span>9:41</span><span>5G</span></div><div class="ah"><span class="xm-logo">' + XM.logo() + '</span><button type="button" data-ap="public">Public page &nearr;</button></div><div class="scr">';
+    if (S.scene === 'c') return h + marketHTML() + '</div></div>';
+    h += '<div class="bal"><span class="pill">Standard #' + ME.id + '</span><small>REAL ACCOUNT BALANCE</small><b>$2,901.88</b><em>Illustrative balance</em></div><div class="dt"><div>Loyalty tier<b>' + ME.tier + '</b></div><div>Competition division<b>' + LABEL[div(ME.tier)] + '</b></div><div>Promotion XMPs<b>' + n(S.xmp) + ' XMP</b></div><div>Samurai level<b>' + lvFor(S.xmp).n + '</b></div></div>' +
+      '<div class="pm"><div><h4>Samurai XMP Challenge</h4><p>' + (S.reg ? 'Registered. Track your promotion XMPs.' : 'Collect XMPs and rise through the ranks.') + '</p></div><button type="button" class="btn btn-outline btn-sm" style="background:#fff" data-ap="' + (S.reg ? 'progress' : 'popup') + '">' + (S.reg ? 'Track progress' : 'View promotion') + '</button></div>' +
+      '<div class="bn2"><div><h4>Give your XMPs a boost</h4><p>' + (S.booster ? 'EUR/USD booster enabled in this demo.' : 'Time-limited XMP boosters for selected instruments.') + '</p></div><button type="button" class="btn btn-outline btn-sm" data-ap="market">Marketplace</button></div>';
+    h += '</div>';
+    if (S.app === 'home' && S.popup) h += '<div class="shade"><div class="sheet" role="dialog" aria-modal="true">' + promoHTML() + '</div></div>';
+    if (S.app === 'register') h += '<div class="shade"><div class="sheet" role="dialog" aria-modal="true">' + regHTML() + '</div></div>';
+    if (S.app === 'progress') h += '<div class="shade"><div class="sheet prog" role="dialog" aria-modal="true">' + progHTML() + '</div></div>';
+    return h + '</div>';
+  }
+  function promoHTML() {
+    return '<div class="promo"><div class="tm">Promotion period: 01&ndash;30 November 2026</div><div class="bd"><span class="badge">Limited time challenge</span>' + (S.reg ? '<span class="reg">Registered</span>' : '') + '<h3>Samurai XMP Challenge</h3><p>Register and collect XMPs through trading. Rise through the ranks in your tier&rsquo;s leaderboard.</p><div class="kan" aria-hidden="true">侍</div>' +
+      (S.reg ? '<button type="button" class="btn btn-w" data-ap="progress">Track progress</button>' : '<button type="button" class="btn btn-w" data-ap="register">Register for the competition</button>') + '<button type="button" class="btn btn-t" data-ap="close">' + (S.reg ? 'Close' : 'Not now') + '</button></div></div><p class="note" style="margin-top:10px">Only XMPs earned after registration during the promotion period count. Example terms are not final.</p>';
+  }
+  function regHTML() {
+    var e = S.regErr, v = S.regVals;
+    return '<h3 class="t">Promo Tool registration</h3><p class="sub">Register for the Samurai XMP Challenge. Your registration is linked to your client ID so we can track eligible trading across your real accounts.</p>' +
+      '<div class="f' + (e.a ? ' err' : '') + '"><label for="cA">Client ID</label><input id="cA" type="text" inputmode="numeric" placeholder="Enter Client ID" value="' + esc(v.a) + '" autocomplete="off">' + (e.a ? '<div class="em">' + e.a + '</div>' : '') + '</div>' +
+      '<div class="f' + (e.b ? ' err' : '') + '"><label for="cB">Confirm Client ID</label><input id="cB" type="text" inputmode="numeric" placeholder="Re-enter Client ID" value="' + esc(v.b) + '" autocomplete="off">' + (e.b ? '<div class="em">' + e.b + '</div>' : '') + '</div>' +
+      '<label class="chk"><input type="checkbox" id="cOk"' + (v.ok ? ' checked' : '') + '> I confirm my Client ID is correct.</label>' + (e.ok ? '<div class="em" style="color:var(--red);font-size:12px;margin:-8px 0 10px">' + e.ok + '</div>' : '') +
+      '<button type="button" class="btn btn-primary btn-block" data-ap="submit">Register</button><div style="display:flex;justify-content:space-between;margin-top:12px"><button type="button" class="lnk" data-ap="demoId">Use demo client ID</button><button type="button" class="lnk" data-ap="back">Back</button></div>';
+  }
+  function progHTML() {
+    var nl = nextLv(), r = rankInfo();
+    return '<h3 class="t">Samurai XMP Challenge <span class="reg" style="float:none;margin-left:6px">Registered</span></h3><p class="sub">You compete on <b>XMP earned</b> from eligible trades on your real accounts, ranked against clients in your tier division. Data refreshed 25 Nov 2026, 09:40 UTC (illustrative).</p>' +
+      '<div class="box"><div class="xmpn"><strong>' + n(S.xmp) + '</strong><span>Promotion XMPs</span></div></div>' +
+      '<div class="box"><h4>Your standing</h4><div class="kv"><span>Client ID</span><b>' + ME.id + '</b></div><div class="kv"><span>Tier and division</span><b>' + ME.tier + ' \u00b7 ' + LABEL[div(ME.tier)] + '</b></div><div class="kv"><span>Rank in your division</span><b>#' + r.rank + ' of ' + r.of + '</b></div><div class="kv"><span>Eligible trades</span><b>' + S.trades + '</b></div></div>' +
+      '<div class="box"><div class="lvh"><span class="lvj" aria-hidden="true">' + nl.l.jp + '</span><div><small>Your samurai level</small><strong>' + nl.l.n + '</strong></div></div><progress value="' + nl.pct + '" max="100" aria-label="Progress to next level"></progress><p class="note">' + (nl.nx ? n(nl.nx.min - S.xmp) + ' XMP to reach ' + nl.nx.n : 'Highest level reached') + '</p></div>' +
+      '<p class="note g">Awards: after the results are reviewed and confirmed, prizes go to winners&rsquo; wallets.</p>' +
+      '<button type="button" class="btn btn-primary btn-block" style="margin-top:12px" data-ap="rank">View my leaderboard &rarr;</button><button type="button" class="btn btn-outline btn-block" style="margin-top:8px" data-ap="market">Explore XMP boosters</button><button type="button" class="lnk" style="display:block;margin:12px auto 0" data-ap="close">Close</button>';
+  }
+  function marketHTML() {
+    return '<h3 style="font-size:20px">Rewards Marketplace</h3><p class="note" style="margin:6px 0 14px">Earn more XMPs on selected instruments for a limited time.</p><div class="mk"><div class="ba"><div><span>EXAMPLE XMP BOOSTER</span><br><strong>+50%</strong></div><div class="coin" aria-hidden="true">XMP</div></div><h4>EUR/USD XMP Booster</h4><p class="note">Earn additional XMPs on eligible EUR/USD trading during the example window.</p><div class="mt"><div><small>Instrument</small><b>EUR/USD</b></div><div><small>Example window (UTC)</small><b>24&ndash;25 Nov 2026</b></div></div>' +
+      '<button type="button" class="btn ' + (S.booster ? 'btn-outline' : 'btn-primary') + ' btn-block" data-ap="boost"' + (S.booster ? ' disabled' : '') + '>' + (S.booster ? 'Enabled in demo' : 'Enable demo booster') + '</button>' + (S.booster ? '<p class="note g" style="margin-top:10px" role="status">Enabled in this demo. Simulated EUR/USD trades now earn +50% XMP.</p>' : '') + '</div><p class="note" style="margin-top:12px">Illustrative offer, rate and window. Whether boosted XMPs count toward the competition is subject to final terms.</p><button type="button" class="btn btn-outline btn-block" style="margin-top:12px" data-ap="home">Back to Members Area</button>';
+  }
+  function drawFlow() {
+    var step = !S.reg ? (S.app === 'register' ? 2 : 1) : 3;
+    $('#flow').innerHTML = [['Discover', 'PWA pop-up card'], ['Register', 'Promo Tool, client ID'], ['Trade and track', 'XMP, level, rank'], ['Results and award', 'After confirmation']].map(function (s, i) { return '<div class="' + (i + 1 === step ? 'on' : '') + '"><b>' + (i + 1) + '</b><span><b style="all:unset;font-weight:600;color:var(--ink)">' + s[0] + '</b> &middot; ' + s[1] + '</span></div>'; }).join('');
+  }
+  function drawApp() {
+    if (S.scene === 'a') return;
+    $('#devHost').innerHTML = appHTML(); drawFlow();
+    $('#simNote').textContent = !S.reg ? 'Register first, then simulate trading to move your XMP, level, rank and the prize pot.' : 'Each simulated trade earns ' + (S.booster ? '1,500 XMP (boosted)' : '1,000 XMP') + ' and adds \u00a5' + n((S.booster ? 1500 : 1000) * 100) + ' to the pot.';
+  }
+  $('#devHost').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-ap]'); if (!b) return; var a = b.getAttribute('data-ap');
+    if (a === 'popup') { S.app = 'home'; S.popup = true; }
+    else if (a === 'close') { S.app = 'home'; S.popup = false; }
+    else if (a === 'register') { S.app = 'register'; S.regErr = {}; }
+    else if (a === 'back') { S.app = 'home'; S.popup = true; }
+    else if (a === 'demoId') { S.regVals = { a: ME.id, b: ME.id, ok: true }; S.regErr = {}; }
+    else if (a === 'submit') {
+      var A = $('#cA').value.trim(), B = $('#cB').value.trim(), ok = $('#cOk').checked, er = {};
+      S.regVals = { a: A, b: B, ok: ok };
+      if (!/^[0-9]{6,10}$/.test(A)) er.a = 'Enter your client ID: 6 to 10 digits.';
+      if (!er.a && B !== A) er.b = 'The two client IDs do not match.';
+      if (!er.a && !er.b && !ok) er.ok = 'Please confirm that your client ID is correct.';
+      S.regErr = er;
+      if (!er.a && !er.b && !er.ok) { if (A !== ME.id) { ME.id = A; } S.reg = true; S.app = 'progress'; XM.toast('Registered. Only XMPs earned from now count.'); }
+    }
+    else if (a === 'progress') S.app = 'progress';
+    else if (a === 'rank') { S.q = ME.id; setScene('a'); $('#sIn').value = ME.id; drawBoard(); $('#lbSec').scrollIntoView(); return; }
+    else if (a === 'market') { setScene('c'); return; }
+    else if (a === 'boost') { S.booster = true; XM.toast('Demo booster enabled'); }
+    else if (a === 'home') { S.app = 'home'; S.popup = false; setScene('b'); return; }
+    else if (a === 'public') { setScene('a'); return; }
+    drawApp();
+  });
+  $('#simTrade').addEventListener('click', function () {
+    if (!S.reg) { XM.toast('Register for the challenge first'); return; }
+    var g = S.booster ? 1500 : 1000; S.xmp += g; S.trades++; S.potXmp += g; drawPot(); drawBoard(); drawApp();
+    XM.toast('+' + n(g) + ' XMP' + (lvFor(S.xmp).n !== lvFor(S.xmp - g).n ? ' \u00b7 new level: ' + lvFor(S.xmp).n : ''));
+  });
+  $('#resetDemo').addEventListener('click', function () { S.reg = false; S.xmp = 0; S.trades = 0; S.booster = false; S.potXmp = SAMPLE_TOTAL; S.app = 'home'; S.popup = true; S.regVals = { a: '', b: '', ok: false }; S.regErr = {}; S.q = ''; ME.id = '370411064'; drawPot(); drawBoard(); drawApp(); XM.toast('Demo reset'); });
+
+  /* ------------------------------------------------ scenes */
+  function setScene(s) {
+    if (!CAPS[s]) s = 'a';
+    S.scene = s;
+    $('#sA').hidden = s !== 'a'; $('#sP').hidden = s === 'a';
+    $$('[data-scene]').forEach(function (b) { var on = b.getAttribute('data-scene') === s; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+    $('#cap').innerHTML = '<span class="n">' + CAPS[s][0] + '</span><span>' + CAPS[s][1] + '</span>';
+    if (s === 'a') { drawBoard(); } else drawApp();
+    try { history.replaceState(null, '', '#' + s); } catch (e) {}
+    if (s !== 'a') window.scrollTo(0, 0);
+  }
+  $$('[data-scene]').forEach(function (b) { b.addEventListener('click', function () { var s = b.getAttribute('data-scene'); if (s === 'b') { S.app = S.reg ? 'progress' : 'home'; S.popup = !S.reg; } setScene(s); }); });
+
+  $('#logoA').innerHTML = XM.logo();
+  drawPot(); drawBoard();
+  setScene(XM.qs('scene') || location.hash.replace('#', '') || 'a');
+
+  XM.notes({
+    title: 'XMP-based competitions (idea 43)',
+    today: 'Affiliates and clients ask for real-account competitions, but the XM product platform cannot deliver them before Q2 2027 at the earliest.',
+    proposed: 'A Promo Tool challenge, the Samurai XMP Challenge: clients register with their client ID and compete on XMP earned from real-account trading, ranked inside their loyalty tier. Activity grows a prize pot with a $100,000 minimum. Progress and results are published on a website, then awards go to winners\u2019 wallets.',
+    why: 'It ties the competition to loyalty, rewards trading activity and gives a clear XMP goal. A pot that grows with participation may make the offer more engaging. Not validated yet.',
+    metric: 'Registrations and activation, trading volume and active days versus non-participants, XMP earned, funnel completion from discovery to registration, new accounts from affiliates. Watch prize cost, abuse, complaints and support contacts.'
+  });
+})();
+</script>
+<script src="../../assets/js/review.js" data-idea="43"></script>
+</body>
+</html>

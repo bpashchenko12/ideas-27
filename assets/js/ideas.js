@@ -39,6 +39,30 @@ window.XM_AREAS = {
 };
 
 window.XM_IDEAS = [
+  /* ============================ NEW: TEAM CONTESTS (P1, first in the list) ============================ */
+  {
+    id: '01', slide: 'n/a', area: 'trading', status: 'built',
+    path: 'ideas/01-team-contests/index.html',
+    title: 'Team contests',
+    short: 'Form a team, invite up to 5 friends and compete on a team leaderboard',
+    shortlist: { priority: 1, impact: 'High', confidence: '', notes: 'New idea, not in the original deck. First in the P1 list.' },
+    shows: [
+      'Competitions page in the PWA with Participating / In Progress / Upcoming / Ended filters',
+      'Register as a team: team name check, then a team lobby for the contest',
+      'Invite link with copy and share buttons, and a live count of members who joined by your invite',
+      'Maximum of 6 members: full-team state pauses the link, removing a member reopens a spot',
+      'Individual and team leaderboards in parallel, with a separate team prize pool'
+    ],
+    assumption: 'If we allow users to form teams (for example a Daimyo leading a Ninja Crew), we may see a boost in overall trading volume.',
+    scope: [
+      'Participants compete on individual and team leaderboards in parallel.',
+      'A separate prize pool for the team track means that even if a user falls behind individually, they may stay motivated to keep trading to support their team\u2019s rank and share in the collective prize.',
+      'Add a Register as a team button on the contest. The team lead sees how many members joined by their invite. A team has a maximum of 6 members.'
+    ],
+    metrics: 'Team registrations, members per team, invite-to-join conversion, new registrations and funded accounts from invites, trading volume and active days of team members versus solo participants. Monitor abuse (multi-accounting between team members), complaints and prize cost.',
+    proposal: 'Let clients register for a contest as a team. The lead invites friends by link, up to 6 members in total, and watches the roster fill. Teams compete on a team leaderboard with its own prize pool, alongside the individual one.'
+  },
+
   /* ============================ PROMOTIONS ============================ */
   {
     id: '02', slide: 4, area: 'promotions', status: 'deck',
@@ -433,5 +457,30 @@ window.XM_IDEAS = [
     scope: 'Users add competitor profiles, upload research, compare products and features, track changes over time and generate structured reports. Dashboards, alerts for important competitor updates, source links and filters by market or region. Distinguish verified information from assumptions, record the source and date of each insight, and control access to sensitive internal analysis.',
     metrics: 'Less duplicated research, better access to competitive intelligence, faster decision-making, and earlier sight of market opportunities and threats.',
     proposal: 'Build an internal application that centralises competitor research, so teams monitor competitor products, pricing, promotions, features, campaigns and market positioning in one place.'
+  },
+
+  /* ============================ NEW: XMP-BASED COMPETITIONS (P1) ============================ */
+  {
+    id: '43', slide: 'n/a', area: 'loyalty', status: 'built',
+    path: 'ideas/43-xmp-based-competitions/index.html',
+    title: 'XMP-based competitions (Samurai XMP Challenge)',
+    short: 'Real-account challenge ranked by XMP earned, per loyalty tier, with a growing prize pot',
+    shortlist: { priority: 1, impact: 'High', confidence: '', notes: 'New idea from the Promo Tool proposal (Case 2). Alternative to Case 1, a classic ROI competition.' },
+    shows: [
+      'Public challenge page: prize pot that grows with XMP earned, five samurai levels, two tier-based leaderboards with account search',
+      'PWA flow from the pop-up card to Promo Tool registration (client ID entered twice) and a private progress view',
+      'Progress view that states the mechanic, shows the last refresh time, XMP, level and rank in your tier division',
+      'Simulated trading that moves XMP, level, rank and the pot, with an optional marketplace XMP booster',
+      'Award note: results are reviewed first, then prizes go to winners\u2019 wallets'
+    ],
+    assumption: 'Clients and affiliates want real-account competitions back. Until the XM product platform can deliver them (not before Q2 2027), a Promo Tool challenge may meet the demand and support acquisition with a fresh offer.',
+    scope: [
+      'Use the Promo Tool to register participants, link each registration to a client ID and track eligible trading activity across the client\u2019s real accounts.',
+      'Participants compete to earn the most XMP in a limited period. Separate leaderboards by loyalty tier, initially higher and lower tiers. The top XMP earner in each tier wins that tier\u2019s prize, subject to final allocation rules.',
+      'Trading activity also feeds the prize pot: minimum guaranteed pot of $100,000, growing if contributions exceed it. The contribution rule is to be confirmed.',
+      'Publish progress and results on a website, then distribute awards to winners\u2019 wallets once results are confirmed.'
+    ],
+    metrics: 'Registrations, activation (first eligible trade), trading volume and active days of participants versus non-participants, XMP earned, new accounts from affiliates, completion of the funnel from discovery to registration, support contacts. Monitor prize cost, abuse and complaints.',
+    proposal: 'Introduce the XMP Samurai Challenge: a limited-time, loyalty-based competition in which clients rise through levels by earning XMP, and the whole community adds to a prize pot that starts at $100,000. It ties the competition to loyalty and rewards trading activity.'
   }
 ];
