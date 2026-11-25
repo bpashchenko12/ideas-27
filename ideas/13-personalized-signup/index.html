@@ -184,7 +184,7 @@ body { background: #f5f5f5; }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   var S = {
     scene: 'a', dev: 'desktop', status: 'approved', note: '', stage: 0,
-    draft: { photo: 1, name: 'Thomas', lang: 'en', tpl: 'rewards', about: 'Join me on XMTrading!', ev: 0, benefit: 'Welcome offer for new clients' }
+    draft: { photo: 1, name: 'FXAffiliate', lang: 'en', tpl: 'rewards', about: 'Join us on XMTrading!', ev: 0, benefit: 'Welcome offer for new clients' }
   };
   S.pub = clone(S.draft);
   var CAPS = {
@@ -233,6 +233,7 @@ body { background: #f5f5f5; }
   }
 
   /* ---------- shell ---------- */
+  function statusHTML() { return S.status === 'approved' ? '' : 'Status ' + stampHTML(); }
   function stampHTML() { var t = { approved: 'Approved', pending: 'In review', draft: S.pubDirty ? 'Draft' : 'Draft' }[S.status]; return '<span class="stamp ' + S.status + '">' + t + '</span>'; }
   function portal(title, tools, body) {
     return '<div class="app"><nav class="nav"><span class="xm-logo">' + XM.logo(false) + '</span><small>Partner portal</small>' +
@@ -243,10 +244,10 @@ body { background: #f5f5f5; }
   /* ---------- scene A ---------- */
   function renderA() {
     var m = S.draft, I = issues(m), dirty = JSON.stringify(S.draft) !== JSON.stringify(S.pub);
-    var tools = '<span class="st">Status ' + stampHTML() + '</span>';
+    var tools = '<span class="st">' + statusHTML() + '</span>';
     var body = '<div class="ed"><div class="card" style="padding:8px 22px 18px">' +
       (S.note ? '<div class="rv" style="margin-top:14px"><b>Note from XMTrading:</b> ' + esc(S.note) + '</div>' : '') +
-      '<div class="row"><span class="lb">Profile photo</span><div><div class="avs">' + AVS.map(function (a, i) { return '<button class="avb' + (m.photo === i ? ' on' : '') + '" data-photo="' + i + '" aria-label="Sample photo ' + (i + 1) + '">' + avHTML(i, m.name, 52) + '</button>'; }).join('') + '</div><div class="hint">Approved photo or logo only. Reviewed by XMTrading before it goes live.</div></div></div>' +
+      '<div class="row"><span class="lb">Profile picture</span><div><div class="avs">' + AVS.map(function (a, i) { return '<button class="avb' + (m.photo === i ? ' on' : '') + '" data-photo="' + i + '" aria-label="Sample picture ' + (i + 1) + '">' + avHTML(i, m.name, 52) + '</button>'; }).join('') + '</div><div class="hint">Approved logo or picture only. Reviewed by XMTrading before it goes live.</div></div></div>' +
       '<div class="row"><label for="fName">Profile name</label><div><input class="inp" id="fName" maxlength="30" value="' + esc(m.name) + '"><div class="cnt"><span id="eName"></span><span id="cName"></span></div></div></div>' +
       '<div class="row"><span class="lb">Language</span><div><div class="chips" role="group" aria-label="Language">' + Object.keys(LANG).map(function (k) { return '<button class="chip' + (m.lang === k ? ' on' : '') + '" data-lang="' + k + '">' + esc(LANG[k].n) + '</button>'; }).join('') + '</div><div class="hint">Each language is its own version of the page, with its own review.</div></div></div>' +
       '<div class="row"><span class="lb">Template</span><div class="tpls">' + Object.keys(TPL).map(function (k) { var t = TPL[k]; return '<button class="tpl' + (m.tpl === k ? ' on' : '') + '" data-tpl="' + k + '" style="--tc:' + t.c + '"><span class="ck">' + CHECK + '</span><div class="th"><i></i><i></i><i></i></div><b>' + esc(t.n) + '</b><small>' + esc(t.d) + '</small></button>'; }).join('') + '</div></div>' +
@@ -285,7 +286,7 @@ body { background: #f5f5f5; }
     if (!dirty && S.status === 'draft') S.status = 'approved';
     if (sb) { sb.disabled = !!I.length || !m.name.trim() || S.status === 'pending' || (S.status === 'approved' && !dirty); sb.textContent = S.status === 'pending' ? 'In review' : 'Submit for review'; }
     if (dn) dn.textContent = I.length ? I.length + ' claim' + (I.length > 1 ? 's' : '') + ' to fix before you can submit' : S.status === 'approved' && !dirty ? 'Published version. Edit anything to start a new draft.' : S.status === 'pending' ? 'Waiting for XMTrading. The published page has not changed.' : 'Changes are not live until XMTrading approves them.';
-    var st = $('.st'); if (st) st.innerHTML = 'Status ' + stampHTML();
+    var st = $('.st'); if (st) st.innerHTML = statusHTML();
   }
   function touched() { if (S.status !== 'draft') { S.status = 'draft'; } S.note = ''; }
   function head() {
@@ -295,7 +296,7 @@ body { background: #f5f5f5; }
 
   /* ---------- scene B ---------- */
   function renderB() {
-    var tools = '<span class="st">Status ' + stampHTML() + '</span>', body;
+    var tools = '<span class="st">' + statusHTML() + '</span>', body;
     var m = S.draft, I = issues(m);
     if (S.status === 'draft') {
       body = '<div class="emp"><h3>Nothing waiting for review</h3>Submit a draft from the editor and it appears here for XMTrading.<br><button class="btn btn-primary" data-scene="a">Go to the editor</button></div>';

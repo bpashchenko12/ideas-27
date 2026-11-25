@@ -244,13 +244,12 @@
     <div class="lh">
       <div class="srch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Search ideas" autocomplete="off" aria-label="Search ideas"><kbd>/</kbd></div>
       <div class="lrow">
-        <div class="seg" role="tablist" aria-label="Group ideas by"><button data-view="area" role="tab">Areas</button><button data-view="priority" role="tab">Shortlist</button></div>
+        <div class="seg" role="tablist" aria-label="Group ideas by"><button data-view="priority" role="tab">Priority</button><button data-view="area" role="tab">Areas</button></div>
         <div class="prog" id="prog"></div>
       </div>
       <div class="chips" id="chips"></div>
     </div>
     <div class="lscroll" id="lscroll"><div id="groups"></div></div>
-    <div class="lf"><span><kbd>&uarr;</kbd><kbd>&darr;</kbd>browse</span><span><kbd>Enter</kbd>open</span><span><kbd>S</kbd>support</span><span><kbd>C</kbd>comment</span></div>
   </aside>
 
   <main class="stage" id="stage"></main>
@@ -280,11 +279,10 @@
   var hash = (location.hash || '').replace('#', '');
   var sel = byId(hash) ? hash : (byId(localStorage.getItem('xm27.sel')) ? localStorage.getItem('xm27.sel') : (IDEAS.filter(function (i) { return i.shortlist; }).sort(function (a, b) { return a.shortlist.priority - b.shortlist.priority; })[0] || IDEAS[0]).id);
   var view = localStorage.getItem('xm27.v2.view') || 'priority', filter = 'all', query = '', tab = localStorage.getItem('xm27.tab') || 'about';
-  var onlyShort = localStorage.getItem('xm27.v2.short') !== '0';
   var shut = {}; try { shut = JSON.parse(localStorage.getItem('xm27.shut') || '{}'); } catch (e) {}
   function lines(v) { return Array.isArray(v) ? v : (v ? [v] : []); }
   document.getElementById('logo').innerHTML = XM.logo(false);
-  $('#q').placeholder = 'Search ' + IDEAS.length + ' ideas';
+  $('#q').placeholder = 'Search ' + IDEAS.filter(function (i) { return i.shortlist; }).length + ' ideas';
 
   var IC = {
     up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11v9H4v-9h3zM7 11l4-8a2 2 0 0 1 2 2v4h5.5a2 2 0 0 1 2 2.3l-1.3 7A2 2 0 0 1 17.3 20H7"/></svg>',
@@ -305,7 +303,7 @@
   function ago(ts) { var s = Math.max(1, (Date.now() - ts) / 1000); if (s < 60) return 'just now'; if (s < 3600) return Math.floor(s / 60) + ' min ago'; if (s < 86400) return Math.floor(s / 3600) + ' h ago'; return Math.floor(s / 86400) + ' d ago'; }
   function matches(i) {
     if (filter !== 'all' && i.area !== filter) return false;
-    if (onlyShort && !i.shortlist) return false;
+    if (!i.shortlist) return false;
     if (!query) return true;
     return (i.id + ' ' + i.title + ' ' + (i.short || '') + ' ' + lines(i.assumption).concat(lines(i.scope), lines(i.proposal)).join(' ') + ' ' + AREAS[i.area].label + ' slide ' + i.slide).toLowerCase().indexOf(query.toLowerCase()) > -1;
   }
@@ -313,15 +311,15 @@
   /* ---------- left: filters + list ---------- */
   function chrome() {
     document.querySelectorAll('[data-view]').forEach(function (b) { var on = b.getAttribute('data-view') === view; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
-    var ks = ['all'].concat(Object.keys(AREAS));
-    $('#chips').innerHTML = '<button class="chip sl' + (onlyShort ? ' on' : '') + '" data-sh="1" aria-pressed="' + onlyShort + '">' + ic('star', 12) + 'Shortlisted</button>' + ks.map(function (k) {
+    var ks = ['all'].concat(Object.keys(AREAS).filter(function (k) { return IDEAS.some(function (i) { return i.shortlist && i.area === k; }); }));
+    $('#chips').innerHTML = ks.map(function (k) {
       var o = AREAS[k] || { label: 'All areas', color: '#1d2024' };
       return '<button class="chip' + (filter === k ? ' on' : '') + '" data-f="' + k + '">' + (k === 'all' ? 'All areas' : '<i style="background:' + o.color + '"></i>' + o.label) + '</button>';
     }).join('');
   }
   function rowHTML(i, step) {
     var o = AREAS[i.area], cls = 'row' + (i.id === sel ? ' sel' : '') + (i.status === 'todo' ? ' light' : '') + (i.status === 'deck' ? ' off' : '');
-    var sub = i.status === 'todo' ? '<em>To build</em> · ' + esc(i.short) : esc(i.short);
+    var sub = esc(i.short);
     if (i.flag) sub = '<em class="inv">' + esc(i.flag) + '</em> · ' + sub;
     var pri = i.shortlist ? '<span class="pri p' + i.shortlist.priority + '">P' + i.shortlist.priority + '</span>' : '';
     return '<button class="' + cls + '" data-id="' + i.id + '"><span class="dot">' + ic('check', 9) + '</span>' +
@@ -339,9 +337,8 @@
         vis.map(function (i) { return rowHTML(i); }).join('') + '</div></section>';
     }
     if (view === 'priority') {
-      grp('p1', 'Priority 1', 'Shortlisted · highest priority', IDEAS.filter(function (i) { return i.shortlist && i.shortlist.priority === 1; }));
-      grp('p2', 'Priority 2', 'Shortlisted', IDEAS.filter(function (i) { return i.shortlist && i.shortlist.priority === 2; }));
-      grp('p0', 'Backlog', 'In the deck, not shortlisted yet', IDEAS.filter(function (i) { return !i.shortlist; }));
+      grp('p1', 'Priority 1', 'Highest priority', IDEAS.filter(function (i) { return i.shortlist && i.shortlist.priority === 1; }));
+      grp('p2', 'Priority 2', 'Next in line', IDEAS.filter(function (i) { return i.shortlist && i.shortlist.priority === 2; }));
     } else {
       Object.keys(AREAS).forEach(function (k) { grp('a' + k, AREAS[k].label, esc(AREAS[k].blurb), IDEAS.filter(function (i) { return i.area === k; })); });
     }
@@ -504,7 +501,6 @@
   });
   document.addEventListener('click', function (e) {
     var vw = e.target.closest('[data-view]'); if (vw) { view = vw.getAttribute('data-view'); localStorage.setItem('xm27.v2.view', view); chrome(); groups(); ensureVisibleSel(); stage(); return; }
-    var sh = e.target.closest('[data-sh]'); if (sh) { onlyShort = !onlyShort; localStorage.setItem('xm27.v2.short', onlyShort ? '1' : '0'); chrome(); groups(); var o2 = visibleOrder(); if (o2.length && o2.indexOf(sel) < 0) select(o2[0], { scroll: true }); else stage(); return; }
     var f = e.target.closest('[data-f]'); if (f) { var nf = f.getAttribute('data-f'); filter = (nf === filter && nf !== 'all') ? 'all' : nf; chrome(); groups(); var o = visibleOrder(); if (o.length && o.indexOf(sel) < 0) select(o[0], { scroll: true }); else stage(); return; }
     var gh = e.target.closest('[data-gh]'); if (gh) { var k = gh.getAttribute('data-gh'); shut[k] = !shut[k]; localStorage.setItem('xm27.shut', JSON.stringify(shut)); gh.closest('.grp').classList.toggle('shut', !!shut[k]); gh.setAttribute('aria-expanded', !shut[k]); return; }
     var row = e.target.closest('.row'); if (row) { select(row.getAttribute('data-id'), { open: true }); return; }
