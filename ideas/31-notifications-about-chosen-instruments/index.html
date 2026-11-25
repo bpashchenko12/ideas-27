@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Password gate: keep this line first. -->
+<script src="../../assets/js/gate.js?v=fe2ac3c6"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notifications about chosen instruments · XMTrading</title>
+<link rel="stylesheet" href="../../assets/css/xm.css">
+<style>
+/* =====================================================================
+   IDEA 31 · Notifications about chosen instruments
+   Visual language follows the Trade Ideas prototype: green BUY, red SELL, light cards.
+   ===================================================================== */
+body { background: #f5f5f5; }
+[hidden] { display: none !important; }
+main button { border: 0; background: none; font: inherit; color: inherit; cursor: pointer; padding: 0; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 96px; }
+
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 22px 0 14px; }
+.head h1 { font-size: clamp(26px, 3vw, 36px); line-height: 1.1; letter-spacing: -.025em; margin-top: 4px; }
+.head p { color: var(--ink-2); max-width: 660px; font-size: 14.5px; margin-top: 6px; }
+.head .pill-tabs { box-shadow: var(--sh-s); }
+.head .pill-tabs button { padding: 10px 20px; transition: background .15s, color .15s; }
+
+.cap { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 11px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+.cap .n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.cap b { color: var(--ink); }
+
+.panel { background: #fff; border: 1px solid var(--line-2); border-radius: 18px; box-shadow: var(--sh-m); padding: 22px; }
+.panel h3 { font-size: 16px; letter-spacing: -.01em; }
+.panel .sub { font-size: 12.5px; color: var(--mut); margin: 2px 0 14px; }
+
+/* ---------- A · follow settings ---------- */
+.fgrid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.search { width: 100%; font: inherit; font-size: 14px; padding: 11px 14px; border: 1.5px solid var(--line-2); border-radius: 10px; outline: none; margin-bottom: 8px; }
+.search:focus { border-color: var(--g); }
+.ins { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.ins:last-child { border-bottom: 0; }
+.ai { flex: none; width: 36px; height: 36px; border-radius: 50%; background: #f3d98b; color: #7a5a00; display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+.ai.c1 { background: #cfe0ff; color: #274a9a; } .ai.c2 { background: #ffd9d9; color: #9a2a2a; } .ai.c3 { background: #d6f0e3; color: #0b6b44; } .ai.c4 { background: #ffe2c7; color: #8a4a00; } .ai.c5 { background: #e6dcf7; color: #5a3a96; }
+.ins .nm { flex: 1; min-width: 0; }
+.ins .nm b { display: block; font-size: 14px; }
+.ins .nm small { color: var(--mut); font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ins .px { text-align: right; font-size: 12.5px; flex: none; }
+.ins .px span { display: block; font-size: 11.5px; }
+.up { color: var(--up); } .dn { color: var(--dn); }
+.ins .tg { display: flex; gap: 12px; flex: none; }
+.ins .tg label { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10.5px; color: var(--mut); cursor: pointer; }
+.sw { position: relative; width: 36px; height: 20px; flex: none; }
+.sw input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; width: 100%; height: 100%; z-index: 1; }
+.sw i { position: absolute; inset: 0; background: var(--line-2); border-radius: 999px; transition: background .15s; }
+.sw i::after { content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .15s; }
+.sw input:checked + i { background: var(--g); }
+.sw input:checked + i::after { transform: translateX(16px); }
+.sw input:focus-visible + i { outline: 2px solid var(--g); outline-offset: 2px; }
+.empty { padding: 22px 8px; text-align: center; color: var(--mut); font-size: 13.5px; }
+.chrow { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.chrow:last-of-type { border-bottom: 0; }
+.chrow .ci { flex: none; width: 34px; height: 34px; border-radius: 10px; background: var(--g-l); color: var(--g); display: grid; place-items: center; }
+.chrow .ci svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.chrow .tx { flex: 1; min-width: 0; }
+.chrow .tx b { display: block; font-size: 13.5px; }
+.chrow .tx small { color: var(--mut); font-size: 12px; }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 4px; }
+.seg label { cursor: pointer; }
+.seg input { position: absolute; opacity: 0; }
+.seg span { display: inline-block; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--line-2); font-size: 12.5px; font-weight: 600; background: #fff; }
+.seg input:checked + span { border-color: var(--g); background: var(--g-l); color: var(--g-d); }
+.seg input:focus-visible + span { outline: 2px solid var(--g); outline-offset: 2px; }
+.sum { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--g-l); color: var(--g-d); font-size: 13px; line-height: 1.5; }
+.sum.warn { background: var(--amber-l); color: var(--amber); }
+.h4 { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); margin: 16px 0 4px; }
+
+/* ---------- B/C · phone + controls ---------- */
+.pgrid { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 28px; align-items: start; }
+.mode { display: inline-flex; padding: 3px; border-radius: 999px; background: #fff; border: 1px solid var(--line); margin-bottom: 12px; }
+.mode button { padding: 8px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.mode button.on { background: var(--ink); color: #fff; }
+.dev { position: relative; width: 100%; max-width: 360px; height: 700px; margin: 0 auto; border-radius: 42px; border: 8px solid #15171b; overflow: hidden; background: #fff; box-shadow: var(--sh-l); }
+.notch { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); width: 92px; height: 24px; border-radius: 999px; background: #15171b; z-index: 30; }
+.sbar { display: flex; justify-content: space-between; padding: 14px 26px 6px; font-size: 13px; font-weight: 700; position: relative; z-index: 20; }
+
+.lock { position: absolute; inset: 0; background: radial-gradient(120% 80% at 20% 10%, #2e8f6c 0%, #0f3b2f 45%, #07151a 100%); color: #fff; padding-top: 0; }
+.lock .sbar { color: #fff; }
+.lk-time { text-align: center; margin-top: 34px; }
+.lk-time small { display: block; font-size: 14px; opacity: .85; }
+.lk-time b { font-size: 76px; font-weight: 600; letter-spacing: -.03em; line-height: 1.05; }
+.stack { position: absolute; left: 10px; right: 10px; top: 210px; bottom: 70px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.pushn { display: flex; gap: 10px; text-align: left; width: 100%; padding: 11px 12px; border-radius: 20px; background: rgba(250,250,250,.88); color: #181a1f; backdrop-filter: blur(10px); animation: drop .35s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes drop { from { transform: translateY(-22px) scale(.96); opacity: 0; } }
+.pushn .xi { flex: none; width: 36px; height: 36px; border-radius: 9px; background: var(--g); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 12px; }
+.pushn .bd { flex: 1; min-width: 0; }
+.pushn .top { display: flex; justify-content: space-between; font-size: 11px; color: #666c78; text-transform: uppercase; letter-spacing: .03em; }
+.pushn b { display: block; font-size: 13.5px; margin-top: 1px; }
+.pushn p { font-size: 12.5px; line-height: 1.35; color: #3a3f48; margin-top: 1px; }
+.pushn.buy b::before, .pushn.sell b::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--up); }
+.pushn.sell b::before { background: var(--dn); }
+.lk-hint { position: absolute; left: 24px; right: 24px; top: 240px; text-align: center; font-size: 13px; opacity: .7; }
+.lk-bar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 120px; height: 5px; border-radius: 5px; background: rgba(255,255,255,.7); }
+.lk-more { text-align: center; font-size: 12px; color: rgba(255,255,255,.85); }
+
+.app { position: absolute; inset: 0; background: #f5f6f7; display: flex; flex-direction: column; }
+.app-h { display: flex; align-items: center; justify-content: space-between; padding: 4px 16px 10px; background: #fff; border-bottom: 1px solid var(--line); }
+.app-h .bell { position: relative; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; }
+.app-h .bell svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.app-h .bell em { position: absolute; top: 2px; right: 0; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: var(--red); color: #fff; font-style: normal; font-size: 10px; font-weight: 700; display: grid; place-items: center; }
+.app-t { padding: 12px 16px 4px; font-size: 18px; font-weight: 700; background: #fff; }
+.app-l { flex: 1; overflow-y: auto; background: #fff; padding: 0 16px 20px; }
+.ar { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.ar .nm { flex: 1; min-width: 0; } .ar .nm b { display: block; font-size: 14px; } .ar .nm small { color: var(--mut); font-size: 12px; }
+.ar .px { text-align: right; font-size: 13px; font-weight: 600; } .ar .px span { display: block; font-size: 11.5px; font-weight: 500; }
+.ar .fb { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--mut); flex: none; }
+.ar .fb svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ar .fb.on { color: var(--g); background: var(--g-l); }
+
+.bnw { position: absolute; left: 8px; right: 8px; top: 38px; z-index: 25; }
+.bn { position: relative; display: flex; align-items: center; gap: 10px; padding: 11px 10px 13px 12px; border-radius: 16px; background: #15171b; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.35); overflow: hidden; animation: slide .35s cubic-bezier(.2,.9,.3,1.1); border-left: 4px solid var(--g); }
+.bn.sell { border-left-color: var(--dn); } .bn.news { border-left-color: var(--blue); }
+@keyframes slide { from { transform: translateY(-120%); opacity: 0; } }
+.bn .bt { flex: 1; min-width: 0; }
+.bn .bt b { display: block; font-size: 13px; }
+.bn .bt span { display: block; font-size: 12px; color: #c9ccd2; line-height: 1.3; }
+.bn .vw { flex: none; padding: 7px 12px; border-radius: 8px; background: #fff; color: #15171b; font-size: 12px; font-weight: 700; }
+.bn .x { flex: none; width: 26px; height: 26px; color: #aeb2ba; display: grid; place-items: center; }
+.bn .x svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.bn .bp { position: absolute; left: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.55); width: 100%; animation: shrink 7s linear forwards; }
+@keyframes shrink { to { width: 0; } }
+.bnw .more { display: block; text-align: center; font-size: 11px; margin: 4px auto 0; width: max-content; padding: 2px 10px; border-radius: 999px; background: rgba(21,23,27,.85); color: #fff; }
+
+.shade { position: absolute; inset: 0; background: rgba(9,10,12,.45); z-index: 40; animation: fade .2s; }
+@keyframes fade { from { opacity: 0; } }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 41; max-height: 86%; overflow-y: auto; background: #fff; border-radius: 22px 22px 0 0; padding: 10px 18px 22px; animation: up .28s ease-out; }
+@keyframes up { from { transform: translateY(100%); } }
+.sheet .grab { width: 40px; height: 4px; border-radius: 4px; background: var(--line-2); margin: 0 auto 12px; }
+.sheet h4 { font-size: 17px; }
+.sheet .rw1 { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.sheet .rw1 .nm { flex: 1; } .sheet .rw1 small { color: var(--mut); display: block; font-size: 12px; }
+.bdg { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.bdg.buy { background: var(--g-l); color: var(--g-d); } .bdg.sell { background: var(--red-l); color: #a5232a; } .bdg.news { background: var(--blue-l); color: var(--blue-d); }
+.chart { position: relative; height: 112px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-bottom: 10px; }
+.chart svg { width: 100%; height: 100%; display: block; }
+.chart span { position: absolute; right: 8px; top: 6px; font-size: 10px; color: var(--mut); }
+.lv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+.lv div { padding: 9px 10px; border-radius: 10px; background: var(--soft); font-size: 11.5px; color: var(--mut); }
+.lv strong { display: block; font-size: 14px; color: var(--ink); margin-top: 2px; }
+.src { font-size: 12px; color: var(--ink-2); display: flex; justify-content: space-between; margin-bottom: 12px; }
+.sheet .btn { width: 100%; }
+.sheet .lk { display: block; text-align: center; font-size: 12.5px; margin-top: 10px; color: var(--mut); text-decoration: underline; }
+.disc { font-size: 11px; color: var(--mut); margin-top: 12px; line-height: 1.45; }
+.inb { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; gap: 10px; cursor: pointer; width: 100%; text-align: left; }
+.inb.un::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--g); flex: none; margin-top: 6px; }
+.inb .bd { flex: 1; min-width: 0; } .inb b { font-size: 13.5px; display: block; } .inb span { font-size: 12.5px; color: var(--ink-2); } .inb small { color: var(--mut); font-size: 11px; display: block; margin-top: 2px; }
+
+/* right column */
+.ctl .evs { display: grid; gap: 8px; margin-top: 10px; }
+.ctl .evs button { display: flex; align-items: center; gap: 10px; text-align: left; padding: 11px 14px; border-radius: 12px; border: 1.5px solid var(--line-2); background: #fff; font-size: 13.5px; font-weight: 600; transition: border-color .15s, background .15s; }
+.ctl .evs button:hover { border-color: var(--g); background: var(--g-l); }
+.ctl .evs small { margin-left: auto; font-weight: 500; color: var(--mut); font-size: 11.5px; }
+.state { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.state .tag { background: var(--soft); color: var(--ink-2); }
+.state .tag.on { background: var(--g-l); color: var(--g-d); }
+.log { margin-top: 12px; max-height: 250px; overflow-y: auto; }
+.log div { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
+.log div:last-child { border-bottom: 0; }
+.log time { flex: none; color: var(--mut); font-variant-numeric: tabular-nums; }
+.log i { flex: none; width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; background: var(--up); }
+.log .held i { background: #e0a000; } .log .skip i { background: #b5bac1; }
+.log .empty { display: block; }
+.stack-r { display: grid; gap: 18px; }
+.rlink { color: var(--g); font-weight: 600; text-decoration: underline; font-size: 13px; }
+
+@media (max-width: 1000px) {
+  .fgrid, .pgrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  .wrap { padding: 0 14px 90px; }
+  .head .pill-tabs { width: 100%; overflow-x: auto; }
+  .head .pill-tabs button { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+  .panel { padding: 16px; }
+  .ins { flex-wrap: wrap; }
+  .ins .px { display: none; }
+  .dev { height: 640px; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <span class="eyebrow">Idea 31 &middot; Trading</span>
+      <h1>Notifications about chosen instruments</h1>
+      <p>Follow the instruments you care about, choose how to be told, and see the same trade idea arrive as a mobile push or as a top banner inside the PWA.</p>
+    </div>
+    <div class="pill-tabs" role="tablist" aria-label="Scenes">
+      <button class="on" role="tab" data-scene="a">A &middot; Follow</button>
+      <button role="tab" data-scene="b">B &middot; Mobile push</button>
+      <button role="tab" data-scene="c">C &middot; PWA banner</button>
+    </div>
+  </div>
+
+  <div class="cap" id="cap"></div>
+
+  <!-- A -->
+  <section id="sceneA">
+    <div class="fgrid">
+      <div class="panel">
+        <h3>Instruments you follow</h3>
+        <div class="sub">Turn on trade ideas, news, or both for each instrument.</div>
+        <input class="search" id="q" type="search" placeholder="Search instruments, e.g. gold or EUR" aria-label="Search instruments">
+        <div id="insList"></div>
+        <div class="sum" id="sum"></div>
+      </div>
+      <div class="panel">
+        <h3>How to notify you</h3>
+        <div class="sub">Changes apply straight away.</div>
+        <div id="chList"></div>
+        <div class="h4">How often</div>
+        <div class="seg" id="freq"></div>
+        <div class="h4">Quiet hours</div>
+        <div class="chrow">
+          <div class="ci"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></div>
+          <div class="tx"><b>No mobile push 22:00 to 07:00</b><small>Held items appear in your notification inbox</small></div>
+          <label class="sw"><input type="checkbox" id="quiet" aria-label="Quiet hours"><i></i></label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B / C -->
+  <section id="sceneP" hidden>
+    <div class="pgrid">
+      <div>
+        <div class="mode" role="tablist" aria-label="Phone state">
+          <button type="button" data-mode="lock">Phone locked</button>
+          <button type="button" data-mode="app">PWA open</button>
+        </div>
+        <div id="phone"></div>
+      </div>
+      <div class="stack-r">
+        <div class="panel ctl">
+          <h3>Simulate a new event</h3>
+          <div class="sub">The platform decides where it goes from your follow settings.</div>
+          <div class="evs" id="evs"></div>
+          <div class="state" id="state"></div>
+          <div style="margin-top:12px"><button type="button" class="rlink" id="toA">Edit follow settings</button></div>
+        </div>
+        <div class="panel">
+          <h3>Delivery log</h3>
+          <div class="sub">Why each event was sent, held or skipped.</div>
+          <div class="log" id="log"><div class="skip empty">Nothing yet. Use the buttons above.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="../../assets/js/common.js"></script>
+<script>
+(function () {
+  var $ = XM.$, $$ = XM.$$, esc = XM.esc;
+
+  var CAPS = {
+    a: ['A', '<b>Follow.</b> Pick instruments, choose trade ideas and/or news, then the channels, frequency and quiet hours.'],
+    b: ['B', '<b>Mobile push.</b> With the phone locked, a new idea arrives as a push. Tap it to open the idea in the PWA.'],
+    c: ['C', '<b>PWA top banner.</b> With the PWA open, the same event slides in as a banner instead, so it does not interrupt twice.']
+  };
+  var INSTR = [
+    ['GOLD', 'Gold vs US Dollar', 'Au', '4,218.40', 0.42, ''],
+    ['EURUSD', 'Euro vs US Dollar', 'EU', '1.17482', -0.18, 'c1'],
+    ['USDJPY', 'US Dollar vs Japanese Yen', 'JP', '149.420', 0.21, 'c2'],
+    ['US500Cash', 'US 500 Index Cash', 'US', '6,884.2', 0.35, 'c3'],
+    ['BTCUSD', 'Bitcoin vs US Dollar', 'BT', '81,792.7', -1.10, 'c4'],
+    ['NZDUSD', 'New Zealand Dollar vs US Dollar', 'NZ', '0.5712', 0.05, 'c5']
+  ];
+  var EVENTS = [
+    { sym: 'GOLD', type: 'idea', dir: 'buy', tf: '15 min', src: 'Analyzzer', entry: '4,218.40', tp: '4,246.00', sl: '4,205.10', label: 'GOLD trade idea' },
+    { sym: 'EURUSD', type: 'idea', dir: 'sell', tf: '1 hour', src: 'Trading Central', entry: '1.17482', tp: '1.16940', sl: '1.17822', label: 'EURUSD trade idea' },
+    { sym: 'USDJPY', type: 'news', head: 'Yen firms as officials signal readiness to act on sharp moves', body: 'Japanese officials said they are watching currency moves closely. Volatility in USDJPY could rise around the next data releases.', src: 'Market news', label: 'USDJPY news alert' },
+    { sym: 'NZDUSD', type: 'idea', dir: 'buy', tf: '30 min', src: 'MQL5', entry: '0.57120', tp: '0.57480', sl: '0.56950', label: 'NZDUSD trade idea' }
+  ];
+  var CHANNELS = [
+    ['push', 'Mobile push', 'Used when the app is in the background', '<path d="M7 3h10a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM11 18h2"/>'],
+    ['banner', 'PWA top banner', 'Used when the app is open', '<rect x="3" y="4" width="18" height="6" rx="2"/><path d="M7 15h10M7 19h6"/>'],
+    ['email', 'Email', 'A short summary with a link', '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>'],
+    ['chat', 'WhatsApp, LINE or Telegram', 'Connect once, then get messages in chat', '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>']
+  ];
+  var FREQ = [['all', 'Every alert'], ['3', 'Max 3 per day'], ['digest', 'Daily digest only']];
+
+  var subs = { GOLD: { ideas: true, news: true }, EURUSD: { ideas: true, news: false }, USDJPY: { ideas: false, news: true } };
+  var ch = { push: true, banner: true, email: false, chat: false };
+  var freq = 'all', quiet = false, query = '';
+  var P = { mode: 'lock', pushes: [], banners: [], bannerTimer: 0, sheet: null, inbox: [], sent: 0 };
+  var clock = 9 * 60 + 41, uid = 0;
+
+  function hhmm(m) { return (m < 600 ? '' : '') + Math.floor(m / 60) + ':' + ('0' + (m % 60)).slice(-2); }
+  function follows(sym) { var s = subs[sym]; return !!(s && (s.ideas || s.news)); }
+  function iconOf(sym) { for (var i = 0; i < INSTR.length; i++) if (INSTR[i][0] === sym) return INSTR[i]; return [sym, '', sym.slice(0, 2), '', 0, '']; }
+  function ai(sym) { var r = iconOf(sym); return '<span class="ai ' + r[5] + '">' + r[2] + '</span>'; }
+
+  /* -------------------------------------------------- A · follow */
+  function drawFollow() {
+    var q = query.toLowerCase(), rows = INSTR.filter(function (r) { return !q || r[0].toLowerCase().indexOf(q) > -1 || r[1].toLowerCase().indexOf(q) > -1; });
+    $('#insList').innerHTML = rows.length ? rows.map(function (r) {
+      var s = subs[r[0]] || {};
+      return '<div class="ins">' + ai(r[0]) + '<div class="nm"><b>' + r[0] + '</b><small>' + r[1] + '</small></div>' +
+        '<div class="px">' + r[3] + '<span class="' + (r[4] >= 0 ? 'up' : 'dn') + '">' + (r[4] >= 0 ? '+' : '') + r[4].toFixed(2) + '%</span></div>' +
+        '<div class="tg"><label>Ideas<span class="sw"><input type="checkbox" data-sym="' + r[0] + '" data-t="ideas" aria-label="' + r[0] + ' trade ideas"' + (s.ideas ? ' checked' : '') + '><i></i></span></label>' +
+        '<label>News<span class="sw"><input type="checkbox" data-sym="' + r[0] + '" data-t="news" aria-label="' + r[0] + ' news"' + (s.news ? ' checked' : '') + '><i></i></span></label></div></div>';
+    }).join('') : '<div class="empty">No instrument matches &ldquo;' + esc(query) + '&rdquo;. Try a symbol such as GOLD or EURUSD.</div>';
+    $('#chList').innerHTML = CHANNELS.map(function (c) {
+      return '<div class="chrow"><div class="ci"><svg viewBox="0 0 24 24">' + c[3] + '</svg></div><div class="tx"><b>' + c[1] + '</b><small>' + c[2] + '</small></div><label class="sw"><input type="checkbox" data-ch="' + c[0] + '" aria-label="' + c[1] + '"' + (ch[c[0]] ? ' checked' : '') + '><i></i></label></div>';
+    }).join('');
+    $('#freq').innerHTML = FREQ.map(function (f) { return '<label><input type="radio" name="freq" value="' + f[0] + '"' + (freq === f[0] ? ' checked' : '') + '><span>' + f[1] + '</span></label>'; }).join('');
+    $('#quiet').checked = quiet;
+    drawSummary();
+  }
+  function drawSummary() {
+    var n = Object.keys(subs).filter(follows).length, on = CHANNELS.filter(function (c) { return ch[c[0]]; }).map(function (c) { return c[1]; });
+    var el = $('#sum');
+    if (!n) { el.className = 'sum warn'; el.textContent = 'You are not following anything yet, so no notifications will be sent. Turn on ideas or news for an instrument above.'; return; }
+    if (!on.length) { el.className = 'sum warn'; el.textContent = 'Following ' + n + ' instrument' + (n > 1 ? 's' : '') + ', but every channel is off. Turn on at least one channel to be notified.'; return; }
+    el.className = 'sum';
+    el.textContent = 'Following ' + n + ' instrument' + (n > 1 ? 's' : '') + '. You will be told via ' + on.join(', ').replace(/, ([^,]*)$/, ' and $1') + (freq === 'digest' ? ', as one daily digest.' : freq === '3' ? ', up to 3 times a day.' : '.');
+  }
+  $('#q').addEventListener('input', function (e) { query = e.target.value.trim(); drawFollow(); });
+  $('#sceneA').addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.getAttribute('data-sym')) {
+      var sym = t.getAttribute('data-sym'), k = t.getAttribute('data-t');
+      subs[sym] = subs[sym] || { ideas: false, news: false }; subs[sym][k] = t.checked;
+      XM.toast((t.checked ? 'Following ' : 'Stopped ') + sym + (k === 'ideas' ? ' trade ideas' : ' news'));
+    } else if (t.getAttribute('data-ch')) { ch[t.getAttribute('data-ch')] = t.checked; XM.toast('Saved'); }
+    else if (t.name === 'freq') { freq = t.value; XM.toast('Saved'); }
+    else if (t.id === 'quiet') { quiet = t.checked; XM.toast('Saved'); }
+    drawSummary(); drawState();
+  });
+
+  /* -------------------------------------------------- dispatch */
+  function titleOf(ev) { return ev.type === 'idea' ? ev.sym + ' · New ' + ev.tf + ' trade idea' : ev.sym + ' · News'; }
+  function bodyOf(ev) { return ev.type === 'idea' ? (ev.dir === 'buy' ? 'Buy' : 'Sell') + ' idea from ' + ev.src + '. Open to see the levels.' : ev.head; }
+  function log(kind, text) {
+    var box = $('#log'), e = box.querySelector('.empty'); if (e) e.remove();
+    var d = document.createElement('div'); d.className = kind;
+    d.innerHTML = '<time>' + hhmm(clock) + '</time><i></i><span>' + text + '</span>';
+    box.insertBefore(d, box.firstChild);
+  }
+  function simulate(i) {
+    var ev = EVENTS[i]; clock += 3;
+    var label = '<b>' + ev.sym + (ev.type === 'idea' ? ' trade idea' : ' news') + '</b>: ';
+    var s = subs[ev.sym];
+    if (!s || !s[ev.type === 'idea' ? 'ideas' : 'news']) { log('skip', label + 'not sent. You do not follow ' + ev.sym + ' ' + (ev.type === 'idea' ? 'trade ideas' : 'news') + '.'); return; }
+    var item = { id: ++uid, ev: ev, time: hhmm(clock), read: false };
+    P.inbox.unshift(item);
+    if (freq === 'digest') { log('held', label + 'held for your daily digest. It is in the notification inbox.'); draw(); return; }
+    if (freq === '3' && P.sent >= 3) { log('held', label + 'held. Daily limit of 3 reached. It is in the notification inbox.'); draw(); return; }
+    var where = '';
+    if (P.mode === 'lock') {
+      if (!ch.push) log('skip', label + 'no push sent because Mobile push is off. It is in the inbox.');
+      else if (quiet) log('held', label + 'push held for quiet hours (22:00 to 07:00). It is in the inbox.');
+      else { P.pushes.unshift(item); P.sent++; where = 'push'; log('ok', label + 'sent as a mobile push (app in background).'); }
+    } else {
+      if (!ch.banner) log('skip', label + 'no banner shown because PWA top banner is off. It is in the inbox.');
+      else { showBanner(item); P.sent++; where = 'banner'; log('ok', label + 'shown as a top banner (app open, so no push).'); }
+    }
+    if (ch.email) log('ok', label + 'also summarised by email.');
+    if (ch.chat) log('ok', label + 'also sent to your connected chat.');
+    draw();
+  }
+  function showBanner(item) {
+    P.banners.unshift(item);
+    clearTimeout(P.bannerTimer);
+    P.bannerTimer = setTimeout(function () { P.banners = []; draw(); }, 7000);
+  }
+
+  /* -------------------------------------------------- phone */
+  var BELL = '<svg viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15L6 17zM10 21h4"/></svg>';
+  function chartSvg(up) {
+    var d = up ? 'M0 95 C22 82 34 96 52 78s39 4 56-17 39 2 57-12 36 2 55-18 37 4 52-11 29-9 48-17' : 'M0 17 C23 28 36 12 58 32s40 2 57 24 37-3 57 15 38-3 56 17 37-2 53 14 25 5 39 12', col = up ? '#008755' : '#d43d47';
+    return '<svg viewBox="0 0 320 116" preserveAspectRatio="none" role="img" aria-label="Illustrative chart"><g stroke="#eceef0"><line x1="0" y1="29" x2="320" y2="29"/><line x1="0" y1="58" x2="320" y2="58"/><line x1="0" y1="87" x2="320" y2="87"/></g><path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="3"/></svg>';
+  }
+  function lockHTML() {
+    var h = '<div class="lock"><div class="sbar"><span></span><span>5G</span></div><div class="lk-time"><small>Wednesday, 25 November</small><b>' + hhmm(clock).replace(/^(\d):/, '$1:') + '</b></div>';
+    if (!P.pushes.length) h += '<div class="lk-hint">No new notifications.<br>Use the buttons on the right to simulate one.</div>';
+    else {
+      h += '<div class="stack">' + P.pushes.slice(0, 4).map(function (it) {
+        var ev = it.ev;
+        return '<button type="button" class="pushn ' + (ev.type === 'idea' ? ev.dir : 'news') + '" data-a="open" data-id="' + it.id + '"><span class="xi">XM</span><span class="bd"><span class="top"><span>XMTrading</span><span>now</span></span><b>' + esc(titleOf(ev)) + '</b><p>' + esc(bodyOf(ev)) + '</p></span></button>';
+      }).join('') + (P.pushes.length > 4 ? '<div class="lk-more">+' + (P.pushes.length - 4) + ' more</div>' : '') + '</div>';
+    }
+    return h + '<div class="lk-bar"></div></div>';
+  }
+  function appHTML() {
+    var unread = P.inbox.filter(function (i) { return !i.read; }).length;
+    var h = '<div class="app"><div class="sbar"><span>' + hhmm(clock) + '</span><span>5G</span></div>' +
+      '<div class="app-h"><span class="xm-logo">' + XM.logo() + '</span><button type="button" class="bell" data-a="inbox" aria-label="Notification inbox">' + BELL + (unread ? '<em>' + unread + '</em>' : '') + '</button></div>' +
+      '<div class="app-t">Markets</div><div class="app-l">' +
+      INSTR.map(function (r) {
+        return '<div class="ar">' + ai(r[0]) + '<div class="nm"><b>' + r[0] + '</b><small>' + r[1] + '</small></div><div class="px">' + r[3] + '<span class="' + (r[4] >= 0 ? 'up' : 'dn') + '">' + (r[4] >= 0 ? '+' : '') + r[4].toFixed(2) + '%</span></div>' +
+          '<button type="button" class="fb' + (follows(r[0]) ? ' on' : '') + '" data-a="fol" data-sym="' + r[0] + '" aria-label="Follow ' + r[0] + '">' + BELL + '</button></div>';
+      }).join('') + '</div>';
+    if (P.banners.length) {
+      var it = P.banners[0], ev = it.ev;
+      h += '<div class="bnw"><div class="bn ' + (ev.type === 'idea' ? ev.dir : 'news') + '" role="status"><span class="bt"><b>' + esc(titleOf(ev)) + '</b><span>' + esc(bodyOf(ev)) + '</span></span><button type="button" class="vw" data-a="open" data-id="' + it.id + '">View</button><button type="button" class="x" data-a="bclose" aria-label="Dismiss"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button><i class="bp"></i></div>' +
+        (P.banners.length > 1 ? '<span class="more">+' + (P.banners.length - 1) + ' more</span>' : '') + '</div>';
+    }
+    if (P.sheet) h += '<div class="shade" data-a="close"></div><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>' + sheetHTML() + '</div>';
+    return h + '</div>';
+  }
+  function sheetHTML() {
+    if (P.sheet === 'inbox') {
+      return '<h4>Notifications</h4><div style="margin-top:6px">' + (P.inbox.length ? P.inbox.map(function (it) {
+        return '<button type="button" class="inb' + (it.read ? '' : ' un') + '" data-a="open" data-id="' + it.id + '">' + ai(it.ev.sym) + '<span class="bd"><b>' + esc(titleOf(it.ev)) + '</b><span>' + esc(bodyOf(it.ev)) + '</span><small>' + it.time + '</small></span></button>';
+      }).join('') : '<div class="empty">No notifications yet.</div>') + '</div>';
+    }
+    var ev = P.sheet.ev, idea = ev.type === 'idea';
+    var h = '<div class="rw1">' + ai(ev.sym) + '<div class="nm"><h4>' + ev.sym + '</h4><small>' + iconOf(ev.sym)[1] + '</small></div><span class="bdg ' + (idea ? ev.dir : 'news') + '">' + (idea ? (ev.dir === 'buy' ? 'BUY' : 'SELL') + ' · ' + ev.tf : 'NEWS') + '</span></div>';
+    if (idea) {
+      h += '<div class="chart">' + chartSvg(ev.dir === 'buy') + '<span>Illustrative</span></div><div class="lv"><div>Entry<strong>' + ev.entry + '</strong></div><div>Target<strong>' + ev.tp + '</strong></div><div>Stop<strong>' + ev.sl + '</strong></div></div>' +
+        '<div class="src"><span>Provider: <b>' + ev.src + '</b></span><span>' + P.sheet.time + '</span></div>' +
+        '<button type="button" class="btn btn-primary" data-a="ticket">Open pre-filled order ticket</button>';
+    } else {
+      h += '<h4 style="margin:4px 0 6px">' + esc(ev.head) + '</h4><p style="font-size:13.5px;color:var(--ink-2);line-height:1.5">' + esc(ev.body) + '</p><div class="src" style="margin-top:10px"><span>Source: <b>' + ev.src + '</b></span><span>' + P.sheet.time + '</span></div><button type="button" class="btn btn-primary" data-a="story">Read full story</button>';
+    }
+    return h + '<button type="button" class="lk" data-a="unfol" data-sym="' + ev.sym + '">Stop notifications for ' + ev.sym + '</button><div class="disc">Trade ideas and news are general information, not personal advice, and may be wrong. Trading leveraged products carries a high risk of loss. Illustrative content.</div>';
+  }
+  function draw() {
+    $('#phone').innerHTML = '<div class="dev"><div class="notch"></div>' + (P.mode === 'lock' ? lockHTML() : appHTML()) + '</div>';
+    $$('[data-mode]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-mode') === P.mode); });
+    drawState();
+  }
+  function drawState() {
+    function t(on, text) { return '<span class="tag' + (on ? ' on' : '') + '">' + text + '</span>'; }
+    var n = Object.keys(subs).filter(follows).length;
+    $('#state').innerHTML = t(n, 'Following ' + n) + t(ch.push, 'Push ' + (ch.push ? 'on' : 'off')) + t(ch.banner, 'Banner ' + (ch.banner ? 'on' : 'off')) + t(!quiet, 'Quiet hours ' + (quiet ? 'on' : 'off')) + t(true, freq === 'all' ? 'Every alert' : freq === '3' ? 'Max 3/day (' + P.sent + ' sent)' : 'Digest only');
+  }
+  function openItem(id) {
+    var it = P.inbox.filter(function (i) { return i.id === +id; })[0]; if (!it) return;
+    it.read = true; P.pushes = P.pushes.filter(function (p) { return p !== it; }); P.banners = P.banners.filter(function (p) { return p !== it; });
+    P.mode = 'app'; P.sheet = it; setTabs('c'); draw();
+  }
+  $('#phone').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-a]'); if (!b) return;
+    var a = b.getAttribute('data-a');
+    if (a === 'open') openItem(b.getAttribute('data-id'));
+    else if (a === 'bclose') { P.banners = []; clearTimeout(P.bannerTimer); draw(); }
+    else if (a === 'inbox') { P.inbox.forEach(function (i) { i.read = true; }); P.sheet = 'inbox'; draw(); }
+    else if (a === 'close') { P.sheet = null; draw(); }
+    else if (a === 'fol') { var s = b.getAttribute('data-sym'), on = !follows(s); subs[s] = { ideas: on, news: on }; XM.toast(on ? 'Following ' + s + ' (ideas and news)' : 'Stopped following ' + s); draw(); drawFollow(); }
+    else if (a === 'unfol') { var y = b.getAttribute('data-sym'); subs[y] = { ideas: false, news: false }; P.sheet = null; XM.toast('Notifications for ' + y + ' turned off'); draw(); drawFollow(); }
+    else if (a === 'ticket') XM.toast('Order ticket opens with entry, target and stop pre-filled (demo)');
+    else if (a === 'story') XM.toast('Full story opens in the news view (demo)');
+  });
+  $('#evs').innerHTML = EVENTS.map(function (ev, i) { return '<button type="button" data-ev="' + i + '">' + ai(ev.sym) + ev.label + '<small>' + (follows(ev.sym) ? '' : 'not followed') + '</small></button>'; }).join('');
+  $('#evs').addEventListener('click', function (e) { var b = e.target.closest('[data-ev]'); if (b) simulate(+b.getAttribute('data-ev')); refreshEvLabels(); });
+  function refreshEvLabels() { $$('#evs button').forEach(function (b, i) { var ev = EVENTS[i], s = subs[ev.sym]; b.querySelector('small').textContent = (s && s[ev.type === 'idea' ? 'ideas' : 'news']) ? '' : 'not followed'; }); }
+  $$('[data-mode]').forEach(function (b) { b.addEventListener('click', function () { P.mode = b.getAttribute('data-mode'); P.sheet = null; setTabs(P.mode === 'lock' ? 'b' : 'c'); draw(); }); });
+  $('#toA').addEventListener('click', function () { setTabs('a'); });
+
+  /* -------------------------------------------------- scenes */
+  function setTabs(s) {
+    if (!CAPS[s]) s = 'a';
+    $('#sceneA').hidden = s !== 'a'; $('#sceneP').hidden = s === 'a';
+    if (s === 'b') P.mode = 'lock'; if (s === 'c') P.mode = 'app';
+    $$('[data-scene]').forEach(function (b) { var on = b.getAttribute('data-scene') === s; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+    $('#cap').innerHTML = '<span class="n">' + CAPS[s][0] + '</span><span>' + CAPS[s][1] + '</span>';
+    if (s === 'a') drawFollow(); else { draw(); refreshEvLabels(); }
+    try { history.replaceState(null, '', '#' + s); } catch (e) {}
+  }
+  $$('[data-scene]').forEach(function (b) { b.addEventListener('click', function () { P.sheet = null; setTabs(b.getAttribute('data-scene')); }); });
+  setTabs(XM.qs('scene') || location.hash.replace('#', '') || 'a');
+
+  XM.notes({
+    title: 'Notifications about chosen instruments (idea 31)',
+    today: 'Traders have to open the platform and look for new trade ideas and news. Ideas expire quickly, so many are missed.',
+    proposed: 'Follow instruments for trade ideas and/or news. New items arrive as a mobile push when the app is in the background, or as a top banner when the PWA is open, plus optional email or chat. Frequency caps and quiet hours keep it from becoming noise.',
+    why: 'Timely, relevant alerts may bring clients back to instrument pages at the right moment. Caps and clear opt-outs may limit fatigue. Not validated yet.',
+    metric: 'Subscriptions per client, notification open rate, instrument-page visits and trades after a notification, opt-outs and complaints, and any change in risk-taking after alerts.'
+  });
+})();
+</script>
+<script src="../../assets/js/review.js" data-idea="31"></script>
+</body>
+</html>

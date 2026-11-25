@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Password gate: keep this line first. -->
+<script src="../../assets/js/gate.js?v=fe2ac3c6"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registration buddy bot · XMTrading</title>
+<link rel="stylesheet" href="../../assets/css/xm.css">
+<style>
+/* =====================================================================
+   IDEA 27 · Registration buddy bot in WhatsApp / LINE / Telegram
+   ===================================================================== */
+body { background: #f5f5f5; }
+[hidden] { display: none !important; }
+main button { border: 0; background: none; font: inherit; color: inherit; cursor: pointer; padding: 0; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 96px; }
+
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 22px 0 14px; }
+.head h1 { font-size: clamp(26px, 3vw, 36px); line-height: 1.1; letter-spacing: -.025em; margin-top: 4px; }
+.head p { color: var(--ink-2); max-width: 640px; font-size: 14.5px; margin-top: 6px; }
+.head .pill-tabs { box-shadow: var(--sh-s); }
+.head .pill-tabs button { padding: 10px 20px; transition: background .15s, color .15s; }
+
+.cap { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 11px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+.cap .n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.cap b { color: var(--ink); }
+
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
+
+/* ---------- website frame ---------- */
+.bw { position: relative; background: #fff; border: 1px solid var(--line-2); border-radius: 16px; box-shadow: var(--sh-l); overflow: hidden; }
+.bw-bar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f1f2f4; border-bottom: 1px solid var(--line); }
+.bw-bar i { width: 10px; height: 10px; border-radius: 50%; background: #d3d6db; flex: none; }
+.bw-url { flex: 1; background: #fff; border-radius: 8px; padding: 5px 12px; font-size: 12px; color: var(--mut); border: 1px solid var(--line); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.site { height: 640px; overflow: auto; padding: 18px 24px 90px; background: #fafafa; }
+.site-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.site-top .xm-lang { font-size: 12px; color: var(--mut); }
+
+.prog { display: flex; gap: 6px; max-width: 520px; margin: 0 auto 16px; }
+.prog div { flex: 1; font-size: 11.5px; color: var(--mut); text-align: center; }
+.prog div::before { content: ''; display: block; height: 4px; border-radius: 4px; background: var(--line-2); margin-bottom: 6px; }
+.prog .done::before, .prog .cur::before { background: var(--g); }
+.prog .cur { color: var(--ink); font-weight: 600; }
+
+.card2 { max-width: 520px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 26px 28px; box-shadow: 0 6px 28px rgba(0,0,0,.07); }
+.card2 h2 { text-align: center; font-size: 22px; letter-spacing: -.02em; }
+.card2 .sub { text-align: center; color: var(--ink-2); font-size: 13.5px; margin: 6px 0 18px; }
+.card2 .sub a { color: var(--g); font-weight: 600; }
+
+.fld { margin-bottom: 14px; border-radius: 10px; transition: box-shadow .2s, background .2s; }
+.fld label { display: block; font-size: 12.5px; color: var(--ink-2); margin-bottom: 6px; }
+.fld label sup { color: var(--red); }
+.fld input, .fld select { width: 100%; font: inherit; font-size: 14px; padding: 13px 14px; border: 1.5px solid transparent; border-radius: 10px; background: var(--soft); color: var(--ink); outline: none; }
+.fld input:focus, .fld select:focus { border-color: var(--g); background: #fff; }
+.fld.err input { border-color: var(--red); background: var(--red-l); }
+.fld .em { color: var(--red); font-size: 12px; margin-top: 5px; }
+.fld.hl { box-shadow: 0 0 0 3px rgba(6,199,85,.45); background: rgba(6,199,85,.08); animation: pulse 1.4s ease-in-out 2; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(6,199,85,.25); } }
+.brand { border: 1px solid var(--line-2); border-radius: 10px; padding: 12px 14px; font-size: 12px; color: var(--ink-2); margin-bottom: 14px; }
+.brand li { list-style: none; padding-left: 20px; position: relative; margin-bottom: 4px; }
+.brand li::before { content: ''; position: absolute; left: 0; top: 4px; width: 11px; height: 11px; border-radius: 50%; background: var(--g); }
+.fine { font-size: 11.5px; color: var(--mut); text-align: center; margin-top: 12px; }
+
+/* verification / deposit / onboarding cards */
+.rw { display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.rw:last-of-type { border-bottom: 0; }
+.rw .ic { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); color: var(--mut); font-weight: 700; font-size: 13px; }
+.rw.ok .ic { background: var(--g); color: #fff; }
+.rw .ic svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.rw .bd { flex: 1; min-width: 0; }
+.rw h4 { font-size: 14.5px; }
+.rw p { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+.rw .act { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.rw.lock { opacity: .5; pointer-events: none; }
+.act input, .act select { font: inherit; font-size: 13.5px; padding: 8px 12px; border: 1.5px solid var(--line-2); border-radius: 8px; background: #fff; width: 130px; }
+.act select { width: auto; }
+.lnk { font-size: 12px; color: var(--mut); text-decoration: underline; background: none; border: 0; cursor: pointer; padding: 0; }
+.alert { margin-top: 8px; font-size: 12.5px; padding: 8px 12px; border-radius: 8px; background: var(--red-l); color: #a5232a; }
+.status { margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: var(--amber-l); color: var(--amber); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.status.ok { background: var(--g-l); color: var(--g-d); }
+.spin { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: sp .7s linear infinite; display: inline-block; }
+@keyframes sp { to { transform: rotate(360deg); } }
+
+.amts { display: flex; gap: 8px; margin: 8px 0 12px; flex-wrap: wrap; }
+.amts button { padding: 8px 16px; border-radius: 999px; border: 1.5px solid var(--line-2); background: #fff; font-weight: 600; font-size: 13px; }
+.amts button.on { border-color: var(--g); background: var(--g-l); color: var(--g-d); }
+.meth { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.meth button { padding: 12px 8px; border: 1.5px solid var(--line-2); border-radius: 10px; background: #fff; font-size: 12.5px; font-weight: 600; text-align: center; }
+.meth button small { display: block; font-weight: 400; color: var(--mut); font-size: 11px; margin-top: 2px; }
+.meth button.on { border-color: var(--g); background: var(--g-l); }
+.big { text-align: center; padding: 8px 0 14px; }
+.big .tick { width: 56px; height: 56px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; margin: 0 auto 10px; }
+.big .tick svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- floating bot button on the page ---------- */
+.fab { position: absolute; right: 18px; bottom: 18px; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 8px 16px 8px 8px; border-radius: 999px; background: #fff; border: 1px solid var(--line-2); box-shadow: 0 8px 26px rgba(0,0,0,.18); font-size: 13px; font-weight: 600; color: var(--ink); text-align: left; transition: transform .15s; }
+.fab:hover { transform: translateY(-2px); }
+.fab .dot { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 11px; font-weight: 800; background: var(--chc, #06C755); }
+.fab small { display: block; font-weight: 400; color: var(--mut); font-size: 11px; }
+.fab .ping { position: absolute; left: 4px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--red); border: 2px solid #fff; }
+.pop { position: absolute; right: 18px; bottom: 82px; z-index: 6; width: 290px; background: #fff; border-radius: 16px; box-shadow: 0 14px 44px rgba(0,0,0,.25); padding: 16px; }
+.pop h4 { font-size: 14.5px; }
+.pop p { font-size: 12.5px; color: var(--ink-2); margin: 4px 0 12px; }
+.pop .chs { display: flex; gap: 6px; margin-bottom: 12px; }
+.pop .chs button { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1.5px solid var(--line-2); background: #fff; font-size: 12px; font-weight: 600; }
+.pop .chs button.on { border-color: var(--chc); color: var(--chc); }
+.pop .qr { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.pop .qr svg { width: 74px; height: 74px; flex: none; }
+.pop .qr span { font-size: 11.5px; color: var(--mut); }
+.pop .go { width: 100%; padding: 11px; border-radius: 10px; background: var(--chc); color: #fff; font-weight: 700; font-size: 14px; border: 0; }
+.pop .fine { margin-top: 8px; }
+
+/* ---------- chat phone ---------- */
+.side { position: sticky; top: 12px; }
+.idle { height: 640px; border: 2px dashed var(--line-2); border-radius: 22px; display: grid; place-items: center; text-align: center; padding: 28px; color: var(--mut); font-size: 14px; background: rgba(255,255,255,.6); }
+.idle b { color: var(--ink); display: block; font-size: 16px; margin-bottom: 6px; }
+.ph { height: 640px; border-radius: 26px; overflow: hidden; display: flex; flex-direction: column; background: var(--chbg); box-shadow: var(--sh-l); border: 6px solid #1d2024; }
+.ph-h { flex: none; display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--chh); color: #fff; }
+.ph-h .av { width: 36px; height: 36px; border-radius: 50%; background: #fff; color: var(--chh); display: grid; place-items: center; font-weight: 800; font-size: 12px; flex: none; }
+.ph-h b { font-size: 14px; display: block; line-height: 1.2; }
+.ph-h small { font-size: 11px; opacity: .85; }
+.ph-h button { margin-left: auto; color: #fff; opacity: .85; width: 28px; height: 28px; background: transparent; border: 0; display: grid; place-items: center; }
+.ph-h button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.msgs { flex: 1; overflow-y: auto; padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; }
+.m { max-width: 82%; padding: 9px 12px; border-radius: 16px; font-size: 13px; line-height: 1.45; background: #fff; color: #1d2024; box-shadow: 0 1px 1px rgba(0,0,0,.08); animation: in .2s ease-out; word-wrap: break-word; }
+.m.bot { align-self: flex-start; border-top-left-radius: 4px; }
+.m.me { align-self: flex-end; border-top-right-radius: 4px; background: var(--chme); }
+.m.agent { align-self: flex-start; background: #fff4e0; border-top-left-radius: 4px; }
+.m ul { margin: 6px 0 0 16px; padding: 0; }
+.m .tg { display: block; font-size: 10.5px; color: var(--mut); margin-bottom: 2px; font-weight: 600; }
+.m a.cta { display: inline-block; margin-top: 8px; padding: 6px 12px; border-radius: 8px; background: var(--g); color: #fff; font-weight: 600; font-size: 12px; }
+.sys { align-self: center; font-size: 11px; color: #4a5058; background: rgba(255,255,255,.7); padding: 3px 10px; border-radius: 999px; }
+@keyframes in { from { opacity: 0; transform: translateY(6px); } }
+.typing { align-self: flex-start; background: #fff; padding: 11px 14px; border-radius: 16px; border-top-left-radius: 4px; display: flex; gap: 4px; }
+.typing i { width: 6px; height: 6px; border-radius: 50%; background: #b5bac1; animation: bl 1s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes bl { 40% { transform: translateY(-4px); background: #7b828b; } }
+.qr-row { flex: none; display: flex; gap: 6px; flex-wrap: wrap; padding: 6px 10px 8px; min-height: 8px; max-height: 128px; overflow-y: auto; }
+.qr-row button { padding: 7px 12px; border-radius: 999px; background: #fff; border: 1.5px solid var(--chh); color: var(--chh); font-size: 12.5px; font-weight: 600; animation: in .2s ease-out; }
+.qr-row button:hover { background: var(--chh); color: #fff; }
+.comp { flex: none; display: flex; gap: 8px; padding: 8px 10px 10px; background: #f7f7f7; border-top: 1px solid rgba(0,0,0,.08); }
+.comp input { flex: 1; font: inherit; font-size: 13px; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line-2); background: #fff; outline: none; min-width: 0; }
+.comp button { width: 38px; height: 38px; border-radius: 50%; background: var(--chh); color: #fff; display: grid; place-items: center; flex: none; }
+.comp button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (max-width: 1000px) {
+  .stage { grid-template-columns: 1fr; }
+  .side { position: static; }
+}
+@media (max-width: 860px) {
+  .wrap { padding: 0 14px 90px; }
+  .head .pill-tabs { width: 100%; overflow-x: auto; }
+  .head .pill-tabs button { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+  .site { padding: 14px 12px 90px; height: 560px; }
+  .card2 { padding: 20px 16px; }
+  .fab small { display: none; }
+  .pop { width: calc(100% - 36px); }
+  .ph, .idle { height: 580px; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <span class="eyebrow">Idea 27 &middot; Onboarding</span>
+      <h1>Registration buddy bot</h1>
+      <p>Click the chat button on the registration page. A bot on LINE, WhatsApp or Telegram then walks the client through sign-up, verification, first deposit and getting started.</p>
+    </div>
+    <div class="pill-tabs" role="tablist" aria-label="Scenes">
+      <button class="on" role="tab" data-scene="a">A &middot; Register</button>
+      <button role="tab" data-scene="b">B &middot; Verify</button>
+      <button role="tab" data-scene="c">C &middot; Deposit</button>
+      <button role="tab" data-scene="d">D &middot; Get started</button>
+    </div>
+  </div>
+
+  <div class="cap" id="cap"></div>
+
+  <div class="stage">
+    <div class="bw" id="bw">
+      <div class="bw-bar"><i></i><i></i><i></i><div class="bw-url" id="url">xmtrading.com/register</div></div>
+      <div class="site" id="site"></div>
+
+      <div class="pop" id="pop" hidden>
+        <h4>Chat with your buddy</h4>
+        <p>Pick the app you already use. The bot keeps your progress, so you can continue on your phone.</p>
+        <div class="chs" id="popCh"></div>
+        <div class="qr"><svg id="qr" viewBox="0 0 25 25" shape-rendering="crispEdges"></svg><span>Scan on your phone, or continue in the chat on this page.</span></div>
+        <button class="go" id="popGo" type="button">Open chat</button>
+        <div class="fine">Illustrative. No account details are shared with the bot until you agree.</div>
+      </div>
+      <button class="fab" id="fab" type="button" aria-label="Open registration buddy chat">
+        <span class="dot" id="fabDot">LINE</span>
+        <span>Need a hand?<small>Chat with a buddy on <span id="fabCh">LINE</span></small></span>
+        <span class="ping" id="ping"></span>
+      </button>
+    </div>
+
+    <div class="side">
+      <div class="idle" id="idle"><div><b>Chat not opened yet</b>Click the green chat button in the corner of the registration page to start.</div></div>
+      <div class="ph" id="ph" hidden>
+        <div class="ph-h">
+          <div class="av">XM</div>
+          <div><b>XMTrading Buddy</b><small id="phSub">Official account (illustrative)</small></div>
+          <button type="button" id="phClose" aria-label="Close chat"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        </div>
+        <div class="msgs" id="msgs" aria-live="polite"></div>
+        <div class="qr-row" id="chips"></div>
+        <form class="comp" id="comp" autocomplete="off">
+          <input id="txt" type="text" placeholder="Ask anything, e.g. which documents?" aria-label="Message">
+          <button type="submit" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="../../assets/js/common.js"></script>
+<script>
+(function () {
+  var $ = XM.$, $$ = XM.$$, esc = XM.esc;
+
+  var STAGES = ['reg', 'verify', 'deposit', 'onboard'];
+  var SCENE = { a: 'reg', b: 'verify', c: 'deposit', d: 'onboard' };
+  var CAPS = {
+    a: ['A', '<b>Registration.</b> Click the chat button, choose LINE, WhatsApp or Telegram, then let the bot guide each field.'],
+    b: ['B', '<b>Verification.</b> The bot explains the email code, ID and address documents, and helps when a photo is rejected.'],
+    c: ['C', '<b>First deposit.</b> The bot explains methods and safety, with no pressure to deposit. Try an amount below the minimum.'],
+    d: ['D', '<b>Getting started.</b> The bot follows up with app, demo account and security set-up, and can hand over to a person.']
+  };
+  var CH = {
+    line: { name: 'LINE', c: '#06C755', hdr: '#06C755', bg: '#dfe7f3', me: '#8de055' },
+    wa:   { name: 'WhatsApp', c: '#25D366', hdr: '#075E54', bg: '#efeae2', me: '#d9fdd3' },
+    tg:   { name: 'Telegram', c: '#229ED9', hdr: '#2a9ede', bg: '#d9e6f0', me: '#eeffde' }
+  };
+  var EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  var PASS_OK = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+  var DEMO_EMAIL = 'taro.demo@example.com', DEMO_PASS = 'Demo1234x';
+
+  function freshVer() { return { email: false, id: false, addr: false, idBad: false, codeErr: false, review: '', codeVal: '' }; }
+  function freshDep() { return { amt: 100, method: 'card', err: '', busy: false, done: false }; }
+  function freshOnb() { return { app: false, demo: false, twofa: false, trade: false }; }
+
+  var S = {
+    stage: 'reg', ch: 'line', open: false, step: -1, gen: 0, hl: '',
+    f: { country: 'Japan', email: '', pass: '', ref: '' }, err: {},
+    ver: freshVer(), dep: freshDep(), onb: freshOnb()
+  };
+
+  /* ------------------------------------------------------------ chat engine */
+  var Q = Promise.resolve();
+  function scrollDown() { var m = $('#msgs'); m.scrollTop = m.scrollHeight; }
+  function addMsg(cls, html, tag) {
+    var d = document.createElement('div');
+    d.className = cls === 'sys' ? 'sys' : 'm ' + cls;
+    d.innerHTML = (tag ? '<span class="tg">' + tag + '</span>' : '') + html;
+    $('#msgs').appendChild(d); scrollDown();
+  }
+  function say(html, tag, cls) {
+    var g = S.gen;
+    Q = Q.then(function () {
+      if (g !== S.gen) return;
+      return new Promise(function (res) {
+        var t = XM.el('<div class="typing"><i></i><i></i><i></i></div>');
+        $('#msgs').appendChild(t); scrollDown();
+        setTimeout(function () {
+          t.remove();
+          if (g === S.gen) addMsg(cls || 'bot', html, tag);
+          res();
+        }, 380 + Math.min(html.length * 3, 650));
+      });
+    });
+  }
+  function sys(text) { var g = S.gen; Q = Q.then(function () { if (g === S.gen) addMsg('sys', esc(text)); }); }
+  function chips(list) {
+    var g = S.gen;
+    Q = Q.then(function () {
+      if (g !== S.gen) return;
+      var box = $('#chips'); box.innerHTML = '';
+      list.forEach(function (c) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.textContent = c[0];
+        b.addEventListener('click', function () { userSays(c[0]); c[1](); });
+        box.appendChild(b);
+      });
+      scrollDown();
+    });
+  }
+  function userSays(text) { $('#chips').innerHTML = ''; addMsg('me', esc(text)); }
+  function react(fn) { if (S.open) fn(); }
+  function hl(name) { S.hl = name || ''; $$('.fld').forEach(function (e) { e.classList.toggle('hl', e.getAttribute('data-f') === S.hl); }); }
+  function resetChat() { S.gen++; Q = Promise.resolve(); $('#msgs').innerHTML = ''; $('#chips').innerHTML = ''; }
+
+  var HUMAN = [['Talk to a person', human]];
+  function human() {
+    var where = { reg: 'registration', verify: 'verification', deposit: 'your first deposit', onboard: 'getting started' }[S.stage];
+    say('Sure. I am passing you to a support agent together with a summary, so you do not have to repeat yourself.');
+    sys('Mika from Support joined the chat');
+    say('Hi, I am Mika. I can see you are at <b>' + where + '</b> and what you have done so far. How can I help?', 'Support agent', 'agent');
+    chips([['Back to the bot', function () { say('Welcome back. I will carry on from where we were.'); stageHelp(); }]]);
+  }
+
+  /* --- free-text answers --- */
+  var FAQ = [
+    [/human|agent|person|support|operator/, function () { human(); }],
+    [/document|passport|licen[cs]e|my ?number|proof|\bid\b/, function () {
+      say('<b>You usually need two things:</b><ul><li>Photo ID: passport, driving licence or national ID card</li><li>Proof of address: a utility bill or bank statement dated within the last 3 months</li></ul>Exact options depend on your country (illustrative).');
+      chips([['Photo tips', photoTips]].concat(stageChips()));
+    }],
+    [/safe|secur|regulat|protect|segregat|trust/, function () {
+      say('Your account is opened with the entity that applies to your country. Client funds are held separately from company funds, and negative balance protection may apply. The details are on the registration page.');
+      chips(stageChips());
+    }],
+    [/fee|cost|charge|free|commission/, function () {
+      say('Opening an account is free. Deposit and withdrawal costs depend on the method and are shown before you confirm (illustrative).');
+      chips(stageChips());
+    }],
+    [/long|time|minute|how fast|wait|approve/, function () {
+      say('Registration takes about 3 minutes. Verification is often reviewed within a few minutes, but it can take longer if a document needs a second look (illustrative).');
+      chips(stageChips());
+    }],
+    [/code|email|spam|resend/, function () {
+      say('The 6-digit code is sent to the email you registered. Check spam, then use <b>Resend code</b> on the page. In this demo the code is <b>123456</b>.');
+      chips(stageChips());
+    }],
+    [/deposit|fund|pay|card|bank|wallet|method/, function () { depositMethods(); }],
+    [/leverage|spread|trade|platform|app|demo/, function () {
+      say('Once you are set up, you can try a demo account first. Leverage and spreads depend on your account type, and trading carries a risk of loss.');
+      chips(stageChips());
+    }],
+    [/stuck|help|lost|where|next|what now/, function () { stageHelp(); }],
+    [/^(hi|hello|hey|yo|konnichiwa)\b/, function () { say('Hi! I am your registration buddy. Tell me what you need, or tap a suggestion.'); chips(stageChips()); }]
+  ];
+  function freeText(t) {
+    userSays(t);
+    var l = t.toLowerCase();
+    for (var i = 0; i < FAQ.length; i++) { if (FAQ[i][0].test(l)) { FAQ[i][1](); return; } }
+    say('I am not sure I got that. I can help with the form, documents, deposits and getting started, or bring in a person.');
+    chips(stageChips());
+  }
+  function faq(t) {
+    var l = t.toLowerCase();
+    for (var i = 0; i < FAQ.length; i++) { if (FAQ[i][0].test(l)) { FAQ[i][1](); return; } }
+  }
+  function stageChips() {
+    var map = {
+      reg: [['Guide me step by step', startReg]],
+      verify: [['Where am I?', stageHelp]],
+      deposit: [['Which method?', depositMethods]],
+      onboard: [['What is left?', stageHelp]]
+    };
+    return map[S.stage].concat(HUMAN);
+  }
+  function stageHelp() {
+    if (S.stage === 'reg') { if (S.step < 0) startReg(); else regStep(); }
+    else if (S.stage === 'verify') verifyNext();
+    else if (S.stage === 'deposit') {
+      if (S.dep.done) { enterOnboardOffer(); return; }
+      say('You are on the deposit page. Choose a method and an amount, or skip it for now. You can fund later from your dashboard.');
+      chips([['Which method?', depositMethods], ['Is it safe?', function () { faq('safe'); }], ['Skip for now', skipDeposit]].concat(HUMAN));
+    } else onboardNext();
+  }
+
+  /* ------------------------------------------------------------ stage: registration */
+  var REG = [
+    { f: 'country', say: '<b>Step 1 of 4.</b> Check your <b>country of residence</b>. It decides which company opens your account and which protections apply.', why: 'Rules differ by country, so we have to open the account with the right entity. It cannot be changed casually later.', check: function () { return ''; } },
+    { f: 'email', say: '<b>Step 2 of 4.</b> Enter your <b>email</b>. Use one you can open right now, because we send a 6-digit code.', why: 'The email is your login and where we send security notices.', check: function () { return EMAIL_OK.test(S.f.email) ? '' : 'That email does not look complete yet. It should look like name@example.com.'; },
+      extra: [['Use a demo email', function () { S.f.email = DEMO_EMAIL; render(); hl('email'); say('Filled in a demo email for you.'); chips(regChips()); }]] },
+    { f: 'pass', say: '<b>Step 3 of 4.</b> Choose a <b>password</b>: at least 8 characters with a capital letter, a small letter and a number.', why: 'A strong, unique password protects your funds. Do not reuse your email password.', check: function () { return PASS_OK.test(S.f.pass) ? '' : 'The password needs 8+ characters with upper case, lower case and a number.'; },
+      extra: [['Use a demo password', function () { S.f.pass = DEMO_PASS; render(); hl('pass'); say('Filled in a demo password. Use your own in real life.'); chips(regChips()); }]] },
+    { f: 'reg', say: '<b>Step 4 of 4.</b> A partner code is optional. When you are ready, press <b>Register</b> on the page and I will take you to verification.', why: 'A partner code only matters if someone referred you. Leave it empty otherwise.', check: function () { return ''; } }
+  ];
+  function regChips() {
+    var st = REG[S.step], c = [[S.step >= REG.length - 1 ? 'Fill the rest for me' : 'Next', regNext], ['Why do you ask?', function () { say(st.why); chips(regChips()); }]];
+    if (st.extra) c = st.extra.concat(c);
+    return c.concat([HUMAN[0]]);
+  }
+  function enterReg() {
+    say('Hi! I am your registration buddy. I can help with <b>sign-up, verification, your first deposit</b> and getting started.');
+    say('It takes about 3 minutes. Ready?');
+    chips([['Start', startReg], ['What do I need?', function () { faq('documents'); }], HUMAN[0]]);
+  }
+  function startReg() { S.step = 0; regStep(); }
+  function regStep() {
+    var st = REG[S.step];
+    hl(st.f);
+    say(st.say); chips(regChips());
+  }
+  function regNext() {
+    var st = REG[S.step];
+    if (S.step >= REG.length - 1) {
+      if (!EMAIL_OK.test(S.f.email)) S.f.email = DEMO_EMAIL;
+      if (!PASS_OK.test(S.f.pass)) S.f.pass = DEMO_PASS;
+      render(); hl('reg');
+      say('I filled in the demo details. Press <b>Register</b> on the page when you are ready.');
+      chips([['Register for me', function () { submitReg(); }]].concat(HUMAN));
+      return;
+    }
+    var e = st.check();
+    if (e) { hl(st.f); say(e); chips(regChips()); return; }
+    S.step++; regStep();
+  }
+  function submitReg() {
+    S.err = {};
+    if (!EMAIL_OK.test(S.f.email)) S.err.email = 'Enter a valid email address.';
+    if (!PASS_OK.test(S.f.pass)) S.err.pass = 'Use 8+ characters with upper case, lower case and a number.';
+    if (S.err.email || S.err.pass) {
+      render();
+      react(function () { say('The form needs a small fix: ' + (S.err.email || S.err.pass)); S.step = S.err.email ? 1 : 2; chips(regChips()); });
+      return;
+    }
+    go('verify');
+  }
+
+  /* ------------------------------------------------------------ stage: verification */
+  function enterVerify() {
+    say('Account created. Welcome!');
+    say('Regulators require us to verify every client before trading. Three quick steps: <b>email code, photo ID, proof of address</b>.');
+    say('I sent a 6-digit code to <b>' + esc(S.f.email || DEMO_EMAIL) + '</b>. In this demo the code is <b>123456</b>.');
+    chips([['Fill the code for me', fillCode], ['I did not get it', noCode], HUMAN[0]]);
+  }
+  function fillCode() { S.ver.codeVal = '123456'; render(); say('Entered. Press <b>Confirm</b> on the page.'); chips(HUMAN); }
+  function noCode() {
+    say('Check your spam folder first. Codes can take up to a minute. Still nothing? Press <b>Resend code</b> on the page, or check the email address is right.');
+    chips([['Resend code', function () { XM.toast('Code sent again'); say('Sent again. Remember, in this demo it is 123456.'); chips(HUMAN); }]].concat(HUMAN));
+  }
+  function photoTips() {
+    say('<b>Photo tips</b><ul><li>All four corners visible</li><li>No glare or shadows</li><li>Text is sharp and readable</li><li>Document is valid and not expired</li></ul>');
+    chips(stageChips());
+  }
+  function verifyNext() {
+    var v = S.ver;
+    if (!v.email) { say('Next: enter the 6-digit email code on the page and press <b>Confirm</b>.'); chips([['Fill the code for me', fillCode], ['I did not get it', noCode]].concat(HUMAN)); }
+    else if (!v.id) { say('Next: <b>photo ID</b>. Choose the document type and upload a clear photo.'); chips([['Photo tips', photoTips], ['Which documents?', function () { faq('documents'); }]].concat(HUMAN)); }
+    else if (!v.addr) { say('Last: <b>proof of address</b>, such as a utility bill or bank statement from the last 3 months.'); chips([['What counts?', function () { faq('proof'); }]].concat(HUMAN)); }
+    else if (v.review === 'ok') { say('You are verified. Ready to fund your account?'); chips([['Go to deposit', function () { go('deposit'); }]].concat(HUMAN)); }
+    else { say('All documents are in. We are reviewing them now.'); chips(HUMAN); }
+  }
+  function verDone() {
+    var v = S.ver;
+    if (v.email && v.id && v.addr && !v.review) {
+      v.review = 'wait'; render();
+      react(function () { say('All three are sent. A reviewer is checking them now. I will message you here as soon as there is news, so you do not need to wait on the page.'); });
+      var g = S.gen;
+      setTimeout(function () {
+        if (v !== S.ver) return;
+        v.review = 'ok'; render();
+        if (S.open && g === S.gen) {
+          say('<b>You are verified.</b> (Illustrative: real reviews can take longer.)');
+          say('Next you can fund your account. There is no obligation, and you can do it later.');
+          chips([['Go to deposit', function () { go('deposit'); }], ['Later', function () { say('No problem. Your dashboard has a Deposit button whenever you are ready.'); enterOnboardOffer(); }]]);
+        }
+      }, 2200);
+    }
+  }
+
+  /* ------------------------------------------------------------ stage: deposit */
+  function enterDeposit() {
+    say('Your account is verified. If you want to trade with real money, you can fund it now.');
+    say('Only deposit money you can afford to lose. I cannot tell you how much to deposit.');
+    chips([['Which method?', depositMethods], ['Is it safe?', function () { faq('safe'); }], ['How much to start?', howMuch], ['Skip for now', skipDeposit]]);
+  }
+  function depositMethods() {
+    say('<b>Methods (illustrative):</b><ul><li><b>Card</b>: usually the fastest</li><li><b>Bank transfer</b>: can take 1 to 3 days</li><li><b>E-wallet</b>: usually quick, depends on provider</li></ul>The name on the payment method should match your account name.');
+    chips([['Use card', function () { S.dep.method = 'card'; render(); say('Card selected. Choose an amount on the page.'); chips(HUMAN); }], ['Is it safe?', function () { faq('safe'); }]].concat(HUMAN));
+  }
+  function howMuch() {
+    say('There is a minimum amount (illustrative: $5), but no amount is right for everyone. Many people start small while they learn. You can also use a demo account first.');
+    chips([['Try a demo first', function () { go('onboard'); }], ['Pick $100', function () { S.dep.amt = 100; render(); say('Set to $100 on the page. Change it any time.'); chips(HUMAN); }]].concat(HUMAN));
+  }
+  function skipDeposit() { say('No problem. You can deposit whenever you like.'); enterOnboardOffer(); }
+  function enterOnboardOffer() { chips([['Continue to getting started', function () { go('onboard'); }]]); }
+  function submitDep() {
+    var d = S.dep;
+    d.err = '';
+    if (!(d.amt >= 5)) d.err = 'The minimum deposit is $5 (illustrative).';
+    else if (d.amt > 10000) d.err = 'For your protection, the demo limit is $10,000 per deposit.';
+    if (d.err) {
+      render();
+      react(function () { say(d.err + ' Want me to set a sensible amount?'); chips([['Set $100', function () { S.dep.amt = 100; S.dep.err = ''; render(); say('Done. Press Deposit when you are ready.'); chips(HUMAN); }]].concat(HUMAN)); });
+      return;
+    }
+    d.busy = true; render();
+    react(function () { say('Processing your payment securely. Do not close this page.'); });
+    setTimeout(function () {
+      if (d !== S.dep) return;
+      d.busy = false; d.done = true; render();
+      react(function () { say('<b>Deposit received:</b> $' + d.amt + ' (demo). It should show in your account shortly.'); enterOnboardOffer(); });
+    }, 1600);
+  }
+
+  /* ------------------------------------------------------------ stage: onboarding */
+  var ONB = [
+    ['app', 'Get the XM app', 'Trade and manage your account on your phone.'],
+    ['demo', 'Try a demo account', 'Practise with virtual money, no risk to your funds.'],
+    ['twofa', 'Turn on 2-step login', 'Adds a second check when you sign in.'],
+    ['trade', 'Learn the first-trade basics', 'A short guide to the order ticket, lots and stop loss.']
+  ];
+  function onbLeft() { return ONB.filter(function (o) { return !S.onb[o[0]]; }); }
+  function enterOnboard() {
+    say('You are all set up. Here is a short checklist to get comfortable. Do them in any order:');
+    say('<ul><li>Get the app</li><li>Try a demo account</li><li>Turn on 2-step login</li><li>Learn the first-trade basics</li></ul>I can do this with you right here in the chat.');
+    chips(onbChips());
+  }
+  function onbChips() {
+    var c = onbLeft().map(function (o) { return [o[1], function () { onbDo(o[0]); }]; });
+    return c.slice(0, 3).concat(HUMAN);
+  }
+  function onbDo(k) {
+    S.onb[k] = true; render();
+    var txt = {
+      app: 'I sent the download link for the app (demo). Sign in with the same email.',
+      demo: 'Your demo account is ready with virtual money. Nothing risky here.',
+      twofa: 'Done. Next sign-in will ask for a code from your authenticator app (demo).',
+      trade: 'Here is the 2-minute guide: choose an instrument, set the size, then add a stop loss. Trading carries a risk of loss. <a class="cta" href="#" onclick="return false">Open the guide</a>'
+    }[k];
+    say(txt); onboardNext();
+  }
+  function onboardNext() {
+    var left = onbLeft();
+    if (!left.length) {
+      say('<b>That is everything.</b> I will stay in this chat. Ask me anything about your account, any time.');
+      chips([['Send me weekly tips', function () { say('Okay. I will send occasional educational tips here. Say <b>stop</b> at any time to opt out.'); }], ['No, thanks', function () { say('No problem. Good luck, and trade responsibly.'); }]]);
+    } else { say(left.length + ' left. Which would you like next?'); chips(onbChips()); }
+  }
+
+  /* ------------------------------------------------------------ stage entry */
+  function enter(stage) {
+    ({ reg: enterReg, verify: enterVerify, deposit: enterDeposit, onboard: enterOnboard })[stage]();
+  }
+  function go(stage) {
+    S.stage = stage;
+    if (stage !== 'reg' && !S.f.email) S.f.email = DEMO_EMAIL;
+    if (stage === 'deposit' || stage === 'onboard') { S.ver.email = S.ver.id = S.ver.addr = true; S.ver.review = 'ok'; }
+    if (stage === 'onboard' && !S.dep.done) S.dep.done = false;
+    render(); setTabs();
+    if (S.open) {
+      var names = { reg: 'Registration', verify: 'Verification', deposit: 'Deposit', onboard: 'Getting started' };
+      sys(names[stage]); enter(stage);
+    }
+  }
+
+  /* ------------------------------------------------------------ website */
+  var URLS = { reg: 'xmtrading.com/register', verify: 'myaccount.xmtrading.com/verify', deposit: 'myaccount.xmtrading.com/deposit', onboard: 'myaccount.xmtrading.com/welcome' };
+  var TICK = '<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+  function fld(name, label, html, req) {
+    return '<div class="fld' + (S.err[name] ? ' err' : '') + (S.hl === name ? ' hl' : '') + '" data-f="' + name + '">' + (label ? '<label>' + label + (req ? '<sup>*</sup>' : '') + '</label>' : '') + html + (S.err[name] ? '<div class="em">' + esc(S.err[name]) + '</div>' : '') + '</div>';
+  }
+  function progress() {
+    var labels = ['Register', 'Verify', 'Deposit', 'Get started'], i = STAGES.indexOf(S.stage);
+    return '<div class="prog">' + labels.map(function (l, k) { return '<div class="' + (k < i ? 'done' : k === i ? 'cur' : '') + '">' + l + '</div>'; }).join('') + '</div>';
+  }
+  function pageReg() {
+    var countries = ['Japan', 'Thailand', 'Indonesia', 'Vietnam', 'Malaysia', 'Philippines'];
+    return progress() + '<div class="card2"><h2>Let&rsquo;s get you registered!</h2><div class="sub">Already have an account? <a href="#" onclick="return false">Login</a></div>' +
+      fld('country', 'Country of residence', '<select id="fCountry">' + countries.map(function (c) { return '<option' + (c === S.f.country ? ' selected' : '') + '>' + c + '</option>'; }).join('') + '</select>') +
+      '<div class="brand"><ul><li>Negative balance protection may apply</li><li>Client funds are held separately</li><li>Entity shown depends on your country (illustrative)</li></ul></div>' +
+      fld('email', 'Email', '<input id="fEmail" type="email" placeholder="Enter email" value="' + esc(S.f.email) + '">', 1) +
+      fld('pass', 'Password', '<input id="fPass" type="text" placeholder="Enter password" value="' + esc(S.f.pass) + '">', 1) +
+      fld('ref', 'Partner or referral code (optional)', '<input id="fRef" placeholder="Enter code" value="' + esc(S.f.ref) + '">') +
+      fld('reg', '', '<button class="btn btn-primary btn-lg btn-block" data-act="register" type="button">Register</button>') +
+      '<div class="fine">Trading leveraged products carries a high risk of loss.</div></div>';
+  }
+  function pageVerify() {
+    var v = S.ver;
+    function r(ok, lock, n, title, desc, act) { return '<div class="rw' + (ok ? ' ok' : '') + (lock ? ' lock' : '') + '"><div class="ic">' + (ok ? TICK : n) + '</div><div class="bd"><h4>' + title + '</h4><p>' + desc + '</p>' + (ok ? '' : '<div class="act">' + act + '</div>') + '</div></div>'; }
+    var st = v.review === 'wait' ? '<div class="status"><span class="spin"></span>Under review. We will notify you in chat and by email.</div>' :
+             v.review === 'ok' ? '<div class="status ok">Verified. You can now fund your account.</div><div style="margin-top:12px"><button class="btn btn-primary btn-block" data-act="to-dep" type="button">Continue to deposit</button></div>' : '';
+    return progress() + '<div class="card2"><h2>Verify your account</h2><div class="sub">Three quick steps. Usually a few minutes.</div>' +
+      r(v.email, false, 1, 'Confirm your email', 'Enter the 6-digit code sent to ' + esc(S.f.email), '<input id="fCode" inputmode="numeric" maxlength="6" placeholder="123456" value="' + esc(v.codeVal) + '"><button class="btn btn-primary btn-sm" data-act="code" type="button">Confirm</button><button class="lnk" data-act="resend" type="button">Resend code</button>' + (v.codeErr ? '<div class="alert" style="flex-basis:100%">That code is not right. Try 123456 in this demo.</div>' : '')) +
+      r(v.id, !v.email, 2, 'Photo ID', 'Passport, driving licence or national ID card', '<select id="fDoc"><option>Passport</option><option>Driving licence</option><option>National ID card</option></select><button class="btn btn-primary btn-sm" data-act="id" type="button">Upload photo</button><button class="lnk" data-act="id-bad" type="button">Simulate blurry photo</button>' + (v.idBad ? '<div class="alert" style="flex-basis:100%">Photo rejected: too blurry to read. Please upload a sharper one.</div>' : '')) +
+      r(v.addr, !v.id, 3, 'Proof of address', 'Utility bill or bank statement from the last 3 months', '<button class="btn btn-primary btn-sm" data-act="addr" type="button">Upload document</button>') +
+      st + '</div>';
+  }
+  function pageDeposit() {
+    var d = S.dep;
+    if (d.done) return progress() + '<div class="card2"><div class="big"><div class="tick">' + TICK + '</div><h2>Deposit received</h2><div class="sub">$' + d.amt + ' by ' + ({ card: 'card', bank: 'bank transfer', ewallet: 'e-wallet' })[d.method] + ' (demo)</div></div><button class="btn btn-primary btn-block" data-act="to-onb" type="button">Continue</button></div>';
+    return progress() + '<div class="card2"><h2>Fund your account</h2><div class="sub">Optional. You can also do this later.</div>' +
+      '<div class="fld"><label>Payment method</label></div><div class="meth" style="margin-top:-8px">' +
+      [['card', 'Card', 'Instant'], ['bank', 'Bank transfer', '1 to 3 days'], ['ewallet', 'E-wallet', 'Usually quick']].map(function (m) { return '<button type="button" data-act="meth" data-v="' + m[0] + '" class="' + (d.method === m[0] ? 'on' : '') + '">' + m[1] + '<small>' + m[2] + '</small></button>'; }).join('') + '</div>' +
+      '<div class="fld' + (d.err ? ' err' : '') + '"><label>Amount (USD)</label><input id="fAmt" type="number" min="0" value="' + d.amt + '">' + (d.err ? '<div class="em">' + esc(d.err) + '</div>' : '') + '</div>' +
+      '<div class="amts">' + [50, 100, 500, 1000].map(function (a) { return '<button type="button" data-act="amt" data-v="' + a + '" class="' + (d.amt === a ? 'on' : '') + '">$' + a + '</button>'; }).join('') + '</div>' +
+      '<button class="btn btn-primary btn-lg btn-block" data-act="deposit" type="button"' + (d.busy ? ' disabled' : '') + '>' + (d.busy ? '<span class="spin"></span> Processing' : 'Deposit') + '</button>' +
+      '<div class="fine">Only deposit money you can afford to lose. Fees are shown before you confirm (illustrative).</div></div>';
+  }
+  function pageOnboard() {
+    var done = ONB.filter(function (o) { return S.onb[o[0]]; }).length;
+    return progress() + '<div class="card2"><h2>Welcome to XMTrading</h2><div class="sub">' + done + ' of ' + ONB.length + ' done. Your buddy can help with any of these.</div>' +
+      ONB.map(function (o, i) { var ok = S.onb[o[0]]; return '<div class="rw' + (ok ? ' ok' : '') + '"><div class="ic">' + (ok ? TICK : i + 1) + '</div><div class="bd"><h4>' + o[1] + '</h4><p>' + o[2] + '</p>' + (ok ? '' : '<div class="act"><button class="btn btn-outline btn-sm" data-act="onb" data-v="' + o[0] + '" type="button">Do it</button></div>') + '</div></div>'; }).join('') + '</div>';
+  }
+  function render() {
+    var site = $('#site'), top = site.scrollTop;
+    site.innerHTML = '<div class="site-top"><span class="xm-logo">' + XM.logo() + '</span><span class="xm-lang">EN</span></div>' + ({ reg: pageReg, verify: pageVerify, deposit: pageDeposit, onboard: pageOnboard })[S.stage]();
+    site.scrollTop = top;
+    $('#url').textContent = URLS[S.stage];
+    $('#ping').hidden = S.open;
+  }
+
+  $('#site').addEventListener('input', function (e) {
+    var id = e.target.id;
+    if (id === 'fEmail') S.f.email = e.target.value;
+    else if (id === 'fPass') S.f.pass = e.target.value;
+    else if (id === 'fRef') S.f.ref = e.target.value;
+    else if (id === 'fAmt') S.dep.amt = parseFloat(e.target.value) || 0;
+    else if (id === 'fCode') S.ver.codeVal = e.target.value;
+  });
+  $('#site').addEventListener('change', function (e) { if (e.target.id === 'fCountry') S.f.country = e.target.value; });
+  $('#site').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var a = b.getAttribute('data-act'), v = b.getAttribute('data-v');
+    if (a === 'register') submitReg();
+    else if (a === 'code') {
+      if (S.ver.codeVal === '123456') { S.ver.email = true; S.ver.codeErr = false; render(); react(function () { say('Email confirmed.'); verifyNext(); }); verDone(); }
+      else { S.ver.codeErr = true; render(); react(function () { say('That code did not match. Check the latest email, or press Resend code. (Demo code: 123456)'); chips([['Fill the code for me', fillCode], ['I did not get it', noCode]].concat(HUMAN)); }); }
+    }
+    else if (a === 'resend') { XM.toast('Code sent again'); react(function () { say('Code sent again. Demo code: 123456.'); }); }
+    else if (a === 'id') { S.ver.id = true; S.ver.idBad = false; render(); react(function () { say('Photo ID received and readable.'); verifyNext(); }); verDone(); }
+    else if (a === 'id-bad') { S.ver.idBad = true; render(); react(function () { say('That photo was rejected as <b>too blurry</b>. It happens a lot, no worries. Hold the phone steady, use daylight and keep the document flat.'); chips([['Photo tips', photoTips]].concat(HUMAN)); }); }
+    else if (a === 'addr') { S.ver.addr = true; render(); react(function () { say('Proof of address received.'); }); verDone(); }
+    else if (a === 'to-dep') go('deposit');
+    else if (a === 'to-onb') go('onboard');
+    else if (a === 'meth') { S.dep.method = v; render(); react(function () { say(({ card: 'Card is usually the quickest.', bank: 'Bank transfers can take 1 to 3 days to arrive.', ewallet: 'E-wallets are usually quick, depending on the provider.' })[v]); chips(HUMAN); }); }
+    else if (a === 'amt') { S.dep.amt = +v; S.dep.err = ''; render(); }
+    else if (a === 'deposit') submitDep();
+    else if (a === 'onb') {
+      if (S.open) { userSays('Do it: ' + ONB.filter(function (o) { return o[0] === v; })[0][1]); onbDo(v); }
+      else { S.onb[v] = true; render(); XM.toast('Done (demo)'); }
+    }
+  });
+
+  /* ------------------------------------------------------------ channel button, popover, phone */
+  function theme() {
+    var c = CH[S.ch], bw = $('#bw'), ph = $('#ph');
+    bw.style.setProperty('--chc', c.c); ph.style.setProperty('--chc', c.c);
+    ph.style.setProperty('--chh', c.hdr); ph.style.setProperty('--chbg', c.bg); ph.style.setProperty('--chme', c.me);
+    $('#fabDot').textContent = S.ch === 'wa' ? 'WA' : S.ch === 'tg' ? 'TG' : 'LINE';
+    $('#fabCh').textContent = c.name;
+    $('#popGo').textContent = 'Open in ' + c.name;
+    $('#phSub').textContent = c.name + ' official account (illustrative)';
+    $('#popCh').innerHTML = Object.keys(CH).map(function (k) { return '<button type="button" data-ch="' + k + '" class="' + (k === S.ch ? 'on' : '') + '">' + CH[k].name + '</button>'; }).join('');
+  }
+  function drawQr() {
+    var s = '', seed = 7, i, j;
+    function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+    function finder(x, y) { return '<rect x="' + x + '" y="' + y + '" width="7" height="7" fill="#1d2024"/><rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="5" height="5" fill="#fff"/><rect x="' + (x + 2) + '" y="' + (y + 2) + '" width="3" height="3" fill="#1d2024"/>'; }
+    for (i = 0; i < 25; i++) for (j = 0; j < 25; j++) {
+      if ((i < 8 && j < 8) || (i > 16 && j < 8) || (i < 8 && j > 16)) continue;
+      if (rnd() > .52) s += '<rect x="' + i + '" y="' + j + '" width="1" height="1" fill="#1d2024"/>';
+    }
+    $('#qr').innerHTML = '<rect width="25" height="25" fill="#fff"/>' + s + finder(0, 0) + finder(18, 0) + finder(0, 18);
+  }
+  $('#popCh').addEventListener('click', function (e) { var b = e.target.closest('[data-ch]'); if (b) { S.ch = b.getAttribute('data-ch'); theme(); } });
+  $('#fab').addEventListener('click', function () {
+    if (S.open) { $('#ph').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return; }
+    $('#pop').hidden = !$('#pop').hidden;
+  });
+  $('#popGo').addEventListener('click', openChat);
+  $('#phClose').addEventListener('click', function () { S.open = false; resetChat(); $('#ph').hidden = true; $('#idle').hidden = false; hl(''); render(); });
+  $('#comp').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var t = $('#txt').value.trim(); if (!t) return;
+    $('#txt').value = ''; freeText(t);
+  });
+  function openChat() {
+    $('#pop').hidden = true; S.open = true;
+    $('#idle').hidden = true; $('#ph').hidden = false;
+    theme(); resetChat(); render();
+    sys('Chat started on ' + CH[S.ch].name + ' (demo)');
+    enter(S.stage);
+    if (window.innerWidth <= 1000) $('#ph').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  /* ------------------------------------------------------------ scenes */
+  function setTabs() {
+    var key = Object.keys(SCENE).filter(function (k) { return SCENE[k] === S.stage; })[0];
+    $$('[data-scene]').forEach(function (b) { var on = b.getAttribute('data-scene') === key; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+    $('#cap').innerHTML = '<span class="n">' + CAPS[key][0] + '</span><span>' + CAPS[key][1] + '</span>';
+    try { history.replaceState(null, '', '#' + key); } catch (e) {}
+  }
+  $$('[data-scene]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var st = SCENE[b.getAttribute('data-scene')];
+      if (st === 'reg') { S.f.email = ''; S.f.pass = ''; S.err = {}; S.step = -1; S.hl = ''; S.ver = freshVer(); S.dep = freshDep(); S.onb = freshOnb(); }
+      if (st === 'verify') S.ver = freshVer();
+      if (st === 'deposit') S.dep = freshDep();
+      if (st === 'onboard') S.onb = freshOnb();
+      if (S.open) resetChat();
+      go(st);
+    });
+  });
+
+  theme(); drawQr();
+  var first = XM.qs('scene') || location.hash.replace('#', '') || 'a';
+  if (!SCENE[first]) first = 'a';
+  go(SCENE[first]);
+  if (XM.qs('chat') === '1') openChat();
+
+  XM.notes({
+    title: 'Registration buddy bot (idea 27)',
+    today: 'New clients fill the form alone. When a field, a document or a payment step confuses them, many leave, or they contact support later.',
+    proposed: 'A chat button on the registration page opens a bot in LINE, WhatsApp or Telegram. It guides each step, answers common questions, follows through verification, first deposit and getting started, and can hand over to a person.',
+    why: 'Help at the moment of doubt, in an app the client already uses, may reduce abandonment and support requests without weakening any required check. Not validated yet.',
+    metric: 'Registration, verification and first-deposit completion rate, drop-off and time per step, support contacts per new client, and a "did you understand what to do next" rating.'
+  });
+})();
+</script>
+<script src="../../assets/js/review.js" data-idea="27"></script>
+</body>
+</html>

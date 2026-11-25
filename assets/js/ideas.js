@@ -267,7 +267,15 @@ window.XM_IDEAS = [
     images: ['assets/deck/s42-mywallet-a.png', 'assets/deck/s42-mywallet-b.png']
   },
   {
-    id: '27', slide: 43, area: 'onboarding', status: 'todo',
+    id: '27', slide: 43, area: 'onboarding', status: 'built',
+    path: 'ideas/27-registration-buddy-bot-in-whatsapp-line/index.html',
+    shows: [
+      'Chat button on the registration page with a LINE, WhatsApp or Telegram choice and QR code',
+      'Bot guides each field of the form, validates email and password, and explains why each is asked',
+      'Verification help: email code, ID and address documents, and a rejected-photo recovery',
+      'First deposit help: methods, safety, minimum amount error, and no pressure to deposit',
+      'Getting-started checklist, free-text questions and hand-over to a support agent'
+    ],
     title: 'Registration buddy bot in WhatsApp / LINE / Telegram',
     short: 'A bot that guides sign-up step by step',
     shortlist: { priority: 1, impact: 'High', confidence: '', notes: '' },
@@ -314,7 +322,15 @@ window.XM_IDEAS = [
     images: ['assets/deck/s50-protected-sl-tp.png']
   },
   {
-    id: '31', slide: 51, area: 'trading', status: 'todo',
+    id: '31', slide: 51, area: 'trading', status: 'built',
+    path: 'ideas/31-notifications-about-chosen-instruments/index.html',
+    shows: [
+      'Follow instruments for trade ideas and/or news, with search and an empty-state summary',
+      'Channel choice (mobile push, PWA banner, email, chat), frequency caps and quiet hours',
+      'Mobile push on a lock screen that opens the idea with entry, target and stop',
+      'Top banner inside the PWA when the app is open, with dismiss, auto-hide and a notification inbox',
+      'Delivery log that explains why each event was sent, held or skipped'
+    ],
     title: 'Notifications about chosen instruments',
     short: 'Subscribe to ideas and news for the instruments you follow',
     shortlist: { priority: 1, impact: 'High', confidence: '', notes: 'Prioritise for WEB over PWA' },
