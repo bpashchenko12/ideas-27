@@ -362,7 +362,15 @@ window.XM_IDEAS = [
     proposal: 'Enable clients to connect their accounts to selected third-party bot services, where they create automated strategies that execute on our platform, without us building a bot creator.'
   },
   {
-    id: '34', slide: 54, area: 'trading', status: 'todo',
+    id: '34', slide: 54, area: 'trading', status: 'built',
+    path: 'ideas/34-trade-the-news-simulator/index.html',
+    shows: [
+      'Public Trade the News Simulator page for newcomers, promoting the next demo competition',
+      'Join flow with validation, then an announced topic (Middle East crisis) with the competition rules',
+      'Replay of a modelled, extra-volatile day: breaking-news tape, speed controls, skip to next headline',
+      'Demo trading with lots, stop loss, take profit, margin level and a stop-out that removes you from the ranking',
+      'Results: standings (only players still in the market can win), your trades and what each headline did to your positions'
+    ],
     title: 'Trade the news simulator',
     short: 'Practise trading the direction after major news',
     shortlist: { priority: 2, impact: 'Medium', confidence: 'Medium', notes: 'Needs extensive work' },

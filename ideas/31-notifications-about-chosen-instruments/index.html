@@ -72,6 +72,103 @@ main button { border: 0; background: none; font: inherit; color: inherit; cursor
 .sum.warn { background: var(--amber-l); color: var(--amber); }
 .h4 { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); margin: 16px 0 4px; }
 
+/* ---------- A · markets view with the Trade Ideas side drawer ---------- */
+.mk { display: grid; grid-template-columns: 64px 270px minmax(0, 1fr) auto 52px; height: 720px; background: #fff; border: 1px solid var(--line-2); border-radius: 18px; box-shadow: var(--sh-l); overflow: hidden; }
+.mk-nav { border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 0; }
+.mk-nav .xm-logo svg { height: 18px; width: auto; }
+.mk-nav button, .mk-rail button { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: var(--ink-2); position: relative; }
+.mk-nav button svg, .mk-rail button svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.mk-nav button.on, .mk-rail button.on { color: var(--g); background: var(--g-l); }
+.mk-rail { border-left: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 0; }
+.mk-rail button.on { box-shadow: inset 0 0 0 1.5px var(--blue); background: #fff; color: var(--blue); }
+.mk-rail button .dotn { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--g); border: 2px solid #fff; }
+.mk-list { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
+.mk-lh { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 14px 10px; position: sticky; top: 0; background: #fff; z-index: 1; border-bottom: 1px solid var(--line); }
+.mk-lh input { width: 120px; font: inherit; font-size: 12.5px; padding: 7px 10px; border: 1.5px solid var(--line-2); border-radius: 8px; outline: none; }
+.mk-lh input:focus { border-color: var(--g); }
+.mk-r { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 14px; border-bottom: 1px solid var(--line); text-align: left; }
+.mk-r:hover { background: #fafafa; }
+.mk-r.on { background: var(--g-l); }
+.mk-r .nm { flex: 1; min-width: 0; }
+.mk-r .nm b { display: flex; align-items: center; gap: 5px; font-size: 13.5px; }
+.mk-r .nm small { color: var(--mut); font-size: 11.5px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mk-r .px { text-align: right; font-size: 13px; font-weight: 600; flex: none; }
+.mk-r .px span { display: block; font-size: 11.5px; font-weight: 500; }
+.mk-r .fb { width: 14px; height: 14px; color: var(--g); flex: none; }
+.mk-r .fb svg { width: 14px; height: 14px; fill: currentColor; stroke: currentColor; stroke-width: 1.4; stroke-linejoin: round; }
+.mk-chart { min-width: 0; padding: 16px 18px; display: flex; flex-direction: column; overflow: hidden; }
+.mk-ch { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.mk-ch h3 { font-size: 17px; }
+.mk-ch small { color: var(--mut); font-size: 12px; }
+.mk-ch .tools { display: flex; gap: 6px; }
+.mk-ch .tools button { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); position: relative; }
+.mk-ch .tools button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.mk-ch .tools button.on { color: var(--g); background: var(--g-l); }
+.mk-ch .tools button.on svg { fill: currentColor; }
+.mk-tb { display: flex; gap: 14px; font-size: 12.5px; color: var(--ink-2); margin: 12px 0 10px; }
+.mk-bs { display: flex; gap: 8px; margin-bottom: 8px; }
+.mk-bs span { padding: 7px 12px; border-radius: 6px; color: #fff; font-size: 12.5px; font-weight: 700; line-height: 1.2; text-align: center; }
+.mk-bs span small { display: block; font-size: 9px; font-weight: 600; opacity: .9; }
+.mk-bs .s { background: var(--dn); } .mk-bs .b { background: #12a56a; }
+.mk-cv { flex: 1; min-height: 0; }
+.mk-cv svg { width: 100%; height: 100%; display: block; }
+.mk-dr { width: 360px; border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: #fff; }
+.mk-dr[hidden] { display: none; }
+.mk-dh { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 10px; }
+.mk-dh h3 { font-size: 17px; }
+.mk-dh button { width: 30px; height: 30px; display: grid; place-items: center; color: var(--ink-2); }
+.mk-dh button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.mk-db { flex: 1; overflow-y: auto; padding: 0 16px 12px; }
+.sc { border: 1.5px solid var(--g); background: linear-gradient(180deg, #f3faf7, #fff); border-radius: 16px; padding: 14px; margin-bottom: 14px; }
+.sc.on { border-color: var(--line-2); background: #fff; }
+.sc .t { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+.sc .t .ci { flex: none; width: 36px; height: 36px; border-radius: 10px; background: var(--g-l); color: var(--g); display: grid; place-items: center; }
+.sc .t .ci svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sc .t b { display: block; font-size: 14px; line-height: 1.25; }
+.sc .t small { color: var(--mut); font-size: 12px; }
+.sc .btn { width: 100%; }
+.sc .btn-on { background: var(--g-l); color: var(--g-d); border-color: transparent; }
+.sc .nrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 13px; }
+.sc .nrow small { display: block; color: var(--mut); font-size: 11.5px; }
+.sc .st { margin-top: 12px; padding: 9px 11px; border-radius: 10px; background: var(--g-l); color: var(--g-d); font-size: 12px; line-height: 1.45; }
+.sc .st.warn { background: var(--amber-l); color: var(--amber); }
+.sc .more { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 12.5px; }
+.sc .more button { color: var(--g); font-weight: 600; text-decoration: underline; }
+.sc .more svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; }
+.set { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 4px; animation: pop .25s ease-out; }
+.set .chrow { padding: 9px 0; }
+.set .chrow .ci { width: 30px; height: 30px; border-radius: 9px; }
+.set .chrow .ci svg { width: 16px; height: 16px; }
+.set .tx b { font-size: 12.5px; } .set .tx small { font-size: 11px; }
+.set .seg span { padding: 6px 11px; font-size: 12px; }
+.set .h4 { margin: 12px 0 2px; font-size: 10.5px; }
+.subs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.subs span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border-radius: 999px; background: var(--soft); font-size: 12px; font-weight: 600; }
+.subs button { width: 18px; height: 18px; border-radius: 50%; background: #fff; color: var(--mut); font-size: 12px; line-height: 1; display: grid; place-items: center; }
+.subs button:hover { color: var(--dn); }
+.mk-sub { font-size: 12px; color: var(--mut); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.mk-sub button { color: var(--g); font-weight: 600; text-decoration: underline; font-size: 12px; }
+.ic2 { background: #f5f6f8; border-radius: 16px; padding: 13px 14px; margin-bottom: 10px; width: 100%; text-align: left; display: block; }
+.ic2.exp { opacity: .55; }
+.ic2 .a { display: flex; align-items: center; gap: 8px; }
+.ic2 .a .ai { width: 24px; height: 24px; font-size: 8px; }
+.ic2 .a b { font-size: 13.5px; flex: 1; }
+.ic2 .chip { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: var(--amber-l); color: var(--amber); }
+.ic2.exp .chip { background: transparent; color: var(--mut); }
+.ic2.new .chip { background: var(--g-l); color: var(--g-d); }
+.ic2 .c { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 13.5px; font-weight: 600; }
+.ic2 .c .bu { color: #12a56a; } .ic2 .c .be { color: var(--dn); }
+.ic2 .c i { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--dn); font-style: normal; font-size: 13px; }
+.ic2 .c i.u { background: #12a56a; }
+.ic2.exp .c i { background: #d3d6db; }
+.ic2 .lv2 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+.ic2 .lv2 div { background: #fff; border-radius: 8px; padding: 6px 8px; font-size: 11px; color: var(--mut); }
+.ic2 .lv2 strong { display: block; font-size: 12.5px; color: var(--ink); }
+.mk-df { margin-top: 6px; font-size: 11px; color: var(--mut); line-height: 1.5; }
+.mk-pv { display: block; margin: 8px auto 0; font-size: 12px; color: var(--g); font-weight: 600; text-decoration: underline; }
+.mk-ft { border-top: 1px solid var(--line); padding: 10px 16px; font-size: 11px; color: var(--blue-d); line-height: 1.45; display: flex; gap: 8px; }
+.mk-ft svg { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; margin-top: 1px; }
+
 /* ---------- B/C · phone + controls ---------- */
 .pgrid { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 28px; align-items: start; }
 .mode { display: inline-flex; padding: 3px; border-radius: 999px; background: #fff; border: 1px solid var(--line); margin-bottom: 12px; }
@@ -172,6 +269,11 @@ main button { border: 0; background: none; font: inherit; color: inherit; cursor
 
 @media (max-width: 1000px) {
   .fgrid, .pgrid { grid-template-columns: 1fr; }
+  .mk { grid-template-columns: 1fr; height: auto; }
+  .mk-nav, .mk-chart, .mk-rail { display: none; }
+  .mk-list { max-height: 250px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .mk-dr { width: auto; border-left: 0; max-height: none; }
+  .mk-db { overflow: visible; }
 }
 @media (max-width: 860px) {
   .wrap { padding: 0 14px 90px; }
@@ -190,10 +292,10 @@ main button { border: 0; background: none; font: inherit; color: inherit; cursor
     <div>
       <span class="eyebrow">Idea 31 &middot; Trading</span>
       <h1>Notifications about chosen instruments</h1>
-      <p>Follow the instruments you care about, choose how to be told, and see the same trade idea arrive as a mobile push or as a top banner inside the PWA.</p>
+      <p>Subscribe to trade ideas on an instrument from the Markets Trade Ideas drawer, choose how to be told, and see the same idea arrive as a mobile push or as a top banner inside the PWA.</p>
     </div>
     <div class="pill-tabs" role="tablist" aria-label="Scenes">
-      <button class="on" role="tab" data-scene="a">A &middot; Follow</button>
+      <button class="on" role="tab" data-scene="a">A &middot; Subscribe</button>
       <button role="tab" data-scene="b">B &middot; Mobile push</button>
       <button role="tab" data-scene="c">C &middot; PWA banner</button>
     </div>
@@ -203,27 +305,15 @@ main button { border: 0; background: none; font: inherit; color: inherit; cursor
 
   <!-- A -->
   <section id="sceneA">
-    <div class="fgrid">
-      <div class="panel">
-        <h3>Instruments you follow</h3>
-        <div class="sub">Turn on trade ideas, news, or both for each instrument.</div>
-        <input class="search" id="q" type="search" placeholder="Search instruments, e.g. gold or EUR" aria-label="Search instruments">
-        <div id="insList"></div>
-        <div class="sum" id="sum"></div>
+    <div class="mk" id="mk">
+      <aside class="mk-nav" id="mkNav" aria-label="PWA navigation"></aside>
+      <div class="mk-list">
+        <div class="mk-lh"><b>Popular</b><input id="q" type="search" placeholder="Search" aria-label="Search instruments"></div>
+        <div id="mkRows"></div>
       </div>
-      <div class="panel">
-        <h3>How to notify you</h3>
-        <div class="sub">Changes apply straight away.</div>
-        <div id="chList"></div>
-        <div class="h4">How often</div>
-        <div class="seg" id="freq"></div>
-        <div class="h4">Quiet hours</div>
-        <div class="chrow">
-          <div class="ci"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></div>
-          <div class="tx"><b>No mobile push 22:00 to 07:00</b><small>Held items appear in your notification inbox</small></div>
-          <label class="sw"><input type="checkbox" id="quiet" aria-label="Quiet hours"><i></i></label>
-        </div>
-      </div>
+      <div class="mk-chart" id="mkChart"></div>
+      <aside class="mk-dr" id="mkDr" aria-label="Trade Ideas"></aside>
+      <div class="mk-rail" id="mkRail"></div>
     </div>
   </section>
 
@@ -261,7 +351,7 @@ main button { border: 0; background: none; font: inherit; color: inherit; cursor
   var $ = XM.$, $$ = XM.$$, esc = XM.esc;
 
   var CAPS = {
-    a: ['A', '<b>Follow.</b> Pick instruments, choose trade ideas and/or news, then the channels, frequency and quiet hours.'],
+    a: ['A', '<b>Subscribe in Markets.</b> Open an instrument, then subscribe to its trade ideas from the Trade Ideas side drawer (or the bell above the chart). News, channels, frequency and quiet hours sit under Notification settings.'],
     b: ['B', '<b>Mobile push.</b> With the phone locked, a new idea arrives as a push. Tap it to open the idea in the PWA.'],
     c: ['C', '<b>PWA top banner.</b> With the PWA open, the same event slides in as a banner instead, so it does not interrupt twice.']
   };
@@ -298,42 +388,124 @@ main button { border: 0; background: none; font: inherit; color: inherit; cursor
   function iconOf(sym) { for (var i = 0; i < INSTR.length; i++) if (INSTR[i][0] === sym) return INSTR[i]; return [sym, '', sym.slice(0, 2), '', 0, '']; }
   function ai(sym) { var r = iconOf(sym); return '<span class="ai ' + r[5] + '">' + r[2] + '</span>'; }
 
-  /* -------------------------------------------------- A · follow */
+  /* -------------------------------------------------- A · markets view + Trade Ideas drawer */
+  var sel = 'GOLD', drawerOpen = true, showSet = false, extra = {}, openCard = '';
+  var IC = {
+    bell: '<path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15L6 17zM10 21h4"/>',
+    radio: '<circle cx="12" cy="12" r="2"/><path d="M8 8a5.7 5.7 0 0 0 0 8M16 8a5.7 5.7 0 0 1 0 8M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/>',
+    plus: '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+    expand: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+    close: '<path d="M6 6l12 12M18 6 6 18"/>',
+    chev: '<path d="m6 9 6 6 6-6"/>',
+    star: '<path d="m12 3 2.8 5.8 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.3l1.1-6.2L3 9.7l6.2-.9L12 3z"/>',
+    share: '<path d="M7 17 17 7M8 7h9v9"/>',
+    cal: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+    chart: '<path d="M4 19V5M4 19h16M8 15l3-4 3 3 5-7"/>'
+  };
+  function svg(n) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + IC[n] + '</svg>'; }
+  function seedOf(sym) { var s = 7; for (var i = 0; i < sym.length; i++) s = (s * 31 + sym.charCodeAt(i)) % 9973; return s; }
+  function numOf(str) { return parseFloat(str.replace(/,/g, '')); }
+  function decOf(str) { var m = str.split('.')[1]; return m ? m.length : 0; }
+  function fmtN(v, d) { return v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function cardsFor(sym) {
+    var r = iconOf(sym), sd = seedOf(sym), base = numOf(r[3]), d = decOf(r[3]);
+    var dirs = [sd % 2 ? 'buy' : 'sell', (sd >> 1) % 2 ? 'buy' : 'sell', sd % 3 ? 'sell' : 'buy', (sd >> 2) % 2 ? 'buy' : 'sell'];
+    var tfs = ['15 mins', '4 hours', '15 mins', '1 hour'], live = [true, true, false, false];
+    var out = (extra[sym] || []).slice();
+    tfs.forEach(function (tf, i) {
+      var up = dirs[i] === 'buy', k = up ? 1 : -1;
+      out.push({ id: sym + i, tf: tf, dir: dirs[i], live: live[i], entry: fmtN(base, d), tp: fmtN(base * (1 + k * 0.0065), d), sl: fmtN(base * (1 - k * 0.003), d) });
+    });
+    return out;
+  }
+  function candles(sym) {
+    var seed = seedOf(sym) + 11, i, o, c, hi, lo, x, p = 150, out = '';
+    function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+    for (i = 0; i < 46; i++) {
+      o = p; c = Math.max(40, Math.min(250, o + (rnd() - .5) * 30)); hi = Math.max(o, c) + rnd() * 11; lo = Math.min(o, c) - rnd() * 11; x = 14 + i * 12.2; p = c;
+      var col = c < o ? '#e5373f' : '#12a56a';
+      out += '<line x1="' + x + '" x2="' + x + '" y1="' + hi.toFixed(1) + '" y2="' + lo.toFixed(1) + '" stroke="' + col + '"/><rect x="' + (x - 3.6) + '" y="' + Math.min(o, c).toFixed(1) + '" width="7.2" height="' + Math.max(2, Math.abs(c - o)).toFixed(1) + '" fill="' + col + '"/>';
+    }
+    var grid = '';
+    for (i = 0; i < 6; i++) grid += '<line x1="0" x2="590" y1="' + (28 + i * 46) + '" y2="' + (28 + i * 46) + '" stroke="#eceef0"/>';
+    return '<svg viewBox="0 0 600 300" preserveAspectRatio="none" role="img" aria-label="Illustrative candlestick chart for ' + sym + '">' + grid + out + '<line x1="0" x2="590" y1="' + p.toFixed(1) + '" y2="' + p.toFixed(1) + '" stroke="#1d2024" stroke-dasharray="2 3"/></svg>';
+  }
+  function noteStatus() {
+    var s = subs[sel] || {}, on = CHANNELS.filter(function (c) { return ch[c[0]]; }).map(function (c) { return c[1]; });
+    if (!s.ideas && !s.news) return '';
+    if (!on.length) return '<div class="st warn">You are subscribed, but every channel is off. Open notification settings and turn one on.</div>';
+    return '<div class="st">You will be told via ' + on.join(', ').replace(/, ([^,]*)$/, ' and $1') + (freq === 'digest' ? ', as one daily digest.' : freq === '3' ? ', up to 3 times a day.' : '.') + '</div>';
+  }
+  function settingsHTML() {
+    var names = Object.keys(subs).filter(follows);
+    return '<div class="set"><div class="h4">Channels</div>' + CHANNELS.map(function (c) {
+      return '<div class="chrow"><div class="ci"><svg viewBox="0 0 24 24">' + c[3] + '</svg></div><div class="tx"><b>' + c[1] + '</b><small>' + c[2] + '</small></div><label class="sw"><input type="checkbox" data-ch="' + c[0] + '" aria-label="' + c[1] + '"' + (ch[c[0]] ? ' checked' : '') + '><i></i></label></div>';
+    }).join('') + '<div class="h4">How often</div><div class="seg">' + FREQ.map(function (f) { return '<label><input type="radio" name="freq" value="' + f[0] + '"' + (freq === f[0] ? ' checked' : '') + '><span>' + f[1] + '</span></label>'; }).join('') + '</div>' +
+      '<div class="h4">Quiet hours</div><div class="chrow"><div class="ci"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></div><div class="tx"><b>No mobile push 22:00 to 07:00</b><small>Held items go to your inbox</small></div><label class="sw"><input type="checkbox" id="quiet" aria-label="Quiet hours"' + (quiet ? ' checked' : '') + '><i></i></label></div>' +
+      '<div class="h4">Your subscriptions</div>' + (names.length ? '<div class="subs">' + names.map(function (n) { var s = subs[n]; return '<span>' + n + ' \u00b7 ' + (s.ideas && s.news ? 'ideas, news' : s.ideas ? 'ideas' : 'news') + '<button type="button" data-a="unsub" data-sym="' + n + '" aria-label="Unsubscribe from ' + n + '">\u00d7</button></span>'; }).join('') + '</div>' : '<div class="note" style="font-size:12px;color:var(--mut)">You are not subscribed to anything yet.</div>') + '</div>';
+  }
+  function drawerHTML() {
+    var s = subs[sel] || {}, r = iconOf(sel), cards = cardsFor(sel);
+    var h = '<div class="mk-dh"><h3>Trade Ideas</h3><button type="button" data-a="closedr" aria-label="Close Trade Ideas">' + svg('close') + '</button></div><div class="mk-db">' +
+      '<div class="sc' + (s.ideas ? ' on' : '') + '"><div class="t"><span class="ci">' + svg('bell') + '</span><div><b>' + (s.ideas ? 'You are subscribed to ' + sel + ' trade ideas' : 'Subscribe to trade ideas on ' + sel) + '</b><small>' + (s.ideas ? 'We will notify you when a new idea appears' : 'Get notified when a new idea appears on this instrument') + '</small></div></div>' +
+      '<button type="button" class="btn ' + (s.ideas ? 'btn-outline btn-on' : 'btn-primary') + '" data-a="subidea">' + (s.ideas ? '\u2713 Subscribed \u00b7 tap to unsubscribe' : 'Subscribe to ' + sel + ' trade ideas') + '</button>' +
+      '<div class="nrow"><span>Also send me ' + sel + ' news<small>Headlines connected with this instrument</small></span><label class="sw"><input type="checkbox" data-a="subnews" aria-label="' + sel + ' news"' + (s.news ? ' checked' : '') + '><i></i></label></div>' +
+      noteStatus() + '<div class="more"><span>' + (Object.keys(subs).filter(follows).length || 'No') + ' instrument' + (Object.keys(subs).filter(follows).length === 1 ? '' : 's') + ' followed</span><button type="button" data-a="settings">' + (showSet ? 'Hide' : 'Notification') + ' settings</button></div>' + (showSet ? settingsHTML() : '') + '</div>';
+    h += '<div class="mk-sub"><span>' + sel + ' ideas</span><button type="button" data-a="preview">Preview a new idea</button></div>';
+    h += cards.map(function (c) {
+      var up = c.dir === 'buy', open = openCard === c.id;
+      return '<button type="button" class="ic2' + (c.live ? '' : ' exp') + (c.isNew ? ' new' : '') + '" data-a="card" data-id="' + c.id + '"><div class="a"><span class="ai ' + r[5] + '">' + r[2] + '</span><b>' + sel + '</b><span class="chip">' + (c.isNew ? 'New' : c.live ? 'In Progress' : 'Expired') + '</span></div><div class="c"><span>' + c.tf + ' <span class="' + (up ? 'bu' : 'be') + '">' + (up ? 'Bullish' : 'Bearish') + '</span> Signal</span><i class="' + (up ? 'u' : '') + '" aria-hidden="true">' + (up ? '\u2197' : '\u2198') + '</i></div>' +
+        (open ? '<div class="lv2"><div>Entry<strong>' + c.entry + '</strong></div><div>Target<strong>' + c.tp + '</strong></div><div>Stop<strong>' + c.sl + '</strong></div></div>' : '') + '</button>';
+    }).join('');
+    h += '</div><div class="mk-ft">' + svg('info') + '<span>This trade idea is based on third-party trading signals and is provided on a general, non-personalised basis. Illustrative content only.</span></div>';
+    return h;
+  }
   function drawFollow() {
     var q = query.toLowerCase(), rows = INSTR.filter(function (r) { return !q || r[0].toLowerCase().indexOf(q) > -1 || r[1].toLowerCase().indexOf(q) > -1; });
-    $('#insList').innerHTML = rows.length ? rows.map(function (r) {
-      var s = subs[r[0]] || {};
-      return '<div class="ins">' + ai(r[0]) + '<div class="nm"><b>' + r[0] + '</b><small>' + r[1] + '</small></div>' +
-        '<div class="px">' + r[3] + '<span class="' + (r[4] >= 0 ? 'up' : 'dn') + '">' + (r[4] >= 0 ? '+' : '') + r[4].toFixed(2) + '%</span></div>' +
-        '<div class="tg"><label>Ideas<span class="sw"><input type="checkbox" data-sym="' + r[0] + '" data-t="ideas" aria-label="' + r[0] + ' trade ideas"' + (s.ideas ? ' checked' : '') + '><i></i></span></label>' +
-        '<label>News<span class="sw"><input type="checkbox" data-sym="' + r[0] + '" data-t="news" aria-label="' + r[0] + ' news"' + (s.news ? ' checked' : '') + '><i></i></span></label></div></div>';
-    }).join('') : '<div class="empty">No instrument matches &ldquo;' + esc(query) + '&rdquo;. Try a symbol such as GOLD or EURUSD.</div>';
-    $('#chList').innerHTML = CHANNELS.map(function (c) {
-      return '<div class="chrow"><div class="ci"><svg viewBox="0 0 24 24">' + c[3] + '</svg></div><div class="tx"><b>' + c[1] + '</b><small>' + c[2] + '</small></div><label class="sw"><input type="checkbox" data-ch="' + c[0] + '" aria-label="' + c[1] + '"' + (ch[c[0]] ? ' checked' : '') + '><i></i></label></div>';
-    }).join('');
-    $('#freq').innerHTML = FREQ.map(function (f) { return '<label><input type="radio" name="freq" value="' + f[0] + '"' + (freq === f[0] ? ' checked' : '') + '><span>' + f[1] + '</span></label>'; }).join('');
-    $('#quiet').checked = quiet;
-    drawSummary();
+    $('#mkNav').innerHTML = '<span class="xm-logo" style="margin:2px 0 12px">' + XM.logo() + '</span>' + [['home', 'Home'], ['chart', 'Markets'], ['wallet', 'Portfolio'], ['copy', 'Copy'], ['trophy', 'Competitions'], ['grid', 'More']].map(function (i) { return '<button type="button" class="' + (i[0] === 'chart' ? 'on' : '') + '" data-nav="' + i[1] + '" aria-label="' + i[1] + '">' + XM.icon(i[0]) + '</button>'; }).join('');
+    $('#mkRows').innerHTML = rows.length ? rows.map(function (r) {
+      return '<button type="button" class="mk-r' + (r[0] === sel ? ' on' : '') + '" data-a="pick" data-sym="' + r[0] + '">' + ai(r[0]) + '<div class="nm"><b>' + r[0] + (follows(r[0]) ? '<span class="fb" title="Subscribed">' + svg('bell') + '</span>' : '') + '</b><small>' + r[1] + '</small></div><div class="px">' + r[3] + '<span class="' + (r[4] >= 0 ? 'up' : 'dn') + '">' + (r[4] >= 0 ? '+' : '') + r[4].toFixed(2) + '%</span></div></button>';
+    }).join('') : '<div class="empty">No instrument matches &ldquo;' + esc(query) + '&rdquo;.</div>';
+    var r0 = iconOf(sel), s = subs[sel] || {};
+    $('#mkChart').innerHTML = '<div class="mk-ch"><div><h3>' + sel + '</h3><small class="' + (r0[4] >= 0 ? 'up' : 'dn') + '">' + (r0[4] >= 0 ? '+' : '') + r0[4].toFixed(2) + '% \u00b7 1 Week</small></div><div class="tools"><button type="button" aria-label="Instrument info">' + svg('info') + '</button><button type="button" class="' + (follows(sel) ? 'on' : '') + '" data-a="bell" aria-label="Subscribe to ' + sel + ' trade ideas" title="Subscribe to ' + sel + ' trade ideas">' + svg('bell') + '</button><button type="button" aria-label="Add">' + svg('plus') + '</button><button type="button" aria-label="Full screen">' + svg('expand') + '</button></div></div>' +
+      '<div class="mk-tb"><span>30m</span><span>\u0192x Indicators</span></div><div class="mk-bs"><span class="s"><small>SELL</small>' + r0[3] + '</span><span class="b"><small>BUY</small>' + r0[3] + '</span></div><div class="mk-cv">' + candles(sel) + '</div>';
+    $('#mkRail').innerHTML = '<button type="button" data-nav="Share" aria-label="Share">' + svg('share') + '</button><button type="button" data-nav="AI" aria-label="AI assistant">' + svg('star') + '</button><button type="button" class="' + (drawerOpen ? 'on' : '') + '" data-a="toggledr" aria-label="Trade Ideas" aria-pressed="' + drawerOpen + '">' + svg('radio') + (!drawerOpen && follows(sel) ? '<span class="dotn"></span>' : '') + '</button><button type="button" data-nav="Analysis" aria-label="Analysis">' + svg('chart') + '</button><button type="button" data-nav="Calendar" aria-label="Calendar">' + svg('cal') + '</button>';
+    var dr = $('#mkDr'); dr.hidden = !drawerOpen; if (drawerOpen) { var keep = dr.querySelector('.mk-db'), top = keep ? keep.scrollTop : 0; dr.innerHTML = drawerHTML(); dr.querySelector('.mk-db').scrollTop = top; }
   }
-  function drawSummary() {
-    var n = Object.keys(subs).filter(follows).length, on = CHANNELS.filter(function (c) { return ch[c[0]]; }).map(function (c) { return c[1]; });
-    var el = $('#sum');
-    if (!n) { el.className = 'sum warn'; el.textContent = 'You are not following anything yet, so no notifications will be sent. Turn on ideas or news for an instrument above.'; return; }
-    if (!on.length) { el.className = 'sum warn'; el.textContent = 'Following ' + n + ' instrument' + (n > 1 ? 's' : '') + ', but every channel is off. Turn on at least one channel to be notified.'; return; }
-    el.className = 'sum';
-    el.textContent = 'Following ' + n + ' instrument' + (n > 1 ? 's' : '') + '. You will be told via ' + on.join(', ').replace(/, ([^,]*)$/, ' and $1') + (freq === 'digest' ? ', as one daily digest.' : freq === '3' ? ', up to 3 times a day.' : '.');
+  function subscribeIdeas(on) {
+    var s = subs[sel] = subs[sel] || { ideas: false, news: false }; s.ideas = on;
+    var chn = CHANNELS.filter(function (c) { return ch[c[0]]; }).length;
+    XM.toast(on ? (chn ? 'Subscribed to ' + sel + ' trade ideas' : 'Subscribed, but all channels are off') : 'Unsubscribed from ' + sel + ' trade ideas');
+    drawFollow(); drawState(); refreshEvLabels();
   }
   $('#q').addEventListener('input', function (e) { query = e.target.value.trim(); drawFollow(); });
+  $('#sceneA').addEventListener('click', function (e) {
+    var nv = e.target.closest('[data-nav]'); if (nv) { XM.toast(nv.getAttribute('data-nav') + ' is not part of this prototype'); return; }
+    var b = e.target.closest('[data-a]'); if (!b) return; var a = b.getAttribute('data-a');
+    if (a === 'pick') { sel = b.getAttribute('data-sym'); openCard = ''; drawFollow(); }
+    else if (a === 'subidea') subscribeIdeas(!(subs[sel] && subs[sel].ideas));
+    else if (a === 'bell') { if (!drawerOpen) { drawerOpen = true; } if (!(subs[sel] && subs[sel].ideas)) subscribeIdeas(true); else { XM.toast('Already subscribed to ' + sel + ' trade ideas'); drawFollow(); } }
+    else if (a === 'closedr') { drawerOpen = false; drawFollow(); }
+    else if (a === 'toggledr') { drawerOpen = !drawerOpen; drawFollow(); }
+    else if (a === 'settings') { showSet = !showSet; drawFollow(); }
+    else if (a === 'card') { var id = b.getAttribute('data-id'); openCard = openCard === id ? '' : id; drawFollow(); }
+    else if (a === 'unsub') { var y = b.getAttribute('data-sym'); subs[y] = { ideas: false, news: false }; XM.toast('Unsubscribed from ' + y); drawFollow(); drawState(); refreshEvLabels(); }
+    else if (a === 'preview') {
+      var r = iconOf(sel), base = numOf(r[3]), d = decOf(r[3]), s = subs[sel] || {};
+      extra[sel] = extra[sel] || []; extra[sel].unshift({ id: sel + 'n' + extra[sel].length, tf: '15 mins', dir: 'buy', live: true, isNew: true, entry: fmtN(base, d), tp: fmtN(base * 1.0065, d), sl: fmtN(base * 0.997, d) });
+      var chn = CHANNELS.filter(function (c) { return ch[c[0]]; }).length;
+      XM.toast(!s.ideas ? 'New idea appeared. You are not subscribed, so nobody was notified.' : !chn ? 'New idea appeared, but every channel is off' : 'New idea appeared. Subscribers get a push or a banner (see scenes B and C).');
+      drawFollow();
+    }
+  });
   $('#sceneA').addEventListener('change', function (e) {
     var t = e.target;
-    if (t.getAttribute('data-sym')) {
-      var sym = t.getAttribute('data-sym'), k = t.getAttribute('data-t');
-      subs[sym] = subs[sym] || { ideas: false, news: false }; subs[sym][k] = t.checked;
-      XM.toast((t.checked ? 'Following ' : 'Stopped ') + sym + (k === 'ideas' ? ' trade ideas' : ' news'));
-    } else if (t.getAttribute('data-ch')) { ch[t.getAttribute('data-ch')] = t.checked; XM.toast('Saved'); }
+    if (t.getAttribute('data-a') === 'subnews') { subs[sel] = subs[sel] || { ideas: false, news: false }; subs[sel].news = t.checked; XM.toast((t.checked ? 'Following ' : 'Stopped ') + sel + ' news'); }
+    else if (t.getAttribute('data-ch')) { ch[t.getAttribute('data-ch')] = t.checked; XM.toast('Saved'); }
     else if (t.name === 'freq') { freq = t.value; XM.toast('Saved'); }
     else if (t.id === 'quiet') { quiet = t.checked; XM.toast('Saved'); }
-    drawSummary(); drawState();
+    drawFollow(); drawState(); refreshEvLabels();
   });
 
   /* -------------------------------------------------- dispatch */

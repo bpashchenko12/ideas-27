@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Password gate: keep this line first. -->
+<script src="../../assets/js/gate.js?v=fe2ac3c6"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trade the news simulator · XMTrading</title>
+<link rel="stylesheet" href="../../assets/css/xm.css">
+<style>
+/* =====================================================================
+   IDEA 34 · Trade the news simulator
+   A: public page · B: register + topic announcement · C: replay the day · D: results
+   ===================================================================== */
+body { background: #f5f5f5; }
+[hidden] { display: none !important; }
+main button { border: 0; background: none; font: inherit; color: inherit; cursor: pointer; padding: 0; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 96px; }
+
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 22px 0 14px; }
+.head h1 { font-size: clamp(26px, 3vw, 36px); line-height: 1.1; letter-spacing: -.025em; margin-top: 4px; }
+.head p { color: var(--ink-2); max-width: 700px; font-size: 14.5px; margin-top: 6px; }
+.head .pill-tabs { box-shadow: var(--sh-s); }
+.head .pill-tabs button { padding: 10px 18px; transition: background .15s, color .15s; }
+.cap { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 11px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+.cap .n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.cap b { color: var(--ink); }
+.panel { background: #fff; border: 1px solid var(--line-2); border-radius: 18px; box-shadow: var(--sh-m); padding: 20px; }
+.panel h3 { font-size: 16px; letter-spacing: -.01em; }
+.panel .sub { font-size: 12.5px; color: var(--mut); margin: 2px 0 12px; }
+.up { color: var(--up); } .dn { color: var(--dn); }
+.fine { font-size: 11.5px; color: var(--mut); line-height: 1.55; }
+
+/* ---------- A · public page ---------- */
+.site { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: var(--sh-l); border: 1px solid var(--line-2); }
+.nv { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 28px; border-bottom: 1px solid var(--line); }
+.nv .lks { display: flex; gap: 26px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.nv .acts { display: flex; gap: 8px; }
+.hero { position: relative; overflow: hidden; background: radial-gradient(circle at 80% 40%, #0b2a63 0, transparent 45%), linear-gradient(110deg, #000 0%, #05070d 60%); color: #fff; padding: 64px 40px; }
+.hero .in { position: relative; z-index: 2; max-width: 560px; }
+.eb { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #f5b82e; }
+.hero h2 { font-size: clamp(34px, 5vw, 56px); line-height: 1.03; letter-spacing: -.03em; margin: 16px 0; }
+.hero h2 span { color: var(--g); background: linear-gradient(90deg, #35d58f, #12a56a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: #aab2c3; line-height: 1.7; font-size: 14.5px; max-width: 480px; }
+.hero .bt { display: flex; gap: 10px; margin: 26px 0 16px; flex-wrap: wrap; }
+.hero .bt .btn-outline { color: #fff; border-color: #3a4152; }
+.hero small { color: #7f879a; font-size: 12px; }
+.spark { position: absolute; right: 4%; top: 50%; transform: translateY(-50%); width: 46%; max-width: 520px; opacity: .95; }
+.spark svg { width: 100%; display: block; }
+.spark .nws { position: absolute; padding: 5px 9px; border-radius: 8px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); color: #fff; font-size: 10.5px; font-weight: 600; backdrop-filter: blur(4px); white-space: nowrap; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); background: #f7f8f9; border-bottom: 1px solid var(--line); }
+.facts div { padding: 18px 26px; border-right: 1px solid var(--line); }
+.facts div:last-child { border: 0; }
+.facts small { display: block; color: var(--mut); font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; margin-bottom: 5px; }
+.facts strong { font-size: 14px; }
+.sec { padding: 54px 40px; }
+.sec h3.big { font-size: clamp(26px, 3vw, 34px); letter-spacing: -.025em; margin: 10px 0 6px; }
+.sec .ld { color: var(--ink-2); font-size: 14px; line-height: 1.65; max-width: 560px; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+.stp { border: 1px solid var(--line); border-radius: 16px; padding: 22px; background: #fff; }
+.stp b.n { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--g-l); color: var(--g-d); font-size: 13px; }
+.stp h4 { font-size: 16px; margin: 14px 0 6px; }
+.stp p { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+.next { margin: 0 40px 54px; border-radius: 22px; background: #0b0f1a; color: #fff; display: grid; grid-template-columns: 1.1fr 1fr; overflow: hidden; }
+.next .l { padding: 30px; }
+.next .l h4 { font-size: 26px; letter-spacing: -.02em; margin: 10px 0 8px; }
+.next .l p { color: #9aa3b5; font-size: 13.5px; line-height: 1.6; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0; }
+.chips span { padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.1); font-size: 11.5px; font-weight: 600; }
+.next .r { background: linear-gradient(135deg, #14305f, #0b0f1a); padding: 24px; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+.next .r .cnt { font-size: 32px; font-weight: 700; letter-spacing: -.02em; }
+.next .r small { color: #9aa3b5; }
+.later { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.later span { padding: 4px 10px; border-radius: 999px; border: 1px dashed #3a4152; color: #7f879a; font-size: 11.5px; }
+.foot { padding: 20px 40px; background: #f7f8f9; color: var(--mut); font-size: 11.5px; line-height: 1.6; }
+
+/* ---------- B · register + briefing ---------- */
+.bg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.f { margin-bottom: 14px; }
+.f label { display: block; font-size: 12.5px; color: var(--ink-2); margin-bottom: 6px; }
+.f input[type=text], .f input[type=email], .f select { width: 100%; font: inherit; font-size: 14px; padding: 12px 14px; border: 1.5px solid var(--line-2); border-radius: 10px; background: var(--soft); outline: none; }
+.f input:focus, .f select:focus { border-color: var(--g); background: #fff; }
+.f.err input, .f.err select { border-color: var(--red); background: var(--red-l); }
+.f .em { color: var(--red); font-size: 12px; margin-top: 4px; }
+.chk { display: flex; gap: 9px; align-items: flex-start; font-size: 12.5px; color: var(--ink-2); margin: 4px 0 14px; line-height: 1.45; }
+.demoacc { display: flex; gap: 14px; align-items: center; padding: 16px; border-radius: 14px; background: linear-gradient(135deg, #3b0b34, #000e53 55%, #1400bb); color: #fff; margin-bottom: 14px; }
+.demoacc b { font-size: 26px; display: block; }
+.demoacc small { color: #c9cce7; }
+.brief h3.t { font-size: 24px; letter-spacing: -.02em; margin: 8px 0; }
+.rules { display: grid; gap: 8px; margin: 14px 0; }
+.rules div { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+.rules b { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--g-l); color: var(--g-d); display: grid; place-items: center; font-size: 11px; }
+.ann { animation: pop .5s ease-out; border: 1.5px solid var(--g); background: linear-gradient(180deg, #f3faf7, #fff); }
+@keyframes pop { from { opacity: 0; transform: translateY(8px); } }
+.pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: var(--g-l); color: var(--g-d); }
+.pill.red { background: var(--red-l); color: #a5232a; }
+.pill.amber { background: var(--amber-l); color: var(--amber); }
+.empty { text-align: center; padding: 56px 20px; }
+.empty h3 { font-size: 18px; } .empty p { color: var(--ink-2); font-size: 13.5px; margin: 6px auto 16px; max-width: 420px; }
+
+/* ---------- C · replay trading ---------- */
+.cg { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+.ctr { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+.ctr .sp { margin-left: auto; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--soft); }
+.seg button { padding: 6px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.seg button.on { background: var(--ink); color: #fff; }
+.bar { height: 6px; border-radius: 6px; background: var(--line-2); overflow: hidden; margin-bottom: 12px; }
+.bar i { display: block; height: 100%; background: var(--g); transition: width .25s linear; }
+.tape { min-height: 54px; border-radius: 12px; background: #15171b; color: #fff; padding: 10px 14px; margin-bottom: 12px; display: flex; gap: 10px; align-items: center; font-size: 13.5px; }
+.tape .lv { flex: none; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; padding: 3px 8px; border-radius: 6px; background: #3a3d44; }
+.tape.hot .lv { background: var(--red); animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: .55; } }
+.tape small { color: #9aa3b5; margin-left: auto; flex: none; font-size: 11.5px; }
+.cv { background: #fff; border: 1px solid var(--line-2); border-radius: 16px; padding: 12px; box-shadow: var(--sh-s); }
+.cv svg { width: 100%; height: auto; display: block; }
+.cvh { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 10px; flex-wrap: wrap; }
+.cvh b { font-size: 16px; }
+.acct { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 12px 0; }
+.acct div { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.acct small { display: block; font-size: 11px; color: var(--mut); }
+.acct b { font-size: 15px; font-variant-numeric: tabular-nums; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.tbl th { text-align: left; font-size: 11px; color: var(--mut); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.tbl td { padding: 9px 8px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.tbl tr.me td { background: var(--g-l); font-weight: 600; }
+.tbl tr.dq td { color: var(--mut); }
+.tbl .r { text-align: right; }
+.scroll { overflow-x: auto; }
+.ord .f label { font-size: 12px; }
+.ord .lots { display: flex; gap: 6px; }
+.ord .lots button { flex: 1; padding: 8px 0; border: 1.5px solid var(--line-2); border-radius: 8px; font-size: 12.5px; font-weight: 600; }
+.ord .lots button.on { border-color: var(--g); background: var(--g-l); color: var(--g-d); }
+.ord .sl { display: flex; gap: 8px; align-items: center; font-size: 12.5px; margin-bottom: 8px; }
+.ord .sl input[type=number] { width: 70px; font: inherit; padding: 6px 8px; border: 1.5px solid var(--line-2); border-radius: 8px; }
+.bs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 6px; }
+.bs button { padding: 12px 6px; border-radius: 10px; color: #fff; font-weight: 700; font-size: 14px; line-height: 1.25; }
+.bs button small { display: block; font-size: 11px; font-weight: 600; opacity: .9; }
+.bs .s { background: var(--dn); } .bs .b { background: #12a56a; }
+.bs button[disabled] { opacity: .45; cursor: not-allowed; }
+.err2 { color: var(--red); font-size: 12px; min-height: 18px; }
+.side { display: grid; gap: 14px; }
+.tl { display: grid; gap: 8px; font-size: 12.5px; }
+.tl div { display: flex; gap: 8px; line-height: 1.4; color: var(--ink-2); }
+.tl b { flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-size: 10.5px; }
+.tl time { flex: none; color: var(--mut); font-variant-numeric: tabular-nums; }
+.ib { display: flex; gap: 6px; align-items: center; }
+.ib button { padding: 4px 8px; border-radius: 6px; background: var(--soft); font-size: 11.5px; font-weight: 600; }
+
+/* ---------- D · results ---------- */
+.rs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.rs div { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.rs small { display: block; color: var(--mut); font-size: 11.5px; }
+.rs b { font-size: 22px; letter-spacing: -.02em; }
+.rg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.win { padding: 16px 18px; border-radius: 14px; background: linear-gradient(120deg, #0f4b37, #008454); color: #fff; margin-bottom: 16px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+.win.dq { background: linear-gradient(120deg, #5a1a1e, #a5232a); }
+.win h3 { font-size: 18px; } .win p { font-size: 12.5px; opacity: .9; margin-top: 2px; }
+
+@media (max-width: 1000px) { .cg, .bg, .rg { grid-template-columns: 1fr; } .next { grid-template-columns: 1fr; } }
+@media (max-width: 860px) {
+  .wrap { padding: 0 14px 90px; }
+  .head .pill-tabs { width: 100%; overflow-x: auto; }
+  .head .pill-tabs button { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+  .nv { padding: 12px 16px; } .nv .lks { display: none; }
+  .hero { padding: 40px 20px; } .spark { display: none; }
+  .facts, .steps { grid-template-columns: 1fr; } .facts div { border-right: 0; border-bottom: 1px solid var(--line); }
+  .sec { padding: 36px 18px; } .next { margin: 0 14px 36px; } .foot { padding: 18px; }
+  .acct { grid-template-columns: repeat(2, 1fr); } .rs { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <span class="eyebrow">Idea 34 &middot; Trading</span>
+      <h1>Trade the news simulator</h1>
+      <p>A demo competition for newcomers: join from a web page, get a topic such as a Middle East crisis, then replay the most volatile day in about a minute. Whoever stays in the market and earns the most wins.</p>
+    </div>
+    <div class="pill-tabs" role="tablist" aria-label="Scenes">
+      <button class="on" role="tab" data-scene="a">A &middot; Web page</button>
+      <button role="tab" data-scene="b">B &middot; Register</button>
+      <button role="tab" data-scene="c">C &middot; Replay the day</button>
+      <button role="tab" data-scene="d">D &middot; Results</button>
+    </div>
+  </div>
+  <div class="cap" id="cap"></div>
+
+  <!-- A -->
+  <section id="sA" class="site">
+    <div class="nv"><span class="xm-logo" id="logoA"></span><div class="lks"><span>How it works</span><span>Next topic</span><span>Leaderboard</span></div><div class="acts"><button class="btn btn-outline btn-sm" data-go="b">Log in</button><button class="btn btn-primary btn-sm" data-go="b">Join free</button></div></div>
+    <div class="hero"><div class="in"><span class="eb">Demo competition &middot; free</span><h2>Trade the news. <span>Practise on the wildest day.</span></h2><p>Markets move fastest when news breaks. Replay a real-style crisis day in about a minute, with $10,000 of virtual money, and learn how to handle volatility before you risk a cent.</p><div class="bt"><button class="btn btn-primary btn-lg" id="ctaA" data-go="b">Join the demo competition &rarr;</button><button class="btn btn-outline btn-lg" id="howBtn">How it works</button></div><small>No deposit. No real money. Educational demo only.</small></div>
+      <div class="spark" aria-hidden="true"><svg viewBox="0 0 520 260"><defs><linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12a56a" stop-opacity=".35"/><stop offset="1" stop-color="#12a56a" stop-opacity="0"/></linearGradient></defs><path d="M0 170 C30 160 50 175 80 150 S120 140 150 100 S190 40 220 60 S260 170 290 190 S330 90 360 40 S400 60 430 150 S480 120 520 130" fill="none" stroke="#35d58f" stroke-width="3"/><path d="M0 170 C30 160 50 175 80 150 S120 140 150 100 S190 40 220 60 S260 170 290 190 S330 90 360 40 S400 60 430 150 S480 120 520 130 V260 H0Z" fill="url(#gA)"/></svg><span class="nws" style="left:22%;top:8%">BREAKING: supply fears</span><span class="nws" style="left:46%;top:76%">Talks announced</span><span class="nws" style="left:66%;top:2%">New escalation</span></div></div>
+    <div class="facts"><div><small>One day replayed</small><strong>About a minute, at your speed</strong></div><div><small>Your account</small><strong>$10,000 virtual, no deposit</strong></div><div><small>Who wins</small><strong>Stay in the market, earn the most</strong></div></div>
+    <div class="sec" id="how"><span class="eb" style="color:var(--g)">How it works</span><h3 class="big">Three steps. One volatile day.</h3><p class="ld">Built for people who have never traded, and for anyone who wants to practise reacting to headlines.</p>
+      <div class="steps"><article class="stp"><b class="n">1</b><h4>Join the competition</h4><p>Pick a nickname and get a demo account with $10,000 of virtual money.</p></article><article class="stp"><b class="n">2</b><h4>Get the topic</h4><p>We announce the scenario, for example a Middle East crisis, and replay its most volatile day.</p></article><article class="stp"><b class="n">3</b><h4>Trade the headlines</h4><p>Buy or sell as the news hits. Stay alive, manage risk and finish with the best profit.</p></article></div></div>
+    <div class="next"><div class="l"><span class="pill amber">Next topic</span><h4>Middle East crisis</h4><p>Replay the most volatile day of an escalating regional conflict: supply fears, calls for calm, stalled talks, then a ceasefire proposal. Oil and gold swing both ways.</p><div class="chips"><span>OILCash</span><span>GOLD</span><span>6 headlines</span><span>1 day, replayed</span></div><button class="btn btn-primary" data-go="b">Join before it opens</button></div><div class="r"><small>Competition opens in</small><div class="cnt" id="cd">2D 04H 12M</div><small><b id="entr" style="color:#fff">1,284</b> already joined</small><div class="later"><span>Central bank surprise</span><span>Election night</span><span>Flash crash</span></div></div></div>
+    <div class="foot">Educational demo using an illustrative, modelled price path inspired by crisis-day volatility. It is not a recording of real prices or events, not a forecast and not advice. Real trading of leveraged products carries a high risk of losing money. Prizes, if any, are subject to terms.</div>
+  </section>
+
+  <!-- B -->
+  <section id="sB" hidden><div id="bHost"></div></section>
+
+  <!-- C -->
+  <section id="sC" hidden><div id="cHost"></div></section>
+
+  <!-- D -->
+  <section id="sD" hidden><div id="dHost"></div></section>
+</main>
+
+<script src="../../assets/js/common.js"></script>
+<script>
+(function () {
+  var $ = XM.$, $$ = XM.$$, esc = XM.esc;
+  var N = 96, START_MIN = 6 * 60, MARGIN = 0.02, BAL0 = 10000, STOPOUT = 50;
+  var CAPS = {
+    a: ['A', '<b>Web page.</b> The public Trade the News Simulator page that newcomers land on from social, search or an affiliate. It promotes the next demo competition.'],
+    b: ['B', '<b>Register.</b> Join the demo competition, then the topic is announced: a Middle East crisis day, replayed.'],
+    c: ['C', '<b>Replay the day.</b> News hits, prices move. Buy or sell, protect with a stop loss, and stay in the market. Use the speed controls, or skip to the next headline.'],
+    d: ['D', '<b>Results.</b> Who stayed and earned? Standings, your trades, and what each headline did to your positions.']
+  };
+  var INS = {
+    OIL: { name: 'OILCash', full: 'WTI Oil Cash', start: 78.40, dec: 2, contract: 1000, spread: 0.05, vol: 0.0011, unit: 'barrels' },
+    GOLD: { name: 'GOLD', full: 'Gold vs US Dollar', start: 2650.00, dec: 2, contract: 100, spread: 0.40, vol: 0.0005, unit: 'oz' }
+  };
+  var EVENTS = [
+    { bar: 12, h: 'Reports of overnight strikes raise fears of supply disruption', imp: { OIL: 0.032, GOLD: 0.008 } },
+    { bar: 30, h: 'Shipping insurers raise war-risk premiums on regional routes', imp: { OIL: 0.024, GOLD: 0.005 } },
+    { bar: 46, h: 'Officials call for calm and announce emergency talks', imp: { OIL: -0.038, GOLD: -0.010 } },
+    { bar: 62, h: 'Talks stall and a new escalation is reported', imp: { OIL: 0.046, GOLD: 0.013 } },
+    { bar: 78, h: 'Ceasefire proposal circulates among mediators', imp: { OIL: -0.052, GOLD: -0.014 } },
+    { bar: 90, h: 'Markets settle as the session nears its close', imp: { OIL: 0.004, GOLD: 0.001 } }
+  ];
+  var BOTS = [
+    { n: 'Kaito_Alpha', fin: 1840, ph: 1 }, { n: 'Mei_Trades', fin: 1420, ph: 2 }, { n: 'Taro_FX', fin: 960, ph: 3 }, { n: 'Nana', fin: 610, ph: 4 }, { n: 'Shin_88', fin: 240, ph: 5 },
+    { n: 'Rei', fin: -180, ph: 6 }, { n: 'Hiro', fin: -520, ph: 7 }, { n: 'Sora_T', fin: -1300, ph: 8 }, { n: 'Daiki', fin: -5000, stop: 46, ph: 9 }, { n: 'Yuna', fin: -5000, stop: 78, ph: 10 }
+  ];
+
+  /* ------------------------------------------------ deterministic price path */
+  var BARS = {};
+  (function () {
+    var seed = 20261125;
+    function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+    Object.keys(INS).forEach(function (k) {
+      var I = INS[k], p = I.start, arr = [{ o: p, h: p, l: p, c: p }];
+      for (var i = 1; i <= N; i++) {
+        var o = p, mv = (rnd() - .5) * 2 * I.vol;
+        EVENTS.forEach(function (e) {
+          var d = i - e.bar;
+          if (d >= 0 && d <= 2) mv += e.imp[k] / 3;
+          if (Math.abs(e.imp[k]) > (k === 'OIL' ? 0.03 : 0.012) && d >= 4 && d <= 6) mv -= e.imp[k] * 0.22 / 3;
+        });
+        var c = o * (1 + mv), h = Math.max(o, c) * (1 + rnd() * I.vol * .8), l = Math.min(o, c) * (1 - rnd() * I.vol * .8);
+        arr.push({ o: o, h: h, l: l, c: c }); p = c;
+      }
+      BARS[k] = arr;
+    });
+  })();
+
+  /* ------------------------------------------------ state */
+  var S, timer = 0;
+  function fresh() {
+    return { scene: 'a', user: null, t: 0, run: false, speed: 1, sym: 'OIL', lots: 0.5, useSl: true, slPct: 1.5, useTp: true, tpPct: 3, pauseNews: false,
+      bal: BAL0, pos: [], closed: [], uid: 0, peak: BAL0, maxDD: 0, stopped: false, stopBar: 0, done: false, entrants: 1284, regErr: {}, regVals: { nick: '', email: '', exp: 'new', ok: false }, orderErr: '' };
+  }
+  S = fresh();
+  function n(x, d) { return x.toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function money(x) { return (x < 0 ? '-$' : '$') + n(Math.abs(x), 2); }
+  function signed(x) { return (x >= 0 ? '+' : '-') + '$' + n(Math.abs(x), 2); }
+  function px(sym, i) { return BARS[sym][Math.min(i, N)].c; }
+  function clock(bar) { var m = START_MIN + bar * 15; return ('0' + Math.floor(m / 60) % 24).slice(-2) + ':' + ('0' + m % 60).slice(-2); }
+  function floating() { return S.pos.reduce(function (s, p) { return s + (px(p.sym, S.t) - p.entry) * p.dir * INS[p.sym].contract * p.lots; }, 0); }
+  function equity() { return S.bal + floating(); }
+  function used() { return S.pos.reduce(function (s, p) { return s + p.entry * INS[p.sym].contract * p.lots * MARGIN; }, 0); }
+  function profit() { return equity() - BAL0; }
+
+  /* ------------------------------------------------ trading engine */
+  function closePos(p, price, bar, why) {
+    var pnl = (price - p.entry) * p.dir * INS[p.sym].contract * p.lots;
+    S.bal += pnl; S.pos = S.pos.filter(function (x) { return x !== p; });
+    S.closed.push({ id: p.id, sym: p.sym, dir: p.dir, lots: p.lots, entry: p.entry, exit: price, pnl: pnl, openBar: p.openBar, closeBar: bar, why: why });
+  }
+  function tick() {
+    if (S.done) return;
+    S.t++;
+    var t = S.t;
+    S.pos.slice().forEach(function (p) {
+      var b = BARS[p.sym][t], hit = null, lvl = 0;
+      if (p.dir > 0) { if (p.sl && b.l <= p.sl) { hit = 'Stop loss'; lvl = p.sl; } else if (p.tp && b.h >= p.tp) { hit = 'Take profit'; lvl = p.tp; } }
+      else { if (p.sl && b.h >= p.sl) { hit = 'Stop loss'; lvl = p.sl; } else if (p.tp && b.l <= p.tp) { hit = 'Take profit'; lvl = p.tp; } }
+      if (hit) { closePos(p, lvl, t, hit); if (S.scene === 'c') XM.toast(hit + ' hit on ' + INS[p.sym].name); }
+    });
+    var eq = equity(), u = used();
+    if (u > 0 && eq / u * 100 < STOPOUT) {
+      S.pos.slice().forEach(function (p) { closePos(p, px(p.sym, t), t, 'Stop-out'); });
+      S.stopped = true; S.stopBar = t; S.run = false; clearInterval(timer);
+      XM.toast('Stop-out: margin level fell below ' + STOPOUT + '%. Your positions were closed.');
+    }
+    var e2 = equity(); S.peak = Math.max(S.peak, e2); S.maxDD = Math.max(S.maxDD, S.peak - e2);
+    var ev = EVENTS.filter(function (e) { return e.bar === t; })[0];
+    if (ev && S.pauseNews && !S.stopped) { S.run = false; clearInterval(timer); XM.toast('Paused: breaking news'); }
+    if (t >= N || S.stopped) finish(); 
+    if (S.scene === 'c') drawC(true);
+  }
+  function finish() {
+    if (S.done) return;
+    S.pos.slice().forEach(function (p) { closePos(p, px(p.sym, Math.min(S.t, N)), Math.min(S.t, N), S.stopped ? 'Stop-out' : 'End of day'); });
+    S.done = true; S.run = false; clearInterval(timer);
+    if (S.scene === 'c') XM.toast(S.stopped ? 'You were stopped out. See the results.' : 'The day is over. See the results.');
+  }
+  function play() { if (S.done) return; if (S.t >= N) { finish(); return; } S.run = true; clearInterval(timer); timer = setInterval(tick, 380 / S.speed); }
+  function pause() { S.run = false; clearInterval(timer); }
+  function place(dir) {
+    S.orderErr = '';
+    if (S.done) { S.orderErr = 'The day is over.'; return; }
+    var I = INS[S.sym], mid = px(S.sym, S.t), entry = mid + dir * I.spread / 2;
+    var need = entry * I.contract * S.lots * MARGIN, free = equity() - used();
+    if (S.useSl && !(S.slPct > 0 && S.slPct < 50)) { S.orderErr = 'Stop loss must be between 0 and 50 percent.'; return; }
+    if (S.useTp && !(S.tpPct > 0 && S.tpPct < 100)) { S.orderErr = 'Take profit must be between 0 and 100 percent.'; return; }
+    if (need > free) { S.orderErr = 'Not enough free margin. Needed ' + money(need) + ', available ' + money(Math.max(0, free)) + '. Try a smaller size.'; return; }
+    S.pos.push({ id: ++S.uid, sym: S.sym, dir: dir, lots: S.lots, entry: entry, openBar: S.t, sl: S.useSl ? entry * (1 - dir * S.slPct / 100) : 0, tp: S.useTp ? entry * (1 + dir * S.tpPct / 100) : 0 });
+    XM.toast((dir > 0 ? 'Bought ' : 'Sold ') + S.lots + ' lot' + (S.lots === 1 ? '' : 's') + ' ' + I.name + ' at ' + n(entry, I.dec));
+  }
+  function ffwd() { pause(); var guard = 0; while (!S.done && guard++ < 200) tick(); }
+
+  /* ------------------------------------------------ leaderboard */
+  function botProfit(b, t) {
+    if (b.stop) return t >= b.stop ? null : -(t / b.stop) * 3200;
+    return b.fin * (t / N) + 150 * Math.sin(t / 5 + b.ph) * (1 - t / N);
+  }
+  function standings() {
+    var rows = BOTS.map(function (b) { var p = botProfit(b, S.t); return { n: b.n, p: p, dq: p === null }; });
+    rows.push({ n: S.user ? S.user.nick : 'You', p: profit(), dq: S.stopped, me: true });
+    var live = rows.filter(function (r) { return !r.dq; }).sort(function (a, b) { return b.p - a.p; });
+    var dq = rows.filter(function (r) { return r.dq; });
+    live.forEach(function (r, i) { r.rank = i + 1; });
+    return live.concat(dq);
+  }
+
+  /* ------------------------------------------------ views */
+  function drawB() {
+    var u = S.user, h;
+    if (!u) {
+      var e = S.regErr, v = S.regVals;
+      h = '<div class="bg"><div class="panel"><h3>Join the demo competition</h3><div class="sub">Free. No deposit. You get a demo account with $10,000 of virtual money.</div>' +
+        '<div class="f' + (e.nick ? ' err' : '') + '"><label for="rN">Nickname (shown on the leaderboard)</label><input id="rN" type="text" maxlength="16" value="' + esc(v.nick) + '" placeholder="e.g. Ronin_Rei" autocomplete="off">' + (e.nick ? '<div class="em">' + e.nick + '</div>' : '') + '</div>' +
+        '<div class="f' + (e.email ? ' err' : '') + '"><label for="rE">Email</label><input id="rE" type="email" value="' + esc(v.email) + '" placeholder="Enter email" autocomplete="off">' + (e.email ? '<div class="em">' + e.email + '</div>' : '') + '</div>' +
+        '<div class="f"><label for="rX">Your trading experience</label><select id="rX"><option value="new"' + (v.exp === 'new' ? ' selected' : '') + '>Brand new</option><option value="some"' + (v.exp === 'some' ? ' selected' : '') + '>A little</option><option value="exp"' + (v.exp === 'exp' ? ' selected' : '') + '>Experienced</option></select></div>' +
+        '<label class="chk"><input type="checkbox" id="rK"' + (v.ok ? ' checked' : '') + '> I understand this is an educational demo with virtual money, not real trading or advice.</label>' + (e.ok ? '<div class="em" style="color:var(--red);font-size:12px;margin:-8px 0 10px">' + e.ok + '</div>' : '') +
+        '<button type="button" class="btn btn-primary btn-lg btn-block" data-a="reg">Create my demo account</button><p class="fine" style="margin-top:10px">Prototype only: use fictional details. Nothing is sent or saved.</p></div>' +
+        '<div class="panel"><h3>What happens next</h3><div class="sub">The whole competition takes a few minutes.</div><div class="rules"><div><b>1</b>We announce today\u2019s topic.</div><div><b>2</b>You trade a replayed, extra-volatile day with virtual money.</div><div><b>3</b>Stay in the market and earn the most to win. Get stopped out and you drop out of the ranking.</div></div><div class="demoacc"><div><small>Demo account preview</small><b>$10,000.00</b><small>Virtual balance, leverage 1:50</small></div></div><p class="fine">Newcomers are welcome. Every step is explained, and you can restart the replay.</p></div></div>';
+    } else {
+      h = '<div class="bg"><div class="panel ann brief"><span class="pill">Topic announced</span><h3 class="t">Middle East crisis</h3><p style="font-size:13.5px;color:var(--ink-2);line-height:1.6">Welcome, <b>' + esc(u.nick) + '</b>. Your demo account is ready with <b>$10,000</b>. Today we replay the most volatile day of an escalating regional conflict. Headlines will move oil and gold in both directions.</p>' +
+        '<div class="chips" style="margin:12px 0"><span style="background:var(--soft)">OILCash</span><span style="background:var(--soft)">GOLD</span><span style="background:var(--soft)">6 headlines</span><span style="background:var(--soft)">About a minute</span></div>' +
+        '<h3 style="font-size:14px;margin-top:6px">Rules of the competition</h3><div class="rules"><div><b>1</b>Trade OILCash and GOLD, buy or sell, 0.1 to 2 lots.</div><div><b>2</b>Stay in the market. If your margin level falls below ' + STOPOUT + '% you are stopped out and removed from the ranking.</div><div><b>3</b>The highest profit at the end of the day wins. Prizes, if any, are to be confirmed.</div><div><b>4</b>A stop loss is on by default. You can change or remove it.</div></div>' +
+        '<button type="button" class="btn btn-primary btn-lg btn-block" data-a="enter">Enter the arena &rarr;</button></div>' +
+        '<div class="panel"><h3>Your demo account</h3><div class="sub">Registered as ' + esc(u.nick) + ' &middot; ' + esc(u.email) + '</div><div class="demoacc"><div><small>Virtual balance</small><b>$10,000.00</b><small>Leverage 1:50 &middot; demo only</small></div></div><div class="rules"><div><b>i</b><span><b style="all:unset;font-weight:700;color:var(--ink)">Scenario note.</b> The price path is modelled for training. It resembles the pattern of a crisis day, but it is not a recording of real prices.</span></div></div><div class="ib"><span class="fine">' + n(S.entrants) + ' players joined</span></div></div></div>';
+    }
+    $('#bHost').innerHTML = h;
+  }
+  function chartSVG() {
+    var sym = S.sym, W = 640, H = 300, L = 8, R = 62, T = 16, B = 20, cw = (W - L - R) / N, i, t = Math.max(1, S.t);
+    var lo = Infinity, hi = -Infinity;
+    for (i = 1; i <= t; i++) { lo = Math.min(lo, BARS[sym][i].l); hi = Math.max(hi, BARS[sym][i].h); }
+    S.pos.forEach(function (p) { if (p.sym === sym) { lo = Math.min(lo, p.entry); hi = Math.max(hi, p.entry); } });
+    var pad = Math.max((hi - lo) * .12, BARS[sym][0].c * 0.004); lo -= pad; hi += pad;
+    function y(v) { return T + (hi - v) / (hi - lo) * (H - T - B); }
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Replay chart for ' + INS[sym].name + '">';
+    for (i = 0; i < 5; i++) { var gv = lo + (hi - lo) * i / 4; s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(gv).toFixed(1) + '" y2="' + y(gv).toFixed(1) + '" stroke="#eceef0"/><text x="' + (W - R + 6) + '" y="' + (y(gv) + 4).toFixed(1) + '" font-size="10" fill="#7b828b">' + n(gv, INS[sym].dec) + '</text>'; }
+    EVENTS.forEach(function (e, k) { if (e.bar <= S.t) { var x = L + e.bar * cw; s += '<line x1="' + x.toFixed(1) + '" x2="' + x.toFixed(1) + '" y1="' + T + '" y2="' + (H - B) + '" stroke="#e5373f" stroke-dasharray="3 3" opacity=".6"/><circle cx="' + x.toFixed(1) + '" cy="' + (T + 2) + '" r="8" fill="#e5373f"/><text x="' + x.toFixed(1) + '" y="' + (T + 5.5) + '" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">' + (k + 1) + '</text>'; } });
+    for (i = 1; i <= S.t; i++) {
+      var b = BARS[sym][i], x2 = L + i * cw, col = b.c >= b.o ? '#12a56a' : '#e5373f';
+      s += '<line x1="' + x2.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y1="' + y(b.h).toFixed(1) + '" y2="' + y(b.l).toFixed(1) + '" stroke="' + col + '"/><rect x="' + (x2 - cw * .32).toFixed(1) + '" y="' + y(Math.max(b.o, b.c)).toFixed(1) + '" width="' + (cw * .64).toFixed(1) + '" height="' + Math.max(1.5, Math.abs(y(b.o) - y(b.c))).toFixed(1) + '" fill="' + col + '"/>';
+    }
+    S.pos.forEach(function (p) { if (p.sym === sym) { var yy = y(p.entry).toFixed(1); s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + yy + '" y2="' + yy + '" stroke="#2f62f0" stroke-dasharray="5 3"/><text x="' + (L + 4) + '" y="' + (yy - 3) + '" font-size="10" fill="#2f62f0" font-weight="700">' + (p.dir > 0 ? 'BUY ' : 'SELL ') + p.lots + '</text>'; } });
+    var cp = px(sym, S.t); s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(cp).toFixed(1) + '" y2="' + y(cp).toFixed(1) + '" stroke="#1d2024" stroke-dasharray="2 3"/><rect x="' + (W - R + 2) + '" y="' + (y(cp) - 9).toFixed(1) + '" width="58" height="18" rx="4" fill="#1d2024"/><text x="' + (W - R + 6) + '" y="' + (y(cp) + 4).toFixed(1) + '" font-size="10.5" fill="#fff" font-weight="700">' + n(cp, INS[sym].dec) + '</text>';
+    return s + '</svg>';
+  }
+  function drawC(light) {
+    if (!S.user) { $('#cHost').innerHTML = '<div class="panel empty"><h3>Register to enter the arena</h3><p>Join the demo competition first. It takes a few seconds and costs nothing.</p><button class="btn btn-primary" data-go="b">Join the competition</button></div>'; return; }
+    var I = INS[S.sym], mid = px(S.sym, S.t), bid = mid - I.spread / 2, ask = mid + I.spread / 2;
+    var ev = null; EVENTS.forEach(function (e) { if (e.bar <= S.t && S.t - e.bar < 7) ev = e; });
+    var eq = equity(), u = used(), ml = u > 0 ? eq / u * 100 : 0;
+    var tape = ev ? '<div class="tape hot"><span class="lv">BREAKING</span><span>' + esc(ev.h) + '</span><small>' + clock(ev.bar) + '</small></div>' : '<div class="tape"><span class="lv">LIVE</span><span>' + (S.t === 0 ? 'Press Play to start the replay. News will break as the day unfolds.' : 'Waiting for the next headline\u2026') + '</span><small>' + clock(S.t) + '</small></div>';
+    var past = EVENTS.filter(function (e) { return e.bar <= S.t; });
+    var posRows = S.pos.length ? S.pos.map(function (p) { var pl = (px(p.sym, S.t) - p.entry) * p.dir * INS[p.sym].contract * p.lots; return '<tr><td>' + INS[p.sym].name + '</td><td>' + (p.dir > 0 ? 'Buy' : 'Sell') + ' ' + p.lots + '</td><td class="r">' + n(p.entry, INS[p.sym].dec) + '</td><td class="r ' + (pl >= 0 ? 'up' : 'dn') + '">' + signed(pl) + '</td><td class="r"><button type="button" class="pill amber" data-a="close" data-id="' + p.id + '">Close</button></td></tr>'; }).join('') : '<tr><td colspan="5" style="color:var(--mut);text-align:center;padding:18px">No open positions. Buy or sell when you are ready.</td></tr>';
+    var st = standings(), mine = st.filter(function (r) { return r.me; })[0];
+    var board = st.slice(0, 6).map(function (r, i) { return '<tr class="' + (r.me ? 'me' : '') + (r.dq ? ' dq' : '') + '"><td>' + (r.dq ? '-' : r.rank) + '</td><td>' + esc(r.n) + (r.dq ? ' (stopped out)' : '') + '</td><td class="r">' + (r.dq ? '-' : signed(r.p)) + '</td></tr>'; }).join('');
+    if (mine && st.indexOf(mine) >= 6) board += '<tr class="me' + (mine.dq ? ' dq' : '') + '"><td>' + (mine.dq ? '-' : mine.rank) + '</td><td>' + esc(mine.n) + (mine.dq ? ' (stopped out)' : '') + '</td><td class="r">' + (mine.dq ? '-' : signed(mine.p)) + '</td></tr>';
+    if (light && $('#cvHost')) {
+      $('#tapeH').innerHTML = tape; $('#cvHost').innerHTML = chartSVG(); $('#prog').style.width = (S.t / N * 100) + '%';
+      $('#clk').textContent = 'Replay time ' + clock(S.t) + ' \u00b7 bar ' + S.t + '/' + N; $('#quoteS').innerHTML = '<small>SELL</small>' + n(bid, I.dec); $('#quoteB').innerHTML = '<small>BUY</small>' + n(ask, I.dec);
+      $('#acctH').innerHTML = acctHTML(eq, u, ml); $('#posB').innerHTML = posRows; $('#liveB').innerHTML = board; $('#tlH').innerHTML = tlHTML(past); $('#playB').textContent = S.run ? 'Pause' : (S.t === 0 ? 'Play' : 'Resume');
+      setDisabled(); return;
+    }
+    var h = '<div class="cg"><div><div class="ctr"><button type="button" class="btn btn-primary btn-sm" id="playB" data-a="play">' + (S.run ? 'Pause' : (S.t === 0 ? 'Play' : 'Resume')) + '</button><div class="seg" role="group" aria-label="Speed">' + [1, 2, 4].map(function (k) { return '<button type="button" data-a="speed" data-v="' + k + '" class="' + (S.speed === k ? 'on' : '') + '">' + k + 'x</button>'; }).join('') + '</div><button type="button" class="btn btn-outline btn-sm" data-a="next">Skip to next news</button><button type="button" class="btn btn-outline btn-sm" data-a="ffwd">Fast-forward to end</button><button type="button" class="btn btn-outline btn-sm" data-a="restart">Restart</button><label class="fine" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="pn"' + (S.pauseNews ? ' checked' : '') + '> Pause on news</label><span class="sp" id="clk">Replay time ' + clock(S.t) + ' &middot; bar ' + S.t + '/' + N + '</span></div><div class="bar"><i id="prog" style="width:' + (S.t / N * 100) + '%"></i></div><div id="tapeH">' + tape + '</div>' +
+      '<div class="cv"><div class="cvh"><div class="seg" role="group" aria-label="Instrument">' + Object.keys(INS).map(function (k) { return '<button type="button" data-a="sym" data-v="' + k + '" class="' + (S.sym === k ? 'on' : '') + '">' + INS[k].name + '</button>'; }).join('') + '</div><b>' + I.full + '</b></div><div id="cvHost">' + chartSVG() + '</div></div>' +
+      '<div class="acct" id="acctH">' + acctHTML(eq, u, ml) + '</div><div class="panel" style="padding:14px"><h3 style="font-size:14px;margin-bottom:6px">Open positions</h3><div class="scroll"><table class="tbl"><thead><tr><th>Instrument</th><th>Side</th><th class="r">Entry</th><th class="r">P&amp;L</th><th></th></tr></thead><tbody id="posB">' + posRows + '</tbody></table></div></div></div>' +
+      '<div class="side"><div class="panel ord"><h3>New order</h3><div class="sub">Virtual money. Leverage 1:50.</div><div class="f"><label>Size (lots)</label><div class="lots">' + [0.1, 0.5, 1, 2].map(function (k) { return '<button type="button" data-a="lots" data-v="' + k + '" class="' + (S.lots === k ? 'on' : '') + '">' + k + '</button>'; }).join('') + '</div></div>' +
+      '<div class="sl"><input type="checkbox" id="slOn"' + (S.useSl ? ' checked' : '') + '><label for="slOn">Stop loss</label><input type="number" id="slV" min="0.1" max="49" step="0.1" value="' + S.slPct + '"> %</div><div class="sl"><input type="checkbox" id="tpOn"' + (S.useTp ? ' checked' : '') + '><label for="tpOn">Take profit</label><input type="number" id="tpV" min="0.1" max="99" step="0.1" value="' + S.tpPct + '"> %</div>' +
+      '<div class="bs"><button type="button" class="s" id="quoteS" data-a="sell"><small>SELL</small>' + n(bid, I.dec) + '</button><button type="button" class="b" id="quoteB" data-a="buy"><small>BUY</small>' + n(ask, I.dec) + '</button></div><div class="err2" id="oerr" role="alert">' + esc(S.orderErr) + '</div><p class="fine">One lot of ' + I.name + ' is ' + n(I.contract) + ' ' + I.unit + '. A stop-out happens if margin level falls below ' + STOPOUT + '%.</p></div>' +
+      '<div class="panel"><h3>Live standings</h3><div class="sub">Illustrative competitors. Only players still in the market can win.</div><table class="tbl"><thead><tr><th>#</th><th>Player</th><th class="r">Profit</th></tr></thead><tbody id="liveB">' + board + '</tbody></table></div>' +
+      '<div class="panel"><h3>News so far</h3><div class="sub">Tap Play, then react.</div><div class="tl" id="tlH">' + tlHTML(past) + '</div></div></div></div>';
+    $('#cHost').innerHTML = h; setDisabled();
+  }
+  function acctHTML(eq, u, ml) {
+    var fl = floating();
+    return '<div><small>Balance</small><b>' + money(S.bal) + '</b></div><div><small>Equity</small><b>' + money(eq) + '</b></div><div><small>Open P&amp;L</small><b class="' + (fl >= 0 ? 'up' : 'dn') + '">' + signed(fl) + '</b></div><div><small>Free margin</small><b>' + money(Math.max(0, eq - u)) + '</b></div><div><small>Margin level</small><b class="' + (u > 0 && ml < 100 ? 'dn' : '') + '">' + (u > 0 ? n(ml, 0) + '%' : '-') + '</b></div>';
+  }
+  function tlHTML(past) { return past.length ? past.map(function (e, i) { return '<div><b>' + (i + 1) + '</b><span><time>' + clock(e.bar) + '</time> ' + esc(e.h) + '</span></div>'; }).join('') : '<div style="color:var(--mut)">No headlines yet.</div>'; }
+  function setDisabled() { $$('.bs button').forEach(function (b) { b.disabled = S.done; }); if ($('#oerr')) $('#oerr').textContent = S.orderErr; }
+
+  function drawD() {
+    if (!S.user) { $('#dHost').innerHTML = '<div class="panel empty"><h3>No results yet</h3><p>Register and play the replay to see how you did.</p><button class="btn btn-primary" data-go="b">Join the competition</button></div>'; return; }
+    if (!S.done) { $('#dHost').innerHTML = '<div class="panel empty"><h3>The day is not over yet</h3><p>Finish the replay to see the standings, or fast-forward to the end of the day.</p><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="btn btn-primary" data-a="goC">Go to the replay</button><button class="btn btn-outline" data-a="ffwdD">Fast-forward to the end</button></div></div>'; return; }
+    var st = standings(), me = st.filter(function (r) { return r.me; })[0], p = me.p, trades = S.closed.length;
+    var wins = S.closed.filter(function (c) { return c.pnl > 0; }).length;
+    var winner = st.filter(function (r) { return !r.dq; })[0];
+    var banner = S.stopped ? '<div class="win dq"><div><h3>You were stopped out</h3><p>Your margin level fell below ' + STOPOUT + '% at ' + clock(S.stopBar) + '. Players who stay in the market compete for the win. Try a smaller size or a tighter stop loss.</p></div><button class="btn btn-light btn-sm" data-a="again">Play again</button></div>' :
+      '<div class="win"><div><h3>' + (me.rank === 1 ? 'You won the demo competition!' : 'You finished #' + me.rank + ' of ' + st.filter(function (r) { return !r.dq; }).length) + '</h3><p>' + (me.rank === 1 ? 'You stayed in the market and earned the most.' : winner.n + ' won with ' + signed(winner.p) + '.') + ' Illustrative result in a modelled scenario.</p></div><button class="btn btn-light btn-sm" data-a="again">Play again</button></div>';
+    var rows = st.map(function (r) { return '<tr class="' + (r.me ? 'me' : '') + (r.dq ? ' dq' : '') + '"><td>' + (r.dq ? '-' : r.rank) + '</td><td>' + esc(r.n) + (r.dq ? ' (stopped out)' : '') + '</td><td class="r">' + (r.dq ? 'Stopped out' : signed(r.p)) + '</td></tr>'; }).join('');
+    var trs = S.closed.length ? S.closed.map(function (c) { return '<tr><td>' + INS[c.sym].name + '</td><td>' + (c.dir > 0 ? 'Buy' : 'Sell') + ' ' + c.lots + '</td><td>' + clock(c.openBar) + '&ndash;' + clock(c.closeBar) + '</td><td>' + esc(c.why) + '</td><td class="r ' + (c.pnl >= 0 ? 'up' : 'dn') + '">' + signed(c.pnl) + '</td></tr>'; }).join('') : '<tr><td colspan="5" style="color:var(--mut);text-align:center;padding:18px">You did not place any trades. Staying out is a choice too, but only traders who earn can win.</td></tr>';
+    var dbf = EVENTS.slice(0, 5).map(function (e, i) {
+      var sym = 'OIL', from = BARS[sym][e.bar - 1].c, to = BARS[sym][Math.min(e.bar + 2, N)].c, mv = (to / from - 1) * 100, held = S.closed.filter(function (c) { return c.openBar <= e.bar && c.closeBar > e.bar; });
+      var verdict = !held.length ? '<span class="pill">No position</span>' : held.map(function (c) { var s = Math.sign(e.imp[c.sym]); return c.dir * s > 0 ? '<span class="pill">' + INS[c.sym].name + ': on the right side</span>' : '<span class="pill red">' + INS[c.sym].name + ': against the move</span>'; }).join(' ');
+      return '<div><b>' + (i + 1) + '</b><span><time>' + clock(e.bar) + '</time> ' + esc(e.h) + '<br><small style="color:var(--mut)">OILCash ' + (mv >= 0 ? '+' : '') + n(mv, 1) + '% within 45 min</small> ' + verdict + '</span></div>';
+    }).join('');
+    $('#dHost').innerHTML = banner + '<div class="rs"><div><small>Your profit</small><b class="' + (p >= 0 ? 'up' : 'dn') + '">' + (S.stopped ? '-' : signed(p)) + '</b></div><div><small>Trades closed</small><b>' + trades + '</b></div><div><small>Winning trades</small><b>' + wins + ' / ' + trades + '</b></div><div><small>Biggest drawdown</small><b>' + money(S.maxDD) + '</b></div></div>' +
+      '<div class="rg"><div class="panel"><h3>Final standings</h3><div class="sub">Rank by profit. Stopped-out players cannot win.</div><table class="tbl"><thead><tr><th>#</th><th>Player</th><th class="r">Result</th></tr></thead><tbody>' + rows + '</tbody></table><p class="fine" style="margin-top:10px">Competitor results are illustrative.</p></div>' +
+      '<div class="side"><div class="panel"><h3>What the headlines did</h3><div class="sub">How each news item hit your positions.</div><div class="tl">' + dbf + '</div></div><div class="panel"><h3>Your trades</h3><div class="scroll"><table class="tbl"><thead><tr><th>Instrument</th><th>Side</th><th>Time</th><th>Exit</th><th class="r">P&amp;L</th></tr></thead><tbody>' + trs + '</tbody></table></div></div>' +
+      '<div class="panel"><h3>Ready for the real thing?</h3><div class="sub">You practised with virtual money. Real trading carries a high risk of losing money, and results here do not predict real results.</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" data-a="open">Open a live account</button><button class="btn btn-outline btn-sm" data-a="again">Try another run</button></div></div></div></div>';
+  }
+
+  /* ------------------------------------------------ events */
+  function bindReg() { S.regVals.nick = ($('#rN') || {}).value || ''; S.regVals.email = ($('#rE') || {}).value || ''; S.regVals.exp = ($('#rX') || {}).value || 'new'; S.regVals.ok = !!($('#rK') || {}).checked; }
+  function reset(keepUser) { pause(); var u = S.user, e = S.entrants; S = fresh(); if (keepUser) { S.user = u; S.entrants = e; } }
+  function onClick(e) {
+    var g = e.target.closest('[data-go]'); if (g) { setScene(g.getAttribute('data-go')); return; }
+    var b = e.target.closest('[data-a]'); if (!b) return; var a = b.getAttribute('data-a'), v = b.getAttribute('data-v');
+    if (a === 'reg') {
+      bindReg(); var r = S.regVals, er = {};
+      if (r.nick.trim().length < 3) er.nick = 'Nickname needs at least 3 characters.'; else if (!/^[\w\-\u3040-\u30ff\u4e00-\u9fff]+$/.test(r.nick.trim())) er.nick = 'Use letters, numbers, - or _ only.'; else if (['admin', 'xmtrading', 'kaito_alpha'].indexOf(r.nick.trim().toLowerCase()) > -1) er.nick = 'That nickname is taken. Try another.';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(r.email)) er.email = 'Enter a valid email address.';
+      if (!er.nick && !er.email && !r.ok) er.ok = 'Please confirm that you understand this is a demo.';
+      S.regErr = er;
+      if (!er.nick && !er.email && !er.ok) { S.user = { nick: r.nick.trim(), email: r.email, exp: r.exp }; S.entrants++; XM.toast('Welcome, ' + S.user.nick + '. Topic announced.'); }
+      drawB(); return;
+    }
+    if (a === 'enter') { setScene('c'); return; }
+    if (a === 'goC') { setScene('c'); return; }
+    if (a === 'ffwdD') { ffwd(); drawD(); return; }
+    if (a === 'again') { reset(true); setScene('c'); return; }
+    if (a === 'open') { XM.toast('Live account sign-up opens here (demo)'); return; }
+    if (a === 'play') { if (S.done) return; if (S.run) pause(); else play(); drawC(true); return; }
+    if (a === 'speed') { S.speed = +v; if (S.run) play(); drawC(); return; }
+    if (a === 'next') { var nx = EVENTS.filter(function (x) { return x.bar > S.t; })[0]; if (!nx) { XM.toast('No more headlines today'); return; } var was = S.run; pause(); while (S.t < nx.bar && !S.done) tick(); if (was && !S.done) play(); drawC(); return; }
+    if (a === 'ffwd') { ffwd(); drawC(); return; }
+    if (a === 'restart') { reset(true); drawC(); return; }
+    if (a === 'sym') { S.sym = v; drawC(); return; }
+    if (a === 'lots') { S.lots = +v; drawC(); return; }
+    if (a === 'buy' || a === 'sell') { place(a === 'buy' ? 1 : -1); drawC(); return; }
+    if (a === 'close') { var p = S.pos.filter(function (x) { return x.id === +b.getAttribute('data-id'); })[0]; if (p) { closePos(p, px(p.sym, S.t), S.t, 'Closed by you'); XM.toast('Position closed'); } drawC(); return; }
+  }
+  document.addEventListener('click', function (e) { if (e.target.closest('main')) onClick(e); });
+  document.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.id === 'slOn') S.useSl = t.checked; else if (t.id === 'tpOn') S.useTp = t.checked; else if (t.id === 'slV') S.slPct = parseFloat(t.value) || 0; else if (t.id === 'tpV') S.tpPct = parseFloat(t.value) || 0; else if (t.id === 'pn') S.pauseNews = t.checked;
+  });
+  $('#howBtn').addEventListener('click', function () { $('#how').scrollIntoView({ behavior: 'smooth' }); });
+
+  /* ------------------------------------------------ scenes */
+  function setScene(s) {
+    if (!CAPS[s]) s = 'a';
+    if (S.scene === 'c' && s !== 'c' && S.run) { pause(); }
+    S.scene = s;
+    ['a', 'b', 'c', 'd'].forEach(function (k) { $('#s' + k.toUpperCase()).hidden = k !== s; });
+    $$('[data-scene]').forEach(function (b) { var on = b.getAttribute('data-scene') === s; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+    $('#cap').innerHTML = '<span class="n">' + CAPS[s][0] + '</span><span>' + CAPS[s][1] + '</span>';
+    $('#ctaA').innerHTML = S.user ? 'Enter the arena &rarr;' : 'Join the demo competition &rarr;';
+    $('#entr').textContent = n(S.entrants);
+    if (s === 'b') drawB(); if (s === 'c') drawC(); if (s === 'd') drawD();
+    try { history.replaceState(null, '', '#' + s); } catch (e) {}
+    window.scrollTo(0, 0);
+  }
+  $$('[data-scene]').forEach(function (b) { b.addEventListener('click', function () { setScene(b.getAttribute('data-scene')); }); });
+  $('#logoA').innerHTML = XM.logo();
+  var cdT = 2 * 86400 + 4 * 3600 + 12 * 60;
+  setInterval(function () { cdT--; var d = Math.floor(cdT / 86400), h = Math.floor(cdT % 86400 / 3600), m = Math.floor(cdT % 3600 / 60); $('#cd').textContent = d + 'D ' + ('0' + h).slice(-2) + 'H ' + ('0' + m).slice(-2) + 'M'; }, 60000);
+  setScene(XM.qs('scene') || location.hash.replace('#', '') || 'a');
+
+  XM.notes({
+    title: 'Trade the news simulator (idea 34)',
+    today: 'Newcomers rarely see how a market behaves when news breaks, and a first volatile day with real money is a bad way to learn. There is little reason for them to try a demo account.',
+    proposed: 'A web page promotes a demo competition. After registering, a topic is announced, such as a Middle East crisis, and the most volatile day is replayed in about a minute. Players trade the headlines with virtual money. Whoever stays in the market and earns the most wins.',
+    why: 'A short, game-like first experience may help beginners learn to handle volatility and may bring new visitors and sign-ups from social and landing pages. Not validated yet.',
+    metric: 'Visitors and registrations, completion of a replay, return plays, conversion from demo to live account, first deposits, plus any complaints about expectations. Real trading carries risk, and demo results do not predict real results.'
+  });
+})();
+</script>
+<script src="../../assets/js/review.js" data-idea="34"></script>
+</body>
+</html>
