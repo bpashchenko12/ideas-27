@@ -290,23 +290,6 @@ window.XM_IDEAS = [
     scope: 'Observation: the Funding section reached through Other (left panel) has Deposit, Withdraw and MyWallet, while the Funding section from the top right corner has only Deposit and Withdraw. Add MyWallet to the Funding tab reachable from the top right corner.',
     images: ['assets/deck/s42-mywallet-a.png', 'assets/deck/s42-mywallet-b.png']
   },
-  {
-    id: '27', slide: 43, area: 'onboarding', status: 'built',
-    path: 'ideas/27-registration-buddy-bot-in-whatsapp-line/index.html',
-    shows: [
-      'Chat button on the registration page with a LINE, WhatsApp or Telegram choice and QR code',
-      'Bot guides each field of the form, validates email and password, and explains why each is asked',
-      'Verification help: email code, ID and address documents, and a rejected-photo recovery',
-      'First deposit help: methods, safety, minimum amount error, and no pressure to deposit',
-      'Getting-started checklist, free-text questions and hand-over to a support agent'
-    ],
-    title: 'Registration buddy bot in WhatsApp / LINE / Telegram',
-    short: 'A bot that guides sign-up step by step',
-    shortlist: { priority: 1, impact: 'High', confidence: '', notes: '' },
-    scope: 'Add a prompt on the website page(s) that opens the bot in WhatsApp, LINE or Telegram. Build the bot with step-by-step guidance, answers to common questions, and links back to the relevant pages on our platform.',
-    metrics: 'Reduce confusion and abandonment, improving registration completion without weakening required checks. Measure completion rate, drop-off and time spent at each step, support requests, and user feedback on whether they understood what to do next.',
-    proposal: 'Offer a registration buddy that guides users step by step while they open a trading account. The bot explains what is required, answers common questions, and helps users continue when they get stuck, so they feel supported throughout the process.'
-  },
 
   /* ============================ TRADING ============================ */
   {
@@ -482,5 +465,24 @@ window.XM_IDEAS = [
     ],
     metrics: 'Registrations, activation (first eligible trade), trading volume and active days of participants versus non-participants, XMP earned, new accounts from affiliates, completion of the funnel from discovery to registration, support contacts. Monitor prize cost, abuse and complaints.',
     proposal: 'Introduce the XMP Samurai Challenge: a limited-time, loyalty-based competition in which clients rise through levels by earning XMP, and the whole community adds to a prize pot that starts at $100,000. It ties the competition to loyalty and rewards trading activity.'
+  },
+
+  /* Registration buddy bot: kept last in the P1 list (array order = list order) */
+  {
+    id: '27', slide: 43, area: 'onboarding', status: 'built',
+    path: 'ideas/27-registration-buddy-bot-in-whatsapp-line/index.html',
+    shows: [
+      'Chat button on the registration page with a LINE, WhatsApp or Telegram choice and QR code',
+      'Bot guides each field of the form, validates email and password, and explains why each is asked',
+      'Verification help: email code, ID and address documents, and a rejected-photo recovery',
+      'First deposit help: methods, safety, minimum amount error, and no pressure to deposit',
+      'Getting-started checklist, free-text questions and hand-over to a support agent'
+    ],
+    title: 'Registration buddy bot in WhatsApp / LINE / Telegram',
+    short: 'A bot that guides sign-up step by step',
+    shortlist: { priority: 1, impact: 'High', confidence: '', notes: '' },
+    scope: 'Add a prompt on the website page(s) that opens the bot in WhatsApp, LINE or Telegram. Build the bot with step-by-step guidance, answers to common questions, and links back to the relevant pages on our platform.',
+    metrics: 'Reduce confusion and abandonment, improving registration completion without weakening required checks. Measure completion rate, drop-off and time spent at each step, support requests, and user feedback on whether they understood what to do next.',
+    proposal: 'Offer a registration buddy that guides users step by step while they open a trading account. The bot explains what is required, answers common questions, and helps users continue when they get stuck, so they feel supported throughout the process.'
   }
 ];
