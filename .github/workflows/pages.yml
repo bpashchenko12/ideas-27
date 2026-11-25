@@ -21,14 +21,14 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Version shared scripts and styles so browsers never serve a stale copy
         run: |
           v="${GITHUB_SHA::8}"
           find . -name '*.html' -not -path './.git/*' -exec sed -i -E "s#(assets/(js|css)/[a-z]+\.(js|css))\"#\1?v=${v}\"#g" {} +
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: .
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
